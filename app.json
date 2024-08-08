@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "TruckMessage",
+    "slug": "truckmessage",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ce0a3a"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mrdesigner.truckmessage"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.mrdesigner.truckmessage"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f9253304-9484-4e21-879f-12d9ab73ed23"
+      }
+    },
+    "owner": "mrdesigner"
+  }
+}
