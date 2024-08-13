@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "TruckMessage",
-    "slug": "truckmessage",
+    "slug": "deco",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,23 +13,23 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mrdesigner.truckmessage"
+      "bundleIdentifier": "com.mash1221.truckmessage"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.mrdesigner.truckmessage"
+      "package": "com.mash1221.truckmessage"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "f9253304-9484-4e21-879f-12d9ab73ed23"
+        "projectId": "4721c354-4ddd-4df2-b0d8-07fa84f86cc1"
       }
     },
-    "owner": "mrdesigner"
+    "owner": "mash1221"
   }
 }
