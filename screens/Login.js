@@ -190,12 +190,12 @@ const Login = () => {
                     <View style={styles.avatarContainer}>
                         <Image
                             style={styles.avatar}
-                            source={require("../assets/images/app-black-logo.png")}
+                            source={require("../assets/images/app-logo.png")}
                         />
                     </View>
 
                     <View style={styles.pageHeadingContainer}>
-                        <Text style={[styles.pageHeading, { textAlign: 'center' }]}>Login</Text>
+                        <Text style={[styles.pageHeading]}>Login</Text>
                     </View>
 
                     <View style={styles.inputField}>
@@ -317,14 +317,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 180,
+        height: 180,
     },
     loginContainer: {
-        borderColor: 'grey',
-        borderWidth: 0.2,
-        padding: 30,
+        padding: 22,
         borderRadius: 5,
         width: "100%",
     },
@@ -332,16 +329,16 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: "bold",
         marginVertical: 12,
-        textAlign: 'center',
         marginBottom: 30,
+        textAlign:'left'
     },
     signupContainer: {
         marginHorizontal: 20,
         marginTop: 30
     },
     label: {
-        fontSize: 14,
-        fontWeight: "400",
+        fontSize: 16,
+        fontWeight: "600",
         marginBottom: 10
     },
     inputField: {
@@ -397,9 +394,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
         backgroundColor: COLORS.primary,
         borderRadius: 5,
-        marginHorizontal: 5,
         paddingVertical: 15,
-        borderWidth: 1,
         alignItems: "center",
         marginTop: 30
     },

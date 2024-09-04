@@ -171,12 +171,12 @@ const ResetPassword = () => {
                     <View style={styles.avatarContainer}>
                         <Image
                             style={styles.avatar}
-                            source={require("../assets/images/app-black-logo.png")}
+                            source={require("../assets/images/app-logo.png")}
                         />
                     </View>
 
                     <View style={styles.pageHeadingContainer}>
-                        <Text style={[styles.pageHeading, { textAlign: 'center' }]}>Reset Password</Text>
+                        <Text style={[styles.pageHeading]}>Reset Password</Text>
                     </View>
 
 
@@ -297,9 +297,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 180,
+        height: 180,
     },
     loginContainer: {
         borderColor: 'grey',

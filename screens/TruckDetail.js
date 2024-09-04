@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -12,13 +12,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderWithOutBS from "../components/HeaderWithOutBS";
 import { COLORS } from "../constants";
 import axiosInstance from "../services/axiosInstance";
+import { useNavigation } from "@react-navigation/native";
+import { LoadNeedsContext } from "../hooks/LoadNeedsContext";
 
 const TruckDetail = ({ route }) => {
   const { item } = route.params;
 
+  const {
+    messageReceiver,
+    setMessageReceiver
+        } = useContext(LoadNeedsContext)
+  const navigation = useNavigation("")
+
   const [fullProductDetails, setFullProductDetails] = useState({
     images: [],
   });
+
 
   useEffect(() => {
     const fetchFullProductDetails = async () => {
@@ -30,6 +39,8 @@ const TruckDetail = ({ route }) => {
           "/buy_sell_id_details",
           fullProductDetailParameter
         );
+
+
         if (response.data.error_code === 0) {
           setFullProductDetails(response.data.data[0]);
         }
@@ -80,6 +91,10 @@ const TruckDetail = ({ route }) => {
         <Text>Loading...</Text>
       </View>
     );
+  }
+
+  const handleChatNavigate = () => {
+    navigation.navigate("Chat")
   }
 
   return (
@@ -150,12 +165,20 @@ const TruckDetail = ({ route }) => {
           <View style={styles.card}>
             <View style={styles.cardContent}>
               <TouchableOpacity
-                style={styles.shareButton}
+                style={[styles.shareButton,{backgroundColor:'green'}]}
                 onPress={() =>
                   Linking.openURL(`tel:${fullProductDetails.contact_no}`)
                 }
               >
-                <Text style={styles.shareButtonText}>Contact</Text>
+                <Text style={styles.shareButtonText}>Call</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.cardContent}>
+              <TouchableOpacity
+                style={styles.shareButton}
+                onPress={() => handleChatNavigate()}
+              >
+                <Text style={styles.shareButtonText}>Message</Text>
               </TouchableOpacity>
             </View>
           </View>

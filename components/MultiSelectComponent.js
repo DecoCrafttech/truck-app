@@ -1,29 +1,28 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { StyleSheet,  View } from 'react-native';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import { MaterialIcons as Icon } from '@expo/vector-icons';
 import { ScrollView } from 'react-native';
-import { citiesArray, citiesData, statesData } from '../constants/cityAndState';
+import { citiesData, statesData } from '../constants/cityAndState';
+import { COLORS } from '../constants';
 
 
-function MultiSelectComponent({ 
-    listOfData, 
-    selectedCities, 
-    setSelectedCities, 
-    selectedStates, 
-    setSelectedStates,
-    setOperatingCities,
-    setOperatingStates
-   }) {
-  
+function MultiSelectComponent({
+  listOfData,
+  selectedCities,
+  setSelectedCities,
+  selectedStates,
+  setSelectedStates,
+  setOperatingCities,
+  setOperatingStates
+}) {
+
 
   const handleSelectedCities = (selectedItemIds) => {
     const prevSelectedCityNames = selectedCities.map(id => {
       const city = citiesData.find(city => city.id === id);
       return city ? city.name : null;
     }).filter(name => name !== null);
-
-    // console.log('Previously selected cities:', prevSelectedCityNames);
 
     setSelectedCities(selectedItemIds);
 
@@ -32,7 +31,6 @@ function MultiSelectComponent({
       return city ? city.name : null;
     }).filter(name => name !== null);
 
-    // console.log('Currently selected cities:', selectedCityNames);
     setOperatingCities(selectedCityNames)
   };
 
@@ -43,7 +41,6 @@ function MultiSelectComponent({
       return state ? state.name : null;
     }).filter(name => name !== null);
 
-    // console.log('Previously selected states:', prevSelectedStateNames);
 
     // Update selected states
     setSelectedStates(selectedItemIds);
@@ -54,7 +51,6 @@ function MultiSelectComponent({
       return state ? state.name : null;
     }).filter(name => name !== null);
 
-    // console.log('Currently selected states:', selectedStateNames);
     setOperatingStates(selectedStateNames)
   };
 
@@ -87,15 +83,16 @@ function MultiSelectComponent({
               />
               :
               <SectionedMultiSelect
-              items={statesData}
-              IconRenderer={Icon}
-              uniqueKey="id"
-              searchPlaceholderText='Search state'
-              selectedText='selected'
-              selectText='Select'
-              confirmText='Done'
-              onSelectedItemsChange={handleSelectedStates}
-              selectedItems={selectedStates}
+                items={statesData}
+                IconRenderer={Icon}
+                uniqueKey="id"
+                searchPlaceholderText='Search state'
+                selectedText='selected'
+                selectText='Select'
+                confirmText='Done'
+                con
+                onSelectedItemsChange={handleSelectedStates}
+                selectedItems={selectedStates}
                 styles={{
                   backdrop: styles.multiSelectBackdrop,
                   selectToggle: styles.multiSelectBox,
@@ -104,6 +101,7 @@ function MultiSelectComponent({
                   selectToggleText: styles.selectToggleText,
                   selectedItemText: styles.selectedItemText,
                   selectText: styles.selectText,
+                  button:{backgroundColor:'#CE093A'}
                 }}
               />
           }
@@ -138,7 +136,7 @@ const styles = StyleSheet.create({
     color: 'red'
   },
   selectedItemText: {
-    color: '#4285F4',
+    color: COLORS.primary,
   },
   multiSelectChipContainer: {
     borderWidth: 0,

@@ -16,6 +16,7 @@ import {
 import axiosInstance from "../../services/axiosInstance";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Entypo from '@expo/vector-icons/Entypo';
 
 const VaughanInfo = ({ navigation }) => {
   const { isLoading } = useContext(LoadNeedsContext);
@@ -72,7 +73,7 @@ const VaughanInfo = ({ navigation }) => {
       if (response.data.error_code === 0) {
         setUpdate(!update);
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const handleDetailsPress = (item) => {
@@ -145,7 +146,7 @@ const VaughanInfo = ({ navigation }) => {
       } else {
         console.log(response);
       }
-    } catch (error) {}
+    } catch (error) { }
 
     toggleModal();
   };
@@ -153,16 +154,21 @@ const VaughanInfo = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.item}>
-        <Image source={images.truck} style={styles.itemImage} />
         <View style={styles.itemContent}>
-          <Text style={styles.itemName}>{item.load_name}</Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>{item.load_name}</Text>
+          </View>
           <View style={styles.tableContainer}>
             <View style={styles.tableRow}>
-              <Text style={styles.tableLabel}>From:</Text>
+              <Text style={styles.tableLabel}>
+                <Entypo name="location-pin" size={24} color="green" />
+              </Text>
               <Text style={styles.tableValue}>{item.from_location}</Text>
             </View>
             <View style={styles.tableRow}>
-              <Text style={styles.tableLabel}>To:</Text>
+              <Text style={styles.tableLabel}>
+                <Entypo name="location-pin" size={24} color="red" />
+              </Text>
               <Text style={styles.tableValue}>{item.to_location}</Text>
             </View>
             <View style={styles.tableRow}>
@@ -170,11 +176,11 @@ const VaughanInfo = ({ navigation }) => {
               <Text style={styles.tableValue}>₹ {item.load_price}</Text>
             </View>
             <View style={styles.tableRow}>
-              <Text style={styles.tableLabel}>Spend:</Text>
+              <Text style={styles.tableLabel}>Spend amount:</Text>
               <Text style={styles.tableValue}>₹ {item.spend_amount}</Text>
             </View>
             <View style={styles.tableRow}>
-              <Text style={styles.tableLabel}>Balance:</Text>
+              <Text style={styles.tableLabel}>Available balance:</Text>
               <Text style={styles.tableValue}>₹ {item.balance_amount}</Text>
             </View>
           </View>
@@ -295,7 +301,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: "row",
-    justifyContent: "flex-end", // Align button to the right
+    justifyContent: "center", // Align button to the right
   },
   button: {
     backgroundColor: COLORS.primary,
@@ -377,6 +383,19 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     marginRight: 20,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#3194d6",
+  },
+  titleContainer: {
+    backgroundColor: "#f1f2ff", // Change to desired background color
+    padding: 10, // Add padding
+    borderRadius: 5, // Optional: Add border radius
+    marginBottom: 10, // Add some margin below the title
+
   },
 });
 

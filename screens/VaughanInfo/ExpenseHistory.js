@@ -20,8 +20,12 @@ const ExpenseHistory = ({ cashFlowExpenseHistory }) => {
     setFilteredData(filtered);
   };
 
+
+
   const renderContent = () => {
     if (filteredData.length === 0) {
+
+
       return (
         <View style={styles.centeredView}>
           <Text style={styles.centeredText}>No Transaction History found</Text>
@@ -30,12 +34,12 @@ const ExpenseHistory = ({ cashFlowExpenseHistory }) => {
     } else {
       return (
         <View style={styles.container}>
-          <TextInput
+          {/* <TextInput
             style={styles.searchInput}
             placeholder="Search by category..."
             value={searchQuery}
             onChangeText={handleSearch}
-          />
+          /> */}
           <FlatList
             style={styles.root}
             data={filteredData}
@@ -50,14 +54,14 @@ const ExpenseHistory = ({ cashFlowExpenseHistory }) => {
                   <View style={styles.contentHeader}>
                     <Text style={styles.name}>{item.cash_flow_name}</Text>
                     <Text style={item.cash_flow_type === "IN" ? styles.addMoney : styles.outMoney}>
-                      ₹ {item.closing_balance}
+                      ₹ {item.amount}
                     </Text>
                   </View>
                   <View style={styles.contentHeader}>
                     <Text style={styles.time}>{item.updt}</Text>
                   </View>
                   <View style={styles.contentHeader}>
-                    <Text style={styles.closingBlancetext}>Closing Balance</Text>
+                    <Text style={styles.closingBlancetext}>Availabe balance</Text>
                     <Text style={styles.time}>₹ {item.closing_balance}</Text>
                   </View>
                 </View>
@@ -76,7 +80,7 @@ const styles = StyleSheet.create({
   root: {
     backgroundColor: "#ffffff",
     marginTop: 12,
-    paddingHorizontal:15
+    paddingHorizontal: 15
   },
   container: {
     flex: 1,
@@ -89,7 +93,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 10,
-    marginTop:5
+    marginTop: 5
   },
   separator: {
     height: 1,
@@ -117,7 +121,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   closingBlancetext: {
-    color: COLORS.brand,
+    color: '#0080FF',
   },
   centeredView: {
     flex: 1,

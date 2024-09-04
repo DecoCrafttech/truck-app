@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../../constants";
 import HeaderWithoutNotifications from "../../components/HeaderWithoutNotifications";
@@ -8,6 +8,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import images from '../../constants/images.js';
 import icons from '../../constants/icons.js';
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const Message = () => {
@@ -16,7 +18,9 @@ const Message = () => {
 
   const {
     currentUser,
-    setCurrentUser
+    setCurrentUser,
+    messageReceiver,
+    setMessageReceiver
   } = useContext(LoadNeedsContext)
 
   const messagesData = [
@@ -143,21 +147,43 @@ const Message = () => {
   ]
 
   const [search, setSearch] = useState("")
-  const [filteredUsers, setFilteredUsers] = useState(messagesData);
+  const [allPersons, setAllPersons] = useState([])
+  const [filteredUsers, setFilteredUsers] = useState([]);
+
+  useEffect(() => {
+    const getChatList = async () => {
+        try{
+
+          const userIdParams = {
+            user_id : await AsyncStorage.getItem("user_id")
+          }
+
+          const response = await axios.post('https://truck.truckmessage.com/get_user_chat_list', userIdParams);
+          console.log(response.data.data)
+          setAllPersons(response.data.data)
+          setFilteredUsers(response.data.data)
+        }catch(err){
+
+        }
+    }
+
+    (async () => getChatList())()
+
+  },[])
 
   const handleSearch = (text) => {
     console.log(text)
     setSearch(text)
-    const filteredResult = messagesData.filter((value) => {
-      return value.fullName.toLowerCase().includes(text.toLowerCase())
+    const filteredResult = allPersons.filter((value) => {
+      return value.profile_name.toLowerCase().includes(text.toLowerCase())
     })
     setFilteredUsers(filteredResult)
   }
 
   const handleNavigateToChat = (item) => {
     console.log(item)
-    navigation.navigate("Chat", { username: item.fullName })
-    setCurrentUser(item)
+    navigation.navigate("Chat")
+    setMessageReceiver(item)
   }
 
 
@@ -177,7 +203,9 @@ const Message = () => {
               <View style={styles.onlineIndicator} />
             )}
             <Image
-              source={item.userImg}
+              // source={item.userImg}
+              source={{uri: 'https://www.bootdey.com/img/Content/avatar/avatar1.png'}}
+
               resizeMode='contain'
               style={styles.userImage}
             />
@@ -188,8 +216,9 @@ const Message = () => {
             width: SIZES.width - 104
           }}>
             <View style={styles.userInfoContainer}>
-              <Text style={styles.fullName}>{item.fullName}</Text>
-              <Text style={styles.lastMessage}>{item.lastMessage}</Text>
+              <Text style={styles.fullName}>{item.profile_name}</Text>
+              {/* <Text style={styles.lastMessage}>{item.lastMessage}</Text> */}
+              <Text style={styles.lastMessage}>lastMessage</Text>
             </View>
 
             <View style={{
@@ -264,7 +293,7 @@ const Message = () => {
               data={filteredUsers}
               showsVerticalScrollIndicator={false}
               renderItem={renderItem}
-              keyExtractor={(value) => value.id.toString()}
+              keyExtractor={(value) => value.person_id.toString()}
             />
           </View>
         </View>

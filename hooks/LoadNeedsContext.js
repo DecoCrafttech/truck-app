@@ -7,6 +7,14 @@ export const LoadNeedsProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState()
 
   const [aadhaarOTP, setAadhaarOTP] = useState("")
+
+  // const [messageReceiver, setMessageReceiver] = useState({
+  //   personId : "1",
+  //   personName : "Marshal",
+  //   personImage : require("../assets/images/apple.png"),
+  //   lastMessage : "heloo"
+  // })
+  const [messageReceiver, setMessageReceiver] = useState(null)
   
 
   const toggleLoading = () => {
@@ -22,7 +30,9 @@ export const LoadNeedsProvider = ({ children }) => {
         currentUser,
         setCurrentUser,
         aadhaarOTP,
-        setAadhaarOTP
+        setAadhaarOTP,
+        messageReceiver,
+        setMessageReceiver
       }}
     >
       {children}

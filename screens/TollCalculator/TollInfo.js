@@ -87,17 +87,19 @@ const TollInfo = () => {
     const tollCount = tollLocations.length;
 
     const tollCosts = {
-      Truck: 200,
-      Bus: 150,
-      "6-Axle Vehicle": 300,
-      "8-Axle Vehicle": 400,
-      "10-Axle Vehicle": 500,
-      "12-Axle Vehicle": 600,
+      'car': 110,
+      'lcv': 170,
+      'Upto 3 Axle Vehicle': 370,
+      '4-to-6-axle': 580,
+      '7-or-more-axle': 650,
+      'hcm-eme': 750
     };
 
     const totalCost = tollCount * (tollCosts[vehicleType] || 0);
     return { count: tollCount, totalCost: totalCost };
   };
+  
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -106,31 +108,34 @@ const TollInfo = () => {
         style={styles.input}
         value={startingPoint}
         onFocus={() => setStartingPointModalVisible(true)}
+        onPress={() => setStartingPointModalVisible(true)}
         placeholder="Enter starting point"
       />
+      
 
       <Text style={styles.label}>Ending Point</Text>
       <TextInput
         style={styles.input}
         value={endingPoint}
         onFocus={() => setEndingPointModalVisible(true)}
+        onPress={() => setEndingPointModalVisible(true)}
         placeholder="Enter ending point"
       />
 
       <Text style={styles.label}>Vehicle Type</Text>
       <View style={styles.pickerContainer}>
         <Picker
-        
+
           selectedValue={vehicleType}
           onValueChange={(itemValue) => setVehicleType(itemValue)}
         >
           <Picker.Item label="Select vehicle type" value="" />
-          <Picker.Item label="Truck" value="Truck" />
-          <Picker.Item label="Bus" value="Bus" />
-          <Picker.Item label="6-Axle Vehicle" value="6-Axle Vehicle" />
-          <Picker.Item label="8-Axle Vehicle" value="8-Axle Vehicle" />
-          <Picker.Item label="10-Axle Vehicle" value="10-Axle Vehicle" />
-          <Picker.Item label="12-Axle Vehicle" value="12-Axle Vehicle" />
+          <Picker.Item label="Car/Jeep/Van" value="car" />
+          <Picker.Item label="LCV" value="lcv" />
+          <Picker.Item label="Upto 3 Axle Vehicle" value="upto-3-axle" />
+          <Picker.Item label="4 to 6 Axle" value="4-to-6-axle" />
+          <Picker.Item label="7 or more Axle" value="7-or-more-axle" />
+          <Picker.Item label="HCM/EME" value="hcm-eme" />
         </Picker>
       </View>
 
@@ -176,7 +181,7 @@ const TollInfo = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>To Location</Text>
+            <Text style={styles.modalTitle}>From Location</Text>
 
 
             <View style={styles.locationContainer}>
@@ -276,7 +281,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 4,
     marginBottom: 16,
-    
+
   },
   results: {
     padding: 16,

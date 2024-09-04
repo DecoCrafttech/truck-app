@@ -35,7 +35,7 @@ const AppNavigation = () => {
       <Toast />
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName="Login"
+        initialRouteName="Main"
       >
 
         <Stack.Screen name="SignUp" component={SignUp} />

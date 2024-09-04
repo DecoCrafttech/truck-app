@@ -15,22 +15,24 @@ import { COLORS } from "../../constants";
 import HeaderWithOutBS from "../../components/HeaderWithOutBS";
 import ExpenseHistory from "./ExpenseHistory";
 import axiosInstance from "../../services/axiosInstance";
-import{ LoadNeedsContext } from "../../hooks/LoadNeedsContext"
+import { LoadNeedsContext } from "../../hooks/LoadNeedsContext"
 
 const LoadExpenseCalculator = ({ route }) => {
   const { item } = route.params;
 
-  const {isLoading, setIsLoading} = useContext(LoadNeedsContext)
+  const { isLoading, setIsLoading } = useContext(LoadNeedsContext)
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [cashStatus, setCashStatus] = useState("");
   const [modalValues, setModalValues] = useState({
+    name: "",
     category: "",
     amount: "",
     details: "",
   });
   const [errorFields, setErrorFields] = useState({
-    category: false,
+    name: false,
+    // category: false,
     amount: false,
     details: false,
   });
@@ -39,49 +41,53 @@ const LoadExpenseCalculator = ({ route }) => {
     setCashStatus(cash);
     setIsModalVisible(!isModalVisible);
     setModalValues({
-      category: "",
+      name: "",
+      // category: "",
       amount: "",
       details: "",
     });
     setErrorFields({
-      category: false,
+      name: false,
+      // category: false,
       amount: false,
       details: false,
     });
 
-   
+
   };
 
   const [cashFlowExpenseHistory, setCashFlowExpenseHistory] = useState([]);
   const [updateCashFlowStatus, setUpdateCashFlowStatus] = useState(false)
   const [initalCash, setInitialCash] = useState({
-    cashIn:"",
-    cashOut:""
+    cashIn: "",
+    cashOut: ""
   })
+  const [loadPrice, setLoadPrice] = useState("")
 
   useEffect(() => {
 
     const getInitialBalance = async () => {
-   try {
-    const getCashFlowParamter = {
-      load_trip_id: item.load_trip_id,
-    };
-    const response = await axiosInstance.post(
-      "/initial_cash_in_out",
-      getCashFlowParamter
-    );    
+      try {
+        const getCashFlowParamter = {
+          load_trip_id: item.load_trip_id,
+        };
+        const response = await axiosInstance.post(
+          "/initial_cash_in_out",
+          getCashFlowParamter
+        );
 
-    console.log(response.data)
+        console.log(response.data)
 
-    if(response.data.error_code===0){
-      setInitialCash({
-        cashIn:response.data.data[0].available_cash,
-    cashOut:response.data.data[0].spend_amount
-      })
-    }
-   } catch (error) {
-    
-   }
+        if (response.data.error_code === 0) {
+          setInitialCash({
+            cashIn: response.data.data[0].available_cash,
+            cashOut: response.data.data[0].spend_amount
+          })
+          setLoadPrice(response.data.data[0].load_price)
+        }
+      } catch (error) {
+        console.log(error)
+      }
     }
 
     getInitialBalance();
@@ -94,63 +100,67 @@ const LoadExpenseCalculator = ({ route }) => {
         const response = await axiosInstance.post(
           "/get_load_trip_cash_flow",
           getCashFlowParamter
-        );        
+        );
         if (response.data.error_code === 0) {
           setCashFlowExpenseHistory(response.data.data);
           setIsLoading(!isLoading)
         }
-      } catch (error) {}
+      } catch (error) { }
     };
 
     getFlowCashTrip();
   }, [updateCashFlowStatus]);
 
   const handleInputChange = (field, value) => {
-  setModalValues({ ...modalValues, [field.toLowerCase()]: value }); // Ensure field is lowercase
+    setModalValues({ ...modalValues, [field.toLowerCase()]: value }); // Ensure field is lowercase
     setErrorFields({ ...errorFields, [field.toLowerCase()]: false }); // Ensure field is lowercase
   };
 
-  const applyFilter = async () => {
-    // Validate inputs
+
+  const handleCashInOut = async () => {
+
     let hasError = false;
     const errors = {};
 
     Object.keys(modalValues).forEach((key) => {
-      if (!modalValues[key]) {
-        errors[key] = true;
-        hasError = true;
-      }
+        if (!modalValues[key]) {
+            errors[key] = true;
+            hasError = true;
+        }
     });
 
-    if (hasError) {
-      setErrorFields(errors);
-      return;
+    if (hasError === true) {
+        setErrorFields(errors);
+        return;
     }
 
     try {
-      const loadTripCashFlowEntryParameters = {        
-          load_trip_id:item.load_trip_id,
-          cash_flow_name:modalValues.details,
-          category:modalValues.category,
-          cash_flow_type:cashStatus === "Cash In" ? "IN" : "OUT",
-          amount:modalValues.amount      
-      }
-      console.log(loadTripCashFlowEntryParameters)
-      const response = await axiosInstance.post("/load_trip_cash_flow_entry",loadTripCashFlowEntryParameters) 
-      if(response.data.error_code === 0){
-        setUpdateCashFlowStatus(!updateCashFlowStatus)
-      }else {
-        Alert.alert(response.data.message)
-      }
+        const loadTripCashFlowEntryParameters = {
+            load_trip_id: item.load_trip_id,
+            cash_flow_name: modalValues.details,
+            category: modalValues.category,
+            cash_flow_type: cashStatus === "Cash In" ? "IN" : "OUT",
+            amount: modalValues.amount
+        };
+        console.log("Parameters:", loadTripCashFlowEntryParameters);
+
+        const response = await axiosInstance.post("/load_trip_cash_flow_entry", loadTripCashFlowEntryParameters);
+
+        if (response.data.error_code === 0) {
+            setUpdateCashFlowStatus(!updateCashFlowStatus);
+        } else {
+            Alert.alert(response.data.message);
+        }
     } catch (error) {
-      
+        console.error("Error occurred during API call:", error);
     }
 
-    toggleModal(); 
-  };
+    toggleModal();
+};
+
 
   const handleButtonPress = (cash) => {
-    toggleModal(cash);    
+    toggleModal(cash);
   };
 
   return (
@@ -158,22 +168,30 @@ const LoadExpenseCalculator = ({ route }) => {
       <View style={{ flex: 1, backgroundColor: COLORS.white }}>
         <HeaderWithOutBS title="Load Expense Calculator" />
         <View style={styles.container}>
-          <Text style={styles.title}>{item.load_name}</Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>{item.load_name}</Text>
+          </View>
           <View style={styles.balanceContainer}>
             <View style={[styles.box, { marginRight: 10 }]}>
               <Text style={styles.boxTitle}>
-                ₹ {initalCash.cashIn}
+                ₹ {loadPrice}
               </Text>
-              <Text style={styles.boxValue}>Cash In</Text>
+              <Text style={styles.boxValue}>Load price</Text>
+            </View>
+            <View style={[styles.box, { marginRight: 10 }]}>
+              <Text style={styles.boxTitle}>
+                ₹ {initalCash.cashOut}
+              </Text>
+              <Text style={styles.boxValue}>Spend amount</Text>
             </View>
             <View style={styles.box}>
-              <Text style={styles.boxTitle}>₹ {initalCash.cashOut}</Text>
-              <Text style={styles.boxValue}>Cash Out</Text>
+              <Text style={styles.boxTitle}>₹ {initalCash.cashIn}</Text>
+              <Text style={styles.boxValue}>Available balance</Text>
             </View>
           </View>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={styles.button}
+              style={[styles.button, { backgroundColor: 'green' }]}
               onPress={() => handleButtonPress("Cash In")}
             >
               <Text style={styles.buttonText}>Credit</Text>
@@ -198,15 +216,16 @@ const LoadExpenseCalculator = ({ route }) => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{cashStatus}</Text>
             <TextInput
-              style={[styles.input, errorFields.category && styles.inputError]}
-              placeholder="Category"
-              value={modalValues.category}
-              onChangeText={(text) => handleInputChange("category", text)} // Use lowercase
+              style={[styles.input, errorFields.name && styles.inputError]}
+              placeholder="Name"
+              value={modalValues.name}
+              onChangeText={(text) => handleInputChange("name", text)} // Use lowercase
             />
 
             <TextInput
               style={[styles.input, errorFields.amount && styles.inputError]}
               placeholder="Amount"
+              keyboardType="number-pad"
               value={modalValues.amount}
               onChangeText={(text) => handleInputChange("amount", text)} // Use lowercase
             />
@@ -218,7 +237,7 @@ const LoadExpenseCalculator = ({ route }) => {
               onChangeText={(text) => handleInputChange("details", text)} // Use lowercase
             />
 
-            <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
+            <TouchableOpacity style={styles.applyButton} onPress={handleCashInOut}>
               <Text style={styles.applyButtonText}>{cashStatus}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
@@ -235,7 +254,8 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 10,
     padding: 20,
-    backgroundColor: COLORS.gray,
+    backgroundColor: "#f3f3f3",
+    elevation: 5
   },
   title: {
     fontSize: 24,
@@ -246,7 +266,7 @@ const styles = StyleSheet.create({
   },
   balanceContainer: {
     flexDirection: "row", // Arrange children horizontally
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
     marginTop: 10,
   },
   box: {
@@ -263,7 +283,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   boxValue: {
-    fontSize: 16,
+    fontSize: 12,
     color: COLORS.brand,
     fontWeight: "bold",
   },
@@ -271,6 +291,7 @@ const styles = StyleSheet.create({
     flexDirection: "row", // Arrange children horizontally
     justifyContent: "center", // Center children horizontally
     marginTop: 20,
+
   },
   button: {
     backgroundColor: COLORS.primary,
@@ -338,6 +359,19 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 5,
     marginTop: 10,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#000",
+  },
+  titleContainer: {
+    backgroundColor: "#fff", // Change to desired background color
+    padding: 10, // Add padding
+    borderRadius: 5, // Optional: Add border radius
+    marginBottom: 10, // Add some margin below the title
+
   },
 });
 

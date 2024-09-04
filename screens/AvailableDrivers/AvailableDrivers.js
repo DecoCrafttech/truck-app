@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Text,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants";
@@ -19,13 +20,19 @@ import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import axios from "axios";
 import { OtpInput } from "react-native-otp-entry";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 const AvailableDrivers = ({ navigation }) => {
+
+  const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+
   const {
     isLoading,
     setIsLoading,
     aadhaarOTP,
-    setAadhaarOTP
+    setAadhaarOTP,
+    setMessageReceiver
+
   } = useContext(LoadNeedsContext)
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,6 +64,10 @@ const AvailableDrivers = ({ navigation }) => {
   const [aadhaarError, setAadhaarError] = useState("")
   const [showOTPInputBox, setShowOTPInputBox] = useState(false)
   const [timeLeft, setTimeLeft] = useState(null);
+
+  const [fromLocationModal, setFromLocationModal] = useState(false)
+  const [toLocationModal, setToLocationModal] = useState(false)
+
 
   useEffect(() => {
     if (timeLeft === 0) {
@@ -100,6 +111,10 @@ const AvailableDrivers = ({ navigation }) => {
     setSearchQuery(query);
   };
 
+  const handleChatNavigate = () => {
+    navigation.navigate("Chat")
+  }
+
   useEffect(() => {
     const getAllDrivers = async () => {
       try {
@@ -117,7 +132,10 @@ const AvailableDrivers = ({ navigation }) => {
             ],
             description: item.description,
             onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
-            onButton2Press: () => alert("Button 2 pressed for Truck 1"),
+            onButton2Press: () => {
+              setMessageReceiver(item)
+              handleChatNavigate()
+              }
           }));
 
           setDriversData(transformedData);
@@ -250,6 +268,60 @@ const AvailableDrivers = ({ navigation }) => {
     }
   }
 
+  const handleFromLocation = (data, details) => {
+    let country = '';
+    let state = '';
+    let city = '';
+
+    if (details.address_components) {
+      details.address_components.forEach(component => {
+        if (component.types.includes('country')) {
+          country = component.long_name;
+        }
+        if (component.types.includes('administrative_area_level_1')) {
+          state = component.long_name;
+        }
+        if (component.types.includes('locality')) {
+          city = component.long_name;
+        }
+      });
+    }
+
+
+    setModalValues((prevState) => ({
+      ...prevState, fromLocation: (`${city} , ${state}`)
+    }))
+    setFromLocationModal(false)
+    // You can use the extracted details as needed
+  };
+
+  const handleToLocation = (data, details) => {
+    let country = '';
+    let state = '';
+    let city = '';
+
+    if (details.address_components) {
+      details.address_components.forEach(component => {
+        if (component.types.includes('country')) {
+          country = component.long_name;
+        }
+        if (component.types.includes('administrative_area_level_1')) {
+          state = component.long_name;
+        }
+        if (component.types.includes('locality')) {
+          city = component.long_name;
+        }
+      });
+    }
+
+
+    setModalValues((prevState) => ({
+      ...prevState, toLocation: (`${city} , ${state}`)
+    }))
+    setToLocationModal(false)
+    // You can use the extracted details as needed
+  };
+
 
   const applyFilter = async () => {
     // Validate inputs
@@ -298,7 +370,10 @@ const AvailableDrivers = ({ navigation }) => {
           ],
           description: item.description,
           onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
-          onButton2Press: () => alert("Button 2 pressed for Truck 1"),
+          onButton2Press: () => {
+            setMessageReceiver(item)
+            handleChatNavigate()
+            }
         }));
         setDriversData(transformedData);
         toggleModal(); // Close modal after applying filter
@@ -382,13 +457,27 @@ const AvailableDrivers = ({ navigation }) => {
               style={[styles.input, errorFields.fromLocation && styles.inputError]}
               placeholder="From Location"
               value={modalValues.fromLocation}
-              onChangeText={(text) => handleInputChange('fromLocation', text)}
+              // onChangeText={(text) => handleInputChange('fromLocation', text)}
+              onPress={() => {
+                setFromLocationModal(true);
+                setModalValues(prevValues => ({
+                  ...prevValues,
+                  fromLocation: ""
+                }));
+              }}
             />
             <TextInput
               style={[styles.input, errorFields.toLocation && styles.inputError]}
               placeholder="To Location"
               value={modalValues.toLocation}
-              onChangeText={(text) => handleInputChange('toLocation', text)}
+             // onChangeText={(text) => handleInputChange('toLocation', text)}
+             onPress={() => {
+              setToLocationModal(true);
+              setModalValues(prevValues => ({
+                ...prevValues,
+                toLocation: ""
+              }));
+            }}
             />
             <TextInput
               style={[styles.input, errorFields.vehicleNumber && styles.inputError]}
@@ -399,6 +488,7 @@ const AvailableDrivers = ({ navigation }) => {
             <TextInput
               style={[styles.input, errorFields.noOfTyres && styles.inputError]}
               placeholder="Number of Tyres"
+              keyboardType="number-pad"
               value={modalValues.noOfTyres}
               onChangeText={(text) => handleInputChange('noOfTyres', text)}
             />
@@ -492,6 +582,85 @@ const AvailableDrivers = ({ navigation }) => {
         </View>
       </Modal>
 
+
+      {/*From Location Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={fromLocationModal}
+      // onRequestClose={() => setIsAadhaarModal(false)}
+      >
+        <View style={styles.locationModalContainer}>
+          <View style={styles.locationModalContent}>
+            <Text style={styles.modalTitle}>From Location</Text>
+
+
+            <View style={styles.locationContainer}>
+              <GooglePlacesAutocomplete
+                placeholder="Search location"
+                onPress={handleFromLocation}
+                textInputProps={{
+                  autoFocus: true,
+                }}
+                query={{
+                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  language: 'en',
+                }}
+                fetchDetails={true} // This ensures that you get more detailed information about the selected location
+                styles={{
+                  textInputContainer: styles.locationTextInputContainer,
+                  textInput: styles.locationTextInput
+                }}
+              />
+            </View>
+
+
+            <TouchableOpacity style={styles.closeButton} onPress={() => setFromLocationModal(false)}>
+              <Text style={styles.applyButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/*To Location Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={toLocationModal}
+      // onRequestClose={() => setIsAadhaarModal(false)}
+      >
+        <View style={styles.locationModalContainer}>
+          <View style={styles.locationModalContent}>
+            <Text style={styles.modalTitle}>To Location</Text>
+
+
+            <View style={styles.locationContainer}>
+              <GooglePlacesAutocomplete
+                placeholder="Search location"
+                onPress={handleToLocation}
+                textInputProps={{
+                  autoFocus: true,
+                }}
+                query={{
+                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  language: 'en',
+                }}
+                fetchDetails={true} // This ensures that you get more detailed information about the selected location
+                styles={{
+                  textInputContainer: styles.locationTextInputContainer,
+                  textInput: styles.locationTextInput
+                }}
+              />
+            </View>
+
+
+            <TouchableOpacity style={styles.closeButton} onPress={() => setToLocationModal(false)}>
+              <Text style={styles.applyButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 };
@@ -555,6 +724,29 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     fontWeight: "bold",
+  },
+  locationModalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    height: "90%"
+  },
+  locationModalContent: {
+    backgroundColor: COLORS.white,
+    padding: 20,
+    width: "80%",
+    borderRadius: 10,
+    elevation: 5,
+    height: "90%"
+  },
+  locationContainer: {
+    flex: 1,
+    padding: 5,
+  },
+  locationTextInput: {
+    borderWidth: 1,
+    borderColor: COLORS.gray,
   },
 });
 

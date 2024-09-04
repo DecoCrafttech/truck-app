@@ -28,8 +28,6 @@ const DrawerNavigation = () => {
   
   useEffect(() => {
       const fun = async () => {
-        console.log("main page user id ",await AsyncStorage.getItem('user_id'))
-        console.log("main page user name ",await AsyncStorage.getItem('userName'))
         const name = 
         setUserName(await AsyncStorage.getItem("userName"))
         setMobileNumber(await AsyncStorage.getItem("mobileNumber"))
@@ -76,7 +74,7 @@ const DrawerNavigation = () => {
               }}
             >
               <Image
-                source={require("../assets/images/app-black-logo.png")}
+                source={require("../assets/images/app-logo.png")}
                 style={{
                   width: 100,
                   height: 100,

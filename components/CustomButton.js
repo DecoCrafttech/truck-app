@@ -22,10 +22,10 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     borderRadius: 5,
-    marginHorizontal: 5,
     paddingVertical: 15,
-    borderWidth: 1,
+    // borderWidth: 1,
     alignItems: "center",
+    marginHorizontal:5
   },
   buttonText: {
     fontSize: 16,

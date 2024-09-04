@@ -17,6 +17,8 @@ import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axiosInstance from "../../services/axiosInstance";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import AadhaarOTPVerification from "../AadhaarOTPVerification";
+import Toast from "react-native-toast-message";
 
 
 const MarketPlace = ({ navigation }) => {
@@ -51,6 +53,7 @@ const MarketPlace = ({ navigation }) => {
   const [timeLeft, setTimeLeft] = useState(null);
 
   const [locationModal, setLocationModal] = useState(false)
+  
 
   useEffect(() => {
     const getMarketPlaceProducts = async () => {
@@ -236,6 +239,7 @@ const MarketPlace = ({ navigation }) => {
 
 
     const filterParams = {
+      "user_id" : "",
       "owner_name": "",
       "vehicle_number": "",
       "contact_no": "",
@@ -250,6 +254,7 @@ const MarketPlace = ({ navigation }) => {
       console.log(filterParams)
 
       const response = await axiosInstance.post("/user_buy_sell_filter", filterParams)
+      console.log("filter response",response)
       if (response.data.error_code === 0) {
       
         setMarketPlaceProducts(response.data.data)
@@ -291,14 +296,16 @@ const MarketPlace = ({ navigation }) => {
     console.log('State:', state);
     console.log('City:', city);
 
-    setLocation(`${city} , ${state}`)
+    setModalValues({
+      location : (`${city} , ${state}`)
+    })
     setLocationModal(false)
     // You can use the extracted details as needed
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
-      <View style={{ flex: 1, backgroundColor: COLORS.white }}>
+      <View style={{ flex: 1, backgroundColor: COLORS.white  }}>
         <HeaderWithOutBS title="Market Place" />
         <View style={styles.container}>
           <CustomButton
@@ -319,7 +326,7 @@ const MarketPlace = ({ navigation }) => {
           navigation={navigation}
           searchQuery={searchQuery}
           onPressCategory={onPressCategory}
-          filteredProducts={filteredProducts}
+          filteredProducts={filteredProducts.reverse()}
           loading={loading}
         />
       </View>
@@ -350,7 +357,10 @@ const MarketPlace = ({ navigation }) => {
               placeholder="location"
               value={modalValues.location}
               // onChangeText={(text) => handleInputChange("location", text)}
-              onPress={() => setLocationModal(true)}
+              onPress={() => {
+                setLocationModal(true);
+                setModalValues({location : ""})
+              }}
             />
 
             <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
@@ -438,8 +448,8 @@ const MarketPlace = ({ navigation }) => {
         visible={locationModal}
       // onRequestClose={() => setIsAadhaarModal(false)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
+        <View style={styles.locationModalContainer}>
+          <View style={styles.locationModalContent}>
             <Text style={styles.modalTitle}>Location</Text>
 
 
@@ -480,12 +490,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 15,
     marginTop: 10,
+
   },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    height:"90%"
   },
   modalContent: {
     backgroundColor: COLORS.white,
@@ -493,6 +505,30 @@ const styles = StyleSheet.create({
     width: "80%",
     borderRadius: 10,
     elevation: 5,
+
+  },
+  locationModalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    height:"90%"
+  },
+  locationModalContent: {
+    backgroundColor: COLORS.white,
+    padding: 20,
+    width: "80%",
+    borderRadius: 10,
+    elevation: 5,
+     height: "90%"
+  },
+  locationContainer : {
+    flex: 1,
+    padding: 5,
+  },
+  locationTextInput: {
+    borderWidth: 1,
+    borderColor: COLORS.gray,
   },
   modalTitle: {
     fontSize: 18,

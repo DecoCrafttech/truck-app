@@ -1,9 +1,12 @@
 import React from "react";
-import { StyleSheet, View, ScrollView, Text } from "react-native";
+import { StyleSheet, View, ScrollView, Text, Linking } from "react-native";
 import TruckCard from "../TruckCard"; 
 
 const LoadDetails = ({ filteredTrucks,status,handleEdit }) => {
   
+  console.log("filteredTrucks",filteredTrucks)
+
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {filteredTrucks.length > 0 ? (
@@ -15,7 +18,7 @@ const LoadDetails = ({ filteredTrucks,status,handleEdit }) => {
             toLocation={truck.toLocation}
             labels={truck.labels}
             description={truck.description}
-            onButton1Press={() => handleEdit(truck)} // Ensure handleEdit is invoked correctly
+            onButton1Press={truck.onButton1Press} // Ensure handleEdit is invoked correctly
             onButton2Press={truck.onButton2Press}
             status={status}
           />

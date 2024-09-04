@@ -19,6 +19,10 @@ import axiosInstance from "../services/axiosInstance";
 import { LoadNeedsContext } from "../hooks/LoadNeedsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { Picker } from "react-native-web";
+import { Dropdown } from "react-native-element-dropdown";
+import RNPickerSelect from 'react-native-picker-select';
+
 
 const SellYourTruck = () => {
 
@@ -26,13 +30,14 @@ const SellYourTruck = () => {
 
 
 
-  const {isLoading , setIsLoading} = useContext(LoadNeedsContext)
+  const { isLoading, setIsLoading } = useContext(LoadNeedsContext)
   const [ownerName, setOwnerName] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [kmsDriven, setKmsDriven] = useState("");
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
+  const [price, setPrice] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
@@ -43,6 +48,7 @@ const SellYourTruck = () => {
   const [kmsDrivenValid, setKmsDrivenValid] = useState(true);
   const [brandValid, setBrandValid] = useState(true);
   const [modelValid, setModelValid] = useState(true);
+  const [priceValid, setPriceValid] = useState(true)
   const [locationValid, setLocationValid] = useState(true);
   const [descriptionValid, setDescriptionValid] = useState(true);
 
@@ -57,6 +63,7 @@ const SellYourTruck = () => {
       kmsDriven.trim() === "" ||
       brand.trim() === "" ||
       model.trim() === "" ||
+      price.trim() === "" ||
       location.trim() === "" ||
       description.trim() === "" ||
       images.length === 0
@@ -68,11 +75,12 @@ const SellYourTruck = () => {
       setKmsDrivenValid(kmsDriven.trim() !== "");
       setBrandValid(brand.trim() !== "");
       setModelValid(model.trim() !== "");
+      setPriceValid(price.trim() !== "");
       setLocationValid(location.trim() !== "");
       setDescriptionValid(description.trim() !== "");
       return;
     }
-  
+
     // Create FormData
     const formData = new FormData();
     formData.append('user_id', await AsyncStorage.getItem("user_id"));
@@ -82,10 +90,11 @@ const SellYourTruck = () => {
     formData.append('kms_driven', kmsDriven);
     formData.append('brand', brand);
     formData.append('model', model);
+    formData.append('price', price);
     formData.append('location', location);
     formData.append('description', description);
-    
-  
+
+
     // Append images to FormData
     images.forEach((image, index) => {
       formData.append(`truck_image${index + 1}`, {
@@ -94,35 +103,46 @@ const SellYourTruck = () => {
         name: `truck_image_${index + 1}.jpg`, // Use a unique name for the image
       });
     });
-  
+
     try {
       const response = await axiosInstance.post("/truck_buy_sell", formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-      });      
-      if(response.data.error_code === 0) {
+      });
+      if (response.data.error_code === 0) {
+        setOwnerName("");
+        setContactNumber("");
+        setVehicleNumber("");
+        setKmsDriven("");
+        setBrand("");
+        setModel("");
+        setPrice("");
+        setLocation("");
+        setDescription("");
+        setImages([])
         Alert.alert("Post added successfully!");
+
         setIsLoading(!isLoading)
       }
     } catch (error) {
       console.error("Error adding post:", error);
     }
   };
-  
+
 
   const pickImage = async () => {
     if (images.length >= 3) {
       Alert.alert("Maximum of 3 images can be uploaded.");
       return;
     }
-  
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
       quality: 1,
     });
-  
+
     if (!result.canceled) {
       // Filter out already selected images and limit to 3
       const newImages = result.assets.slice(0, 3 - images.length);
@@ -159,6 +179,26 @@ const SellYourTruck = () => {
     // You can use the extracted details as needed
   };
 
+  const brandData = [
+    { label: 'Ashok Leyland', value: 'ashokLeyland' },
+    { label: 'Tata', value: 'tata' },
+    { label: 'Mahindra', value: 'mahindra' },
+    { label: 'Eicher', value: 'eicher' },
+    { label: 'Daimler India', value: 'daimlerIndia' },
+    { label: 'Bharat Benz', value: 'bharatBenz' },
+    { label: 'Maruthi Suzuki', value: 'maruthiSuzuki' },
+    { label: 'SML Lsuzu', value: 'smlLsuzu' },
+    { label: 'Force', value: 'force' },
+    { label: 'AMW', value: 'amw' },
+    { label: 'Man', value: 'man' },
+    { label: 'Volvo', value: 'volvo' },
+    { label: 'Scania', value: 'scania' },
+    { label: 'Others', value: 'others' },
+  ]
+
+
+
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -182,6 +222,7 @@ const SellYourTruck = () => {
                 styles.textInput,
                 !contactNumberValid && { borderColor: "red" },
               ]}
+              keyboardType="number-pad"
               placeholder="Type Your Number"
               onChangeText={setContactNumber}
               value={contactNumber}
@@ -202,23 +243,59 @@ const SellYourTruck = () => {
                 styles.textInput,
                 !kmsDrivenValid && { borderColor: "red" },
               ]}
-              placeholder="2500000"
+              placeholder="250000"
+              keyboardType="number-pad"
               onChangeText={setKmsDriven}
               value={kmsDriven}
             />
             <Text style={styles.label}>Brand</Text>
-            <TextInput
+            {/* <TextInput
               style={[styles.textInput, !brandValid && { borderColor: "red" }]}
               placeholder="Brand"
               onChangeText={setBrand}
               value={brand}
+            /> */}
+
+            <View style={{borderColor:COLORS.gray,borderWidth:1,padding:0,borderRadius:5,marginBottom:10}}>
+            <RNPickerSelect
+              onValueChange={(value) => setBrand(value)}
+              items={brandData}
+              value={brand}
             />
+            </View>
+
+
+            <View>
+              {/* <Picker
+              selectedValue={brand}
+              onValueChange={(itemValue) => setBrand(itemValue)}
+            >
+              <Picker.Item label="Select vehicle type" value="" />
+              <Picker.Item label="Car/Jeep/Van" value="car" />
+              <Picker.Item label="LCV" value="LCV" />
+              <Picker.Item label="Upto 3 Axle Vehicle" value="upto-3-axle" />
+              <Picker.Item label="4 to 6 Axle" value="4-to-6-axle" />
+              <Picker.Item label="7 or more Axle" value="7-or-more-axle" />
+              <Picker.Item label="HCM/EME" value="hcm-eme" />
+            </Picker> */}
+            </View>
+
             <Text style={styles.label}>Model</Text>
             <TextInput
               style={[styles.textInput, !modelValid && { borderColor: "red" }]}
               placeholder="Model"
               onChangeText={setModel}
               value={model}
+              keyboardType="number-pad"
+
+            />
+            <Text style={styles.label}>Price</Text>
+            <TextInput
+              style={[styles.textInput, !priceValid && { borderColor: "red" }]}
+              placeholder="Price"
+              onChangeText={setPrice}
+              value={price}
+              keyboardType="number-pad"
             />
             <Text style={styles.label}>Location</Text>
             <TextInput
@@ -338,7 +415,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.gray,
     borderRadius: 5,
-    padding: 10,
+    padding: 15,
     marginBottom: 10,
   },
   imageContainer: {
@@ -401,6 +478,29 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     fontWeight: "bold",
+  },
+  dropdown: {
+    fontSize: 14,
+    width: "100%",
+    borderBottomColor: 'gray',
+    paddingLeft: 12,
+    borderWidth: 1,
+    borderWidth: 1,
+    borderColor: COLORS.gray,
+    borderRadius: 5,
+    paddingVertical: 11,
+    marginBottom: 10,
+    fontSize: 14,
+  },
+  placeholderStyle: {
+    fontSize: 14,
+    color: 'grey'
+  },
+  itemTextStyle: {
+    fontSize: 14,
+  },
+  selectedTextStyle: {
+    fontSize: 14,
   },
 });
 

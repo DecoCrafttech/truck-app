@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { StyleSheet,  View } from 'react-native';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import { MaterialIcons as Icon } from '@expo/vector-icons';
 import { ScrollView } from 'react-native';
-import { citiesArray, citiesData, statesData } from '../constants/cityAndState';
+import { citiesData, statesData } from '../constants/cityAndState';
 
 
 function MultiSelectComponentUpdation({
@@ -12,9 +12,7 @@ function MultiSelectComponentUpdation({
   setUserCities,
   userStates,
   setUserStates,
-  updatedOperatingCities,
   setUpdatedOperatingCities,
-  updatedOperatingStates,
   setUpdatedOperatingStates
 
 }) {
@@ -26,7 +24,6 @@ function MultiSelectComponentUpdation({
       return city ? city.name : null;
     }).filter(name => name !== null);
 
-    // console.log('Previously selected cities:', prevSelectedCityNames);
 
     setUserCities(selectedItemIds);
 
@@ -35,7 +32,6 @@ function MultiSelectComponentUpdation({
       return city ? city.name : null;
     }).filter(name => name !== null);
 
-    console.log('Currently selected cities:', selectedCityNames);
     setUpdatedOperatingCities(selectedCityNames)
   };
 
@@ -46,8 +42,6 @@ function MultiSelectComponentUpdation({
       return state ? state.name : null;
     }).filter(name => name !== null);
 
-    // console.log('Previously selected states:', prevSelectedStateNames);
-
     // Update selected states
     setUserStates(selectedItemIds);
 
@@ -57,7 +51,6 @@ function MultiSelectComponentUpdation({
       return state ? state.name : null;
     }).filter(name => name !== null);
 
-    console.log('Currently selected states:', selectedStateNames);
     setUpdatedOperatingStates(selectedStateNames)
   };
 

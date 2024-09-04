@@ -19,14 +19,20 @@ import TruckDetails from "./TruckDetails";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 const AvailableTruck = ({ navigation }) => {
+
+  const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+
 
   const {
     isLoading,
     setIsLoading,
     aadhaarOTP,
-    setAadhaarOTP
+    setAadhaarOTP,
+    setMessageReceiver
+
   } = useContext(LoadNeedsContext)
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,6 +65,9 @@ const AvailableTruck = ({ navigation }) => {
   const [showOTPInputBox, setShowOTPInputBox] = useState(false)
   const [timeLeft, setTimeLeft] = useState(null);
 
+  const [fromLocationModal, setFromLocationModal] = useState(false)
+  const [toLocationModal, setToLocationModal] = useState(false)
+
   useEffect(() => {
     if (timeLeft === 0) {
       setTimeLeft(null);
@@ -83,10 +92,10 @@ const AvailableTruck = ({ navigation }) => {
       }
       const response = await axiosInstance.post("/check_aadhar_verification", isAadhaarVerifiedParams)
       console.log(response)
-      console.log("true or false",response.data.data.is_aadhar_verified)
+      console.log("true or false", response.data.data.is_aadhar_verified)
       if (response.data.error_code === 0) {
         if (response.data.data.is_aadhar_verified === true) {
-        
+
           navigation.navigate("TruckNeeds");
         } else {
           setIsAadhaarModal(true)
@@ -104,6 +113,10 @@ const AvailableTruck = ({ navigation }) => {
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
+
+  const handleChatNavigate = () => {
+    navigation.navigate("Chat")
+  }
 
   useEffect(() => {
     const getAllTruckDetails = async () => {
@@ -123,8 +136,10 @@ const AvailableTruck = ({ navigation }) => {
             ],
             description: item.description,
             onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
-            onButton2Press: () =>
-              alert("Message Content will be displayed here..."),
+            onButton2Press: () => {
+              setMessageReceiver(item)
+              handleChatNavigate()
+            }
           }));
 
           setGetTruckData(transformedData);
@@ -254,31 +269,71 @@ const AvailableTruck = ({ navigation }) => {
     }
   }
 
+  const handleFromLocation = (data, details) => {
+    let country = '';
+    let state = '';
+    let city = '';
+
+    if (details.address_components) {
+      details.address_components.forEach(component => {
+        if (component.types.includes('country')) {
+          country = component.long_name;
+        }
+        if (component.types.includes('administrative_area_level_1')) {
+          state = component.long_name;
+        }
+        if (component.types.includes('locality')) {
+          city = component.long_name;
+        }
+      });
+    }
+
+
+    setModalValues((prevState) => ({
+      ...prevState, fromLocation: (`${city} , ${state}`)
+    }))
+    setFromLocationModal(false)
+    // You can use the extracted details as needed
+  };
+
+  const handleToLocation = (data, details) => {
+    let country = '';
+    let state = '';
+    let city = '';
+
+    if (details.address_components) {
+      details.address_components.forEach(component => {
+        if (component.types.includes('country')) {
+          country = component.long_name;
+        }
+        if (component.types.includes('administrative_area_level_1')) {
+          state = component.long_name;
+        }
+        if (component.types.includes('locality')) {
+          city = component.long_name;
+        }
+      });
+    }
+
+
+    setModalValues((prevState) => ({
+      ...prevState, toLocation: (`${city} , ${state}`)
+    }))
+    setToLocationModal(false)
+    // You can use the extracted details as needed
+  };
+
   const applyFilter = async () => {
-    // let hasError = false;
-    // const errors = {};
-
-    // Object.keys(modalValues).forEach((key) => {
-    //   if (!modalValues[key]) {
-    //     errors[key] = true;
-    //     hasError = true;
-    //   }
-    // });
-
-    // if (hasError) {
-    //   setErrorFields(errors);
-    //   return;
-    // }
     const filterParams = {
-      "contact_no":"",
-      "vehicle_number" : "",
-      "company_name" : "",
+      "contact_no": "",
+      "vehicle_number": "",
+      "company_name": "",
       "from_location": modalValues.fromLocation,
       "to_location": modalValues.toLocation,
-      "truck_name" : "",
+      "truck_name": "",
       "truck_body_type": modalValues.truckBodyType,
       "no_of_tyres": modalValues.noOfTyres,
-      "tone" : modalValues.tons
+      "tone": modalValues.tons
     }
 
     try {
@@ -297,8 +352,10 @@ const AvailableTruck = ({ navigation }) => {
           ],
           description: item.description,
           onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
-          onButton2Press: () =>
-            alert("Message Content will be displayed here..."),
+          onButton2Press: () => {
+            setMessageReceiver(item)
+            handleChatNavigate()
+          }
         }));
         setGetTruckData(transformedData);
         toggleModal(); // Close modal after applying filter
@@ -367,7 +424,14 @@ const AvailableTruck = ({ navigation }) => {
               ]}
               placeholder="From Location"
               value={modalValues.fromLocation}
-              onChangeText={(text) => handleInputChange("fromLocation", text)}
+              // onChangeText={(text) => handleInputChange('fromLocation', text)}
+              onPress={() => {
+                setFromLocationModal(true);
+                setModalValues(prevValues => ({
+                  ...prevValues,
+                  fromLocation: ""
+                }));
+              }}
             />
             <TextInput
               style={[
@@ -376,7 +440,14 @@ const AvailableTruck = ({ navigation }) => {
               ]}
               placeholder="To Location"
               value={modalValues.toLocation}
-              onChangeText={(text) => handleInputChange("toLocation", text)}
+              // onChangeText={(text) => handleInputChange('toLocation', text)}
+              onPress={() => {
+                setToLocationModal(true);
+                setModalValues(prevValues => ({
+                  ...prevValues,
+                  toLocation: ""
+                }));
+              }}
             />
             <TextInput
               style={[styles.input, errorFields.material && styles.inputError]}
@@ -387,12 +458,14 @@ const AvailableTruck = ({ navigation }) => {
             <TextInput
               style={[styles.input, errorFields.noOfTyres && styles.inputError]}
               placeholder="Number of Tyres"
+              keyboardType="number-pad"
               value={modalValues.noOfTyres}
               onChangeText={(text) => handleInputChange("noOfTyres", text)}
             />
             <TextInput
               style={[styles.input, errorFields.tons && styles.inputError]}
               placeholder="Tons"
+              keyboardType="number-pad"
               value={modalValues.tons}
               onChangeText={(text) => handleInputChange("tons", text)}
             />
@@ -447,15 +520,15 @@ const AvailableTruck = ({ navigation }) => {
                   />
                   <View style={{ alignItems: 'center', marginVertical: 20 }}>
                     <Text>Don't receive the code ? </Text>
-                    <TouchableOpacity disabled = {timeLeft === null ? false : true}>
+                    <TouchableOpacity disabled={timeLeft === null ? false : true}>
                       <Text
-                        style={{ color: timeLeft === null ? "#4285F4" : '#ccc' , fontWeight: 'bold', textDecorationLine: 'underline', marginTop: 10 }}
+                        style={{ color: timeLeft === null ? "#4285F4" : '#ccc', fontWeight: 'bold', textDecorationLine: 'underline', marginTop: 10 }}
                         onPress={resendClick}
-                        disabled = {timeLeft === null ? false : true}
+                        disabled={timeLeft === null ? false : true}
                       >
                         {""}Resend code
                       </Text>
-                      <Text style={{display : timeLeft === null ? "none" : "inline"}}>(in {timeLeft} seconds)</Text>
+                      <Text style={{ display: timeLeft === null ? "none" : "inline" }}>(in {timeLeft} seconds)</Text>
                     </TouchableOpacity>
                   </View>
                 </>
@@ -477,6 +550,84 @@ const AvailableTruck = ({ navigation }) => {
                 </TouchableOpacity>
             }
             <TouchableOpacity style={styles.closeButton} onPress={() => setIsAadhaarModal(false)}>
+              <Text style={styles.applyButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/*From Location Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={fromLocationModal}
+      // onRequestClose={() => setIsAadhaarModal(false)}
+      >
+        <View style={styles.locationModalContainer}>
+          <View style={styles.locationModalContent}>
+            <Text style={styles.modalTitle}>From Location</Text>
+
+
+            <View style={styles.locationContainer}>
+              <GooglePlacesAutocomplete
+                placeholder="Search location"
+                onPress={handleFromLocation}
+                textInputProps={{
+                  autoFocus: true,
+                }}
+                query={{
+                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  language: 'en',
+                }}
+                fetchDetails={true} // This ensures that you get more detailed information about the selected location
+                styles={{
+                  textInputContainer: styles.locationTextInputContainer,
+                  textInput: styles.locationTextInput
+                }}
+              />
+            </View>
+
+
+            <TouchableOpacity style={styles.closeButton} onPress={() => setFromLocationModal(false)}>
+              <Text style={styles.applyButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/*To Location Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={toLocationModal}
+      // onRequestClose={() => setIsAadhaarModal(false)}
+      >
+        <View style={styles.locationModalContainer}>
+          <View style={styles.locationModalContent}>
+            <Text style={styles.modalTitle}>To Location</Text>
+
+
+            <View style={styles.locationContainer}>
+              <GooglePlacesAutocomplete
+                placeholder="Search location"
+                onPress={handleToLocation}
+                textInputProps={{
+                  autoFocus: true,
+                }}
+                query={{
+                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  language: 'en',
+                }}
+                fetchDetails={true} // This ensures that you get more detailed information about the selected location
+                styles={{
+                  textInputContainer: styles.locationTextInputContainer,
+                  textInput: styles.locationTextInput
+                }}
+              />
+            </View>
+
+
+            <TouchableOpacity style={styles.closeButton} onPress={() => setToLocationModal(false)}>
               <Text style={styles.applyButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -546,6 +697,29 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 5,
     marginTop: 10,
+  },
+  locationModalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    height: "90%"
+  },
+  locationModalContent: {
+    backgroundColor: COLORS.white,
+    padding: 20,
+    width: "80%",
+    borderRadius: 10,
+    elevation: 5,
+    height: "90%"
+  },
+  locationContainer: {
+    flex: 1,
+    padding: 5,
+  },
+  locationTextInput: {
+    borderWidth: 1,
+    borderColor: COLORS.gray,
   },
 });
 

@@ -75,12 +75,12 @@ const ForgotPassword = () => {
                     <View style={styles.avatarContainer}>
                         <Image
                             style={styles.avatar}
-                            source={require("../assets/images/app-black-logo.png")}
+                            source={require("../assets/images/app-logo.png")}
                         />
                     </View>
 
                     <View style={styles.pageHeadingContainer}>
-                        <Text style={[styles.pageHeading, { textAlign: 'center' }]}>Forgot Password</Text>
+                        <Text style={[styles.pageHeading]}>Forgot Password</Text>
                     </View>
 
 
@@ -149,9 +149,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 180,
+        height: 180,
     },
     loginContainer: {
         borderColor: 'grey',
@@ -164,7 +163,6 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: "bold",
         marginVertical: 12,
-        textAlign: 'center',
         marginBottom: 30,
     },
     signupContainer: {
@@ -234,9 +232,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
         backgroundColor: COLORS.primary,
         borderRadius: 5,
-        marginHorizontal: 5,
         paddingVertical: 15,
-        borderWidth: 1,
         alignItems: "center",
         marginTop: 10
     },

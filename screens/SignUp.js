@@ -19,6 +19,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { FlatList } from 'react-native-web';
 import MultiSelectComponent from '../components/MultiSelectComponent';
 import { BackHandler } from 'react-native';
+import { COLORS } from '../constants';
 
 
 
@@ -38,7 +39,9 @@ const SignUp = () => {
         name: "",
         dob: "",
         mobileNumber: "",
+        email : "",
         state: "",
+        pincode : "",
         operatingCity: "",
         password: "",
         confirmPassword: "",
@@ -156,8 +159,8 @@ const SignUp = () => {
             inputs.name === "" ||
             inputs.dob === "" ||
             inputs.mobileNumber === "" ||
-            category === "" ||
-            operatingCities.length === 0 ||
+            inputs.email === "" ||
+            inputs.pincode === "" ||
             operatingStates.length === 0 ||
             inputs.password === "" ||
             inputs.confirmPassword === "" ||
@@ -196,9 +199,11 @@ const SignUp = () => {
                 date_of_birth: `${inputs.dob.toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-')}`,
                 // date_of_birth: "1996-11-14" ,
                 phone_number: inputs.mobileNumber,
+                email : inputs.email,
                 category: category,
-                operating_city: operatingCities,
+                operating_city: "",
                 state: operatingStates,
+                pincode: inputs.pincode,
                 password: inputs.password,
             }
 
@@ -235,33 +240,7 @@ const SignUp = () => {
                     Toast.error(response.data.message)
                 }
 
-                // await axios.post("https://truck.truckmessage.com/registration", signupParams)
-                //     .then((response) => {
-                //         if (response.data.error_code === 0) {
-                //             if (response.data.message === "Phone Number already registered!") {
-                //                 Toast.warn(response.data.message)
-                //                 return
-                //             }
-                //             AsyncStorage.setItem("userName",inputs.name)
-                //             Toast.success(response.data.message)
-                //             setInputs({
-                //                 name: "",
-                //                 dob: "",
-                //                 mobileNumber: "",
-                //                 state: "",
-                //                 operatingCity: "",
-                //                 password: "",
-                //                 confirmPassword: "",
-                //             })
-                //             setCategory("")
-                //             navigation.navigate("Login")
-                //         } else {
-                //             Toast.error(response.data.message)
-                //         }
-
-                //     }).catch((err) => {
-                //         console.log(err)
-                //     })
+               
 
             } catch (err) {
                 console.log(err)
@@ -272,6 +251,9 @@ const SignUp = () => {
 
 
     }
+
+
+
 
     const sendOTP = async (e) => {
             const OTPParams = {
@@ -295,6 +277,8 @@ const SignUp = () => {
     // console.log("operatingCities", operatingCities)
     // console.log("operatingStates", operatingStates)
 
+    console.log("inputs",inputs)
+
     return (
         <SafeAreaProvider>
             <SafeAreaView>
@@ -314,12 +298,12 @@ const SignUp = () => {
                         <View style={styles.avatarContainer}>
                             <Image
                                 style={styles.avatar}
-                                source={require("../assets/images/app-black-logo.png")}
-                            />
+                                source={require("../assets/images/app-logo.png")}
+                                />
                         </View>
 
                         <View style={styles.pageHeadingContainer}>
-                            <Text style={[styles.pageHeading, { textAlign: 'center' }]}>Registration</Text>
+                            <Text style={[styles.pageHeading]}>Registration</Text>
                         </View>
 
                         {/* Signup container */}
@@ -367,9 +351,6 @@ const SignUp = () => {
                                 </View>
                             </View>
 
-
-
-
                             <View style={styles.inputField}>
                                 <View>
                                     <Text style={styles.label}>Phone Number</Text>
@@ -393,6 +374,23 @@ const SignUp = () => {
                                 </View>
                             </View>
 
+
+                            <View style={styles.inputField}>
+                                <View>
+                                    <Text style={styles.label}>E-mail</Text>
+                                </View>
+                                <View style={styles.inputBox}>
+                                    <TextInput
+                                        placeholder='Enter your email'
+                                        placeholderTextColor='grey'
+                                        keyboardType='email-address'
+                                        style={styles.input}
+                                        value={inputs.email}
+                                        onChangeText={(value) => handleChange('email', value)}
+                                    >
+                                    </TextInput>
+                                </View>
+                            </View>
 
 
                             <View style={styles.inputField}>
@@ -420,18 +418,10 @@ const SignUp = () => {
                                 </View>
                             </View>
 
-                            <View style={styles.inputField}>
+                            {/* <View style={styles.inputField}>
                                 <View>
                                     <Text style={styles.label}>Operating City</Text>
                                 </View>
-                                {/* <TextInput
-                                    placeholder='Enter operating city'
-                                    placeholderTextColor='grey'
-                                    style={styles.input}
-                                    value={inputs.operatingCity}
-                                    onChangeText={(value) => handleChange('operatingCity', value)}
-                                >
-                                </TextInput> */}
                                 <View>
                                     <MultiSelectComponent
                                         listOfData={citiesData}
@@ -441,21 +431,12 @@ const SignUp = () => {
                                        
                                     />
                                 </View>
-                            </View>
+                            </View> */}
 
                             <View style={styles.inputField}>
                                 <View>
-                                    <Text style={styles.label}>State</Text>
+                                    <Text style={styles.label}>Operating States</Text>
                                 </View>
-                                {/* <TextInput
-                                    placeholder='Enter operating state'
-                                    placeholderTextColor='grey'
-                                    style={styles.input}
-                                    value={inputs.state}
-                                    onChangeText={(value) => handleChange('state', value)}
-                                >
-                                </TextInput> */}
-
                                 <View>
                                     <MultiSelectComponent
                                         listOfData={statesData}
@@ -463,6 +444,24 @@ const SignUp = () => {
                                         setSelectedStates={setSelectedStates}
                                         setOperatingStates={setOperatingStates}
                                     />
+                                </View>
+                            </View>
+
+                            <View style={styles.inputField}>
+                                <View>
+                                    <Text style={styles.label}>Pincode</Text>
+                                </View>
+                                <View style={styles.inputBox}>
+                                    <TextInput
+                                    keyboardType='number-pad'
+                                        placeholder='Enter your pincode'
+                                        maxLength={6}
+                                        placeholderTextColor='grey'
+                                        style={styles.input}
+                                        value={inputs.pincode}
+                                        onChangeText={(value) => handleChange('pincode', value)}
+                                    >
+                                    </TextInput>
                                 </View>
                             </View>
 
@@ -528,6 +527,7 @@ const SignUp = () => {
                                 <Checkbox
                                     value={isChecked ? true : false}
                                     onValueChange={handleCheckBox}
+                                    color={COLORS.defaultPrimary}
                                 />
                                 <Text
                                     onPress={handleCheckBox}
@@ -544,7 +544,7 @@ const SignUp = () => {
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 marginTop: 10,
-                                justifyContent: 'center'
+                                justifyContent: 'center',
                             }}>
                                 <Text style={{ textAlign: 'center' }}>
                                     Registered user?{" "}
@@ -580,24 +580,24 @@ const styles = StyleSheet.create({
     pageHeading: {
         fontSize: 22,
         fontWeight: "bold",
-        marginTop: 12
+        marginVertical: 12,
+        marginHorizontal:20
     },
     avatarContainer: {
         marginTop: 30,
         alignItems: 'center',
     },
     avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 180,
+        height: 180,
     },
     signupContainer: {
         marginHorizontal: 20,
         marginTop: 15
     },
     label: {
-        fontSize: 14,
-        fontWeight: "400",
+        fontSize: 16,
+        fontWeight: "600",
         marginBottom: 10
     },
     inputField: {
@@ -651,7 +651,6 @@ const styles = StyleSheet.create({
     },
     checkboxContainer: {
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 30
     },

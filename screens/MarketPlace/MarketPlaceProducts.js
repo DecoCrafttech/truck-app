@@ -10,36 +10,96 @@ import {
 } from "react-native";
 
 import axiosInstance from "../../services/axiosInstance";
-import { images } from "../../constants";
+import { COLORS, images } from "../../constants";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
+import AntDesign from '@expo/vector-icons/AntDesign';
+import Entypo from '@expo/vector-icons/Entypo';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
-const ProductCategoryList = ({ navigation, searchQuery,filteredProducts,onPressCategory,loading }) => {
 
- 
+
+const ProductCategoryList = ({ navigation, searchQuery, filteredProducts, onPressCategory, loading }) => {
+
+  const {
+    currentUser,
+    setCurrentUser,
+    messageReceiver,
+    setMessageReceiver
+  } = useContext(LoadNeedsContext)
 
 
 
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => onPressCategory(item)}>
-      <View style={styles.categoryItem}>
-        {item.images && item.images.length > 0 ? (
-          <Image
-            source={{ uri: item.images[0] }}
-            style={styles.categoryImage}
-          />
-        ) : (
-          <Image source={images.truck} style={styles.categoryImage} />
-        )}
 
-        <View style={styles.categoryInfo}>
-          <Text style={styles.categoryName}>{item.brand}</Text>
-          <Text style={styles.categoryDescription}>{item.model}</Text>
-          <Text style={styles.categoryPrice}>{item.location}</Text>
+
+
+    <TouchableOpacity >
+      <View style={[styles.categoryItem]}>
+        {item.images && item.images.length > 0 ? (
+          <View style={{backgroundColor:'#f1f2ff',borderWidth:6,borderColor:'#fff',borderRadius:8,paddingHorizontal:10,paddingBottom:10}}>
+            <View style={[styles.ratingsContainer]}>
+              <View style={styles.starsContainer}>
+                {[...Array(5)].map((_, index) => (
+                  <Icon
+                    key={index}
+                    name={index > 2 ? "star-o" : "star"}
+                    size={13}
+                    color="#FFD700"
+                  />
+                ))}
+              </View>
+              <Text style={styles.textRight}>Posts : </Text>
+            </View>
+
+            <Image
+              source={{ uri: item.images[0] }}
+              style={styles.categoryImage}
+            />
+          </View>
+
+
+
+        ) :
+          <Image source={images.truck} style={styles.categoryImage} resizeMethod="auto" resizeMode="cover" />
+        }
+        <View style={styles.categoryInfoContainer}>
+          <View>
+            <MaterialCommunityIcons style={[styles.value, { textAlign: 'center' }]} name="map-marker-distance" size={24} color="black" />
+            <Text style={[styles.value, { textAlign: 'center' }]}>{item.kms_driven}</Text>
+          </View>
+          <View>
+            <Entypo style={[styles.value, { textAlign: 'center' }]} name="location-pin" size={24} color="black" />
+            <Text style={[styles.value, { textAlign: 'center' }]}>{item.location}</Text>
+          </View>
+          <View>
+            <AntDesign style={[styles.value, { textAlign: 'center' }]} name="calendar" size={24} color="black" />
+            <Text style={[styles.value, { textAlign: 'center' }]}>{item.model}</Text>
+          </View>
+
+        </View>
+
+        <Text style={styles.price}>
+          Price : {item.price}
+        </Text>
+
+        <View>
+          <TouchableOpacity 
+              style={styles.buttonContainer} 
+              onPress={() => {
+                setMessageReceiver(item)
+                onPressCategory(item)
+              }}>
+            <Text style={styles.buttonText}>View details</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
   );
+
+
+
 
   return loading ? (
     <ActivityIndicator
@@ -50,7 +110,7 @@ const ProductCategoryList = ({ navigation, searchQuery,filteredProducts,onPressC
   ) : filteredProducts.length === 0 ? (
     <Text style={styles.noProductsText}>No truck details found</Text>
   ) : (
-    <View style={{ flex: 1, marginBottom: 55 }}>
+    <View style={{ flex: 1 }}>
       <FlatList
         data={filteredProducts}
         renderItem={renderItem}
@@ -66,6 +126,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingTop: 10,
+
   },
   noProductsText: {
     textAlign: "center",
@@ -73,36 +134,86 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   categoryItem: {
-    flexDirection: "row",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 5,
-    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    // padding: 10,
+    // paddingTop: 30,
     marginBottom: 10,
   },
   categoryImage: {
-    width: 80,
-    height: 80,
+    width: "100%",
+    height: 200,
     borderRadius: 5,
-    marginRight: 10,
+    margin: 'auto',
+    resizeMode: 'cover',
+
+
   },
   categoryInfo: {
     flex: 1,
   },
   categoryName: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "bold",
+    textAlign: 'center'
   },
   categoryDescription: {
-    fontSize: 16,
-    color: "#666",
-    marginTop: 5,
+    fontSize: 15,
+    fontWeight: "bold",
+    textAlign: 'center'
   },
   categoryPrice: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "bold",
-    color: "green",
-    marginTop: 5,
+    textAlign: 'center'
   },
+  categoryInfoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    textAlign: 'center',
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  value: {
+    marginTop: 10
+  },
+  price: {
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  buttonContainer: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 5,
+    marginHorizontal: 5,
+    paddingVertical: 10,
+    alignItems: "center",
+    marginVertical: 20
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+    fontWeight: 'bold'
+  },
+  ratingsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center', // Center vertically if needed
+    marginHorizontal:5,
+    marginBottom:10,
+    paddingTop:10
+  },
+  starsContainer: {
+    flexDirection: 'row', // Align stars horizontally
+  },
+  textRight: {
+    textAlign: 'right',
+    fontWeight:'600'
+    // Additional styling for the "Hi" text if needed
+  },
+
 });
 
 export default ProductCategoryList;
