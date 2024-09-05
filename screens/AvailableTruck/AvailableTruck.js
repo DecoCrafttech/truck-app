@@ -20,6 +20,8 @@ import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import RNPickerSelect from 'react-native-picker-select';
+
 
 const AvailableTruck = ({ navigation }) => {
 
@@ -50,6 +52,7 @@ const AvailableTruck = ({ navigation }) => {
     noOfTyres: "",
     tons: "",
     truckBodyType: "",
+    truckName: ""
   });
   const [errorFields, setErrorFields] = useState({
     companyName: false,
@@ -59,6 +62,7 @@ const AvailableTruck = ({ navigation }) => {
     noOfTyres: false,
     tons: false,
     truckBodyType: false,
+    truckName: false
   });
   const [aadhaar, setAadhaar] = useState("")
   const [aadhaarError, setAadhaarError] = useState("")
@@ -86,13 +90,10 @@ const AvailableTruck = ({ navigation }) => {
 
     try {
 
-      console.log(`${await AsyncStorage.getItem("user_id")}`)
       const isAadhaarVerifiedParams = {
         user_id: `${await AsyncStorage.getItem("user_id")}`
       }
       const response = await axiosInstance.post("/check_aadhar_verification", isAadhaarVerifiedParams)
-      console.log(response)
-      console.log("true or false", response.data.data.is_aadhar_verified)
       if (response.data.error_code === 0) {
         if (response.data.data.is_aadhar_verified === true) {
 
@@ -124,6 +125,8 @@ const AvailableTruck = ({ navigation }) => {
         const response = await axiosInstance.get("/all_truck_details");
         if (response.data.error_code === 0) {
           const transformedData = response.data.data.map((item) => ({
+            post: item.user_post,
+            profileName: item.profile_name,
             title: item.company_name,
             fromLocation: item.from_location,
             toLocation: item.to_location,
@@ -204,9 +207,7 @@ const AvailableTruck = ({ navigation }) => {
           id_number: `${aadhaar}`
         }
         const response = await axiosInstance.post("/aadhaar_generate_otp", generateOTPParams)
-        console.log(response.data)
         if (response.data.error_code === 0) {
-          console.log(response.data)
           AsyncStorage.setItem("client_id", response.data.data[0].client_id)
           setShowOTPInputBox(true)
           setTimeLeft(60)
@@ -225,9 +226,7 @@ const AvailableTruck = ({ navigation }) => {
         id_number: `${aadhaar}`
       }
       const response = await axiosInstance.post("/aadhaar_generate_otp", resendParams)
-      console.log(response.data)
       if (response.data.error_code === 0) {
-        console.log(response.data)
         AsyncStorage.setItem("client_id", response.data.data[0].client_id)
       } else {
         Toast.error(response.data.message)
@@ -248,12 +247,10 @@ const AvailableTruck = ({ navigation }) => {
     try {
 
 
-      console.log(verifyParams)
 
       const response = await axiosInstance.post("/aadhaar_submit_otp", verifyParams)
 
       if (response.data.error_code === 0) {
-        console.log(response)
         Toast.success(response.data.message)
         setIsAadhaarModal(false)
         setTimeLeft(null)
@@ -340,6 +337,8 @@ const AvailableTruck = ({ navigation }) => {
       const response = await axiosInstance.post("/user_truck_details_filter", filterParams)
       if (response.data.error_code === 0) {
         const transformedData = response.data.data.map((item) => ({
+          post: item.user_post,
+          profileName: item.profile_name,
           title: item.company_name,
           fromLocation: item.from_location,
           toLocation: item.to_location,
@@ -378,6 +377,44 @@ const AvailableTruck = ({ navigation }) => {
     );
   }
 
+  const brandData = [
+    { label: 'Ashok Leyland', value: 'ashokLeyland' },
+    { label: 'Tata', value: 'tata' },
+    { label: 'Mahindra', value: 'mahindra' },
+    { label: 'Eicher', value: 'eicher' },
+    { label: 'Daimler India', value: 'daimlerIndia' },
+    { label: 'Bharat Benz', value: 'bharatBenz' },
+    { label: 'Maruthi Suzuki', value: 'maruthiSuzuki' },
+    { label: 'SML Lsuzu', value: 'smlLsuzu' },
+    { label: 'Force', value: 'force' },
+    { label: 'AMW', value: 'amw' },
+    { label: 'Man', value: 'man' },
+    { label: 'Volvo', value: 'volvo' },
+    { label: 'Scania', value: 'scania' },
+    { label: 'Others', value: 'others' },
+  ]
+
+  const bodyTypeData = [
+    { label: 'Open body', value: 'open_body' },
+    { label: 'Container', value: 'container' },
+    { label: 'Trailer', value: 'trailer' },
+    { label: 'Tanker', value: 'tanker' },
+  ];
+
+  const numberOfTyresData = [
+    { label: '4', value: '4' },
+    { label: '6', value: '6' },
+    { label: '8', value: '8' },
+    { label: '10', value: '10' },
+    { label: '12', value: '12' },
+    { label: '14', value: '14' },
+    { label: '16', value: '16' },
+    { label: '18', value: '18' },
+    { label: '20', value: '20' },
+    { label: '22', value: '22' },
+  ];
+
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -408,15 +445,7 @@ const AvailableTruck = ({ navigation }) => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Filter Options</Text>
-            <TextInput
-              style={[
-                styles.input,
-                errorFields.companyName && styles.inputError,
-              ]}
-              placeholder="Company Name"
-              value={modalValues.companyName}
-              onChangeText={(text) => handleInputChange("companyName", text)}
-            />
+
             <TextInput
               style={[
                 styles.input,
@@ -455,7 +484,7 @@ const AvailableTruck = ({ navigation }) => {
               value={modalValues.material}
               onChangeText={(text) => handleInputChange("material", text)}
             />
-            <TextInput
+            {/* <TextInput
               style={[styles.input, errorFields.noOfTyres && styles.inputError]}
               placeholder="Number of Tyres"
               keyboardType="number-pad"
@@ -477,9 +506,57 @@ const AvailableTruck = ({ navigation }) => {
               placeholder="Truck Body Type"
               value={modalValues.truckBodyType}
               onChangeText={(text) => handleInputChange("truckBodyType", text)}
-            />
+            /> */}
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({...modalValues,truckName : value})}
+                items={brandData}
+                value={modalValues.truckName}
+                placeholder={{
+                  label: 'Select truck name',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({...modalValues,truckBodyType : value})}
+                items={bodyTypeData}
+                value={modalValues.truckBodyType}
+                placeholder={{
+                  label: 'Select truck body type',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({...modalValues,noOfTyres : value})}
+                items={numberOfTyresData}
+                value={modalValues.numberOfTyres}
+                placeholder={{
+                  label: 'Select number of tyres',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
             <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
               <Text style={styles.applyButtonText}>Apply Filter</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.applyButton}
+              onPress={() => {
+                 setIsLoading(!isLoading)
+                 toggleModal()
+              }}>
+              <Text style={styles.applyButtonText}>Clear filter</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.applyButtonText}>Close</Text>
@@ -676,7 +753,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    height: 40,
+    // height: 40,
+    padding:12
   },
   inputError: {
     borderColor: "red",

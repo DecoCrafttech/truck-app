@@ -42,16 +42,6 @@ const VehicleProfileDetails = () => {
         user_id: await AsyncStorage.getItem("user_id")
       }
       const response = await axios.post("https://truck.truckmessage.com/get_user_profile", getVehicleDetailsParams)
-      // if(response.data.error_code === 0){
-      //     setName(response.data.data[1].profile.first_name)
-      //     setMobile(response.data.data[1].profile.phone_number)
-      //     setCategory(response.data.data[1].profile.category)
-      //     setCategory(response.data.data[1].profile.category)
-      //     setCity(response.data.data[1].profile.operating_city)
-      //     setState(response.data.data[1].profile.state)
-      // }else{
-      //     console.log(response.data.message)
-      // }
 
       if (response.data.error_code === 0) {
         setUsers(response.data.data[0].vehicle_data)
@@ -66,7 +56,6 @@ const VehicleProfileDetails = () => {
 
 
   const handleAddTruck = () => {
-    console.log('add trusk click')
     setModalVisible(true);
   };
 
@@ -82,15 +71,10 @@ const VehicleProfileDetails = () => {
       vehicle_no: `${vehicleNumber}`
     }
     try {
-      console.log(addTruckParams)
       const response = await axios.post("https://truck.truckmessage.com/add_user_vehicle_details", addTruckParams)
-      console.log(response.data)
       if (response.data.error_code === 0) {
-        console.log(response.data.message)
         Toast.success(response.data.message)
 
-        // Implement logic to add the new truck with vehicleNumber
-        console.log("Submit pressed with vehicle number:", vehicleNumber);
 
         // Reset state and close modal
         setModalVisible(false);
@@ -111,8 +95,6 @@ const VehicleProfileDetails = () => {
   };
 
   const handleViewVehicleDetails = async (vehicleNo) => {
-
-    console.log(vehicleNo)
     const viewVehicleParams = {
       "vehicle_no": `${vehicleNo}`
     }
@@ -120,7 +102,6 @@ const VehicleProfileDetails = () => {
     try {
       const response = await axios.post("https://truck.truckmessage.com/get_vehicle_details", viewVehicleParams)
       if (response.data.error_code === 0) {
-        console.log("eyeiconclick")
         navigation.navigate("ViewFullDetails", { vehicleNo })
       } else {
         console.log(response.data.message)

@@ -22,12 +22,14 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import { Picker } from "react-native-web";
 import { Dropdown } from "react-native-element-dropdown";
 import RNPickerSelect from 'react-native-picker-select';
+import { useNavigation } from "@react-navigation/native";
 
 
 const SellYourTruck = () => {
 
   const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
 
+  const navigation = useNavigation("")
 
 
   const { isLoading, setIsLoading } = useContext(LoadNeedsContext)
@@ -110,6 +112,8 @@ const SellYourTruck = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
+
+
       if (response.data.error_code === 0) {
         setOwnerName("");
         setContactNumber("");
@@ -122,7 +126,7 @@ const SellYourTruck = () => {
         setDescription("");
         setImages([])
         Alert.alert("Post added successfully!");
-
+        navigation.goBack()
         setIsLoading(!isLoading)
       }
     } catch (error) {
@@ -170,9 +174,7 @@ const SellYourTruck = () => {
       });
     }
 
-    console.log('Country:', country);
-    console.log('State:', state);
-    console.log('City:', city);
+
 
     setLocation(`${city} , ${state}`)
     setLocationModal(false)
@@ -195,6 +197,54 @@ const SellYourTruck = () => {
     { label: 'Scania', value: 'scania' },
     { label: 'Others', value: 'others' },
   ]
+
+  const kmsData = [
+    { label: '0 - 10,000 kms', value: '0_10000_kms' },
+    { label: '10,001 - 30,000 kms', value: '10001_30000_kms' },
+    { label: '30,001 - 50,000 kms', value: '30001_50000_kms' },
+    { label: '50,001 - 70,000 kms', value: '50001_70000_kms' },
+    { label: '70,001 - 100,000 kms', value: '70001_100000_kms' },
+    { label: '100,001 - 150,000 kms', value: '100001_150000_kms' },
+    { label: '150,001 - 200,000 kms', value: '150001_200000_kms' },
+    { label: '200,001 - 300,000 kms', value: '200001_300000_kms' },
+    { label: '300,001 - 500,000 kms', value: '300001_500000_kms' },
+    { label: '500,001 - 700,000 kms', value: '500001_700000_kms' },
+    { label: '700,001 - 1,000,000 kms', value: '700001_1000000_kms' },
+    { label: '1,000,001 - 1,500,000 kms', value: '1000001_1500000_kms' },
+    { label: '1,500,001 - 2,000,000 kms', value: '1500001_2000000_kms' },
+    { label: '2,000,001+ kms', value: '2000001_plus_kms' },
+  ];
+
+
+  const priceData = [
+    { label: '0 - 5,00,000 lakhs', value: '0_5_lakhs' },
+    { label: '5,00,001 - 10,00,000 lakhs', value: '5_10_lakhs' },
+    { label: '10,00,001 - 20,00,000 lakhs', value: '10_20_lakhs' },
+    { label: '20,00,001 - 30,00,000 lakhs', value: '20_30_lakhs' },
+    { label: '30,00,001 - 40,00,000 lakhs', value: '30_40_lakhs' },
+    { label: '40,00,001 - 50,00,000 lakhs', value: '40_50_lakhs' },
+    { label: '50,00,001 - 60,00,000 lakhs', value: '50_60_lakhs' },
+    { label: '60,00,001 - 70,00,000 lakhs', value: '60_70_lakhs' },
+    { label: '70,00,001 - 80,00,000 lakhs', value: '70_80_lakhs' },
+    { label: '80,00,001 - 90,00,000 lakhs', value: '80_90_lakhs' },
+    { label: '90,00,001 and above lakhs', value: '90_above_lakhs' },
+  ];
+
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 40 }, (_, index) => {
+    const year = currentYear - index;
+    return {
+      label: `${year}`,
+      value: `${year}`,
+    };
+  });
+
+  const yearsData = years
+
+
+
+
 
 
 
@@ -248,47 +298,29 @@ const SellYourTruck = () => {
               onChangeText={setKmsDriven}
               value={kmsDriven}
             />
+
+
             <Text style={styles.label}>Brand</Text>
-            {/* <TextInput
-              style={[styles.textInput, !brandValid && { borderColor: "red" }]}
-              placeholder="Brand"
-              onChangeText={setBrand}
-              value={brand}
-            /> */}
-
-            <View style={{borderColor:COLORS.gray,borderWidth:1,padding:0,borderRadius:5,marginBottom:10}}>
-            <RNPickerSelect
-              onValueChange={(value) => setBrand(value)}
-              items={brandData}
-              value={brand}
-            />
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setBrand(value)}
+                items={brandData}
+                value={brand}
+              />
             </View>
-
-
             <View>
-              {/* <Picker
-              selectedValue={brand}
-              onValueChange={(itemValue) => setBrand(itemValue)}
-            >
-              <Picker.Item label="Select vehicle type" value="" />
-              <Picker.Item label="Car/Jeep/Van" value="car" />
-              <Picker.Item label="LCV" value="LCV" />
-              <Picker.Item label="Upto 3 Axle Vehicle" value="upto-3-axle" />
-              <Picker.Item label="4 to 6 Axle" value="4-to-6-axle" />
-              <Picker.Item label="7 or more Axle" value="7-or-more-axle" />
-              <Picker.Item label="HCM/EME" value="hcm-eme" />
-            </Picker> */}
+
             </View>
 
             <Text style={styles.label}>Model</Text>
-            <TextInput
-              style={[styles.textInput, !modelValid && { borderColor: "red" }]}
-              placeholder="Model"
-              onChangeText={setModel}
-              value={model}
-              keyboardType="number-pad"
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
 
-            />
+              <RNPickerSelect
+                onValueChange={(value) => setModel(value)}
+                items={yearsData}
+                value={model}
+              />
+            </View>
             <Text style={styles.label}>Price</Text>
             <TextInput
               style={[styles.textInput, !priceValid && { borderColor: "red" }]}
@@ -297,6 +329,7 @@ const SellYourTruck = () => {
               value={price}
               keyboardType="number-pad"
             />
+
             <Text style={styles.label}>Location</Text>
             <TextInput
               style={[
@@ -304,7 +337,6 @@ const SellYourTruck = () => {
                 !locationValid && { borderColor: "red" },
               ]}
               placeholder="Location"
-              // onChangeText={setLocation}
               value={location}
               onPress={() => setLocationModal(true)}
             />

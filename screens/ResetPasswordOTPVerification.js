@@ -20,19 +20,15 @@ const ResetPasswordOTPVerification = () => {
 
 
     const resendClick = async () => {
-        console.log(AsyncStorage.getItem("mobileNumber"))
         const resendParams = {
             phone_number: `${await AsyncStorage.getItem("mobileNumber")}`
         }
         try {
 
-            console.log(resendParams)
 
             const response = await axiosInstance.post("/send_forgot_pwd_otp", resendParams)
-            console.log("resend res",response)
 
             if (response.data.error_code === 0) {
-                console.log(response.data)
                 Toast.success(response.data.message)
             } else {
                 Toast.error(response.data.message)
@@ -52,11 +48,9 @@ const ResetPasswordOTPVerification = () => {
     
         try {
 
-            console.log(verifyParams)
 
             const response = await axiosInstance.post("/validate_forgot_otp", verifyParams)
 
-            console.log("validate otp res",response)
             if (response.data.error_code === 0) {
                 Toast.success(response.data.message)
                 navigation.navigate("ResetPassword")

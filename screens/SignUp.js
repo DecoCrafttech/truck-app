@@ -103,7 +103,6 @@ const SignUp = () => {
     }
 
     const handleChange = (name, value) => {
-        // console.log(e.nativeEvent.text)
         setInputs((prevState) => ({
             ...prevState, [name]: value
         }))
@@ -210,10 +209,8 @@ const SignUp = () => {
             try {
 
 
-                console.log(signupParams)
 
                 const response = await axiosInstance.post("/registration", signupParams)
-                console.log("signup response",response.data)
                 if (response.data.error_code === 0) {
                     if (response.data.message === "Phone Number already registered!") {
                         Toast.warn(response.data.message)
@@ -262,7 +259,6 @@ const SignUp = () => {
             try {
                 const response = await axiosInstance.post("/send_signup_otp", OTPParams)
                 if (response.data.error_code === 0) {
-                    console.log(response.data)
                     Toast.success(response.data.message)
                 } else {
                     Toast.error(response.data.message)
@@ -273,11 +269,6 @@ const SignUp = () => {
         }
     
 
-
-    // console.log("operatingCities", operatingCities)
-    // console.log("operatingStates", operatingStates)
-
-    console.log("inputs",inputs)
 
     return (
         <SafeAreaProvider>

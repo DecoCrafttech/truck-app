@@ -14,6 +14,14 @@ import { COLORS } from "../constants";
 import axiosInstance from "../services/axiosInstance";
 import { useNavigation } from "@react-navigation/native";
 import { LoadNeedsContext } from "../hooks/LoadNeedsContext";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { Ionicons } from "@expo/vector-icons";
+import Icon1 from "react-native-vector-icons/MaterialIcons";
+import AntDesign from '@expo/vector-icons/AntDesign';
+
+
+
+
 
 const TruckDetail = ({ route }) => {
   const { item } = route.params;
@@ -21,7 +29,7 @@ const TruckDetail = ({ route }) => {
   const {
     messageReceiver,
     setMessageReceiver
-        } = useContext(LoadNeedsContext)
+  } = useContext(LoadNeedsContext)
   const navigation = useNavigation("")
 
   const [fullProductDetails, setFullProductDetails] = useState({
@@ -40,7 +48,6 @@ const TruckDetail = ({ route }) => {
           fullProductDetailParameter
         );
 
-
         if (response.data.error_code === 0) {
           setFullProductDetails(response.data.data[0]);
         }
@@ -48,7 +55,7 @@ const TruckDetail = ({ route }) => {
         console.error('Error fetching product details:', error);
       }
     };
-  
+
     fetchFullProductDetails();
   }, [item.buy_sell_id]);
 
@@ -102,14 +109,40 @@ const TruckDetail = ({ route }) => {
       <View style={styles.container}>
         <HeaderWithOutBS title="Truck Details" />
         <ScrollView style={styles.content}>
-          <View style={styles.card}>
-            <View style={styles.productCardHeader}>
-              <Text style={styles.name}>{fullProductDetails.brand}</Text>
-              <Text style={styles.price}>
-                {fullProductDetails.vehicle_number}
-              </Text>
-            </View>
+          <View style={[styles.card]}>
+
             <View style={styles.cardContent}>{renderImages()}</View>
+            <View style={styles.productCardHeader}>
+              <Text style={[styles.name]}>{fullProductDetails.brand}</Text>
+            </View>
+
+            <View style={[styles.ratingsContainer]}>
+              <View style={styles.starsContainer}>
+                {[...Array(5)].map((_, index) => (
+                  <Icon
+                    key={index}
+                    name={index > 2 ? "star-o" : "star"}
+                    size={13}
+                    color="#FFD700"
+                  />
+                ))}
+              </View>
+              <Text style={styles.textRight}>Posts :{1} </Text>
+            </View>
+
+            <View style={styles.locationContainer}>
+              <Icon1 name="place" size={24} color="green" />
+              <Text style={styles.location}>{fullProductDetails.location}</Text>
+            </View>
+            <View style={styles.locationContainer}>
+              <AntDesign name="calendar" size={20} color={COLORS.gray} />
+              <Text style={styles.location}>{fullProductDetails.updt}</Text>
+            </View>
+
+            <View>
+
+            </View>
+
           </View>
 
           <View style={styles.card}>
@@ -119,8 +152,7 @@ const TruckDetail = ({ route }) => {
             <View style={styles.cardContent}>
               <Text style={styles.description}>{fullProductDetails.model}</Text>
             </View>
-          </View>
-          <View style={styles.card}>
+
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Kms Driven</Text>
             </View>
@@ -129,8 +161,16 @@ const TruckDetail = ({ route }) => {
                 {fullProductDetails.kms_driven}
               </Text>
             </View>
-          </View>
-          <View style={styles.card}>
+
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Vehicle number</Text>
+            </View>
+            <View style={styles.cardContent}>
+              <Text style={styles.description}>
+                {fullProductDetails.vehicle_number}
+              </Text>
+            </View>
+
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Owner Name</Text>
             </View>
@@ -139,8 +179,7 @@ const TruckDetail = ({ route }) => {
                 {fullProductDetails.owner_name}
               </Text>
             </View>
-          </View>
-          <View style={styles.card}>
+
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Location</Text>
             </View>
@@ -149,9 +188,7 @@ const TruckDetail = ({ route }) => {
                 {fullProductDetails.location}
               </Text>
             </View>
-          </View>
 
-          <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Description</Text>
             </View>
@@ -160,12 +197,10 @@ const TruckDetail = ({ route }) => {
                 {fullProductDetails.description}
               </Text>
             </View>
-          </View>
 
-          <View style={styles.card}>
             <View style={styles.cardContent}>
               <TouchableOpacity
-                style={[styles.shareButton,{backgroundColor:'green'}]}
+                style={[styles.shareButton, { backgroundColor: 'green' }]}
                 onPress={() =>
                   Linking.openURL(`tel:${fullProductDetails.contact_no}`)
                 }
@@ -173,7 +208,8 @@ const TruckDetail = ({ route }) => {
                 <Text style={styles.shareButtonText}>Call</Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.cardContent}>
+
+            <View style={[styles.cardContent, { paddingBottom: 30 }]}>
               <TouchableOpacity
                 style={styles.shareButton}
                 onPress={() => handleChatNavigate()}
@@ -181,6 +217,8 @@ const TruckDetail = ({ route }) => {
                 <Text style={styles.shareButtonText}>Message</Text>
               </TouchableOpacity>
             </View>
+          </View>
+          <View style={styles.card}>
           </View>
         </ScrollView>
       </View>
@@ -206,19 +244,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.37,
     shadowRadius: 7.49,
     elevation: 12,
-    marginVertical: 5,
     backgroundColor: "white",
     marginHorizontal: 5,
   },
   productCardHeader: {
     paddingTop: 12.5,
-    paddingBottom: 25,
+    paddingBottom: 15,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 1,
     borderBottomRightRadius: 1,
   },
   name: {
-    fontSize: 22,
+    fontSize: 24,
     color: "#696969",
     fontWeight: "bold",
   },
@@ -229,7 +266,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   cardContent: {
-    paddingVertical: 5,
+    paddingVertical: 8,
     paddingHorizontal: 16,
   },
   cardHeader: {
@@ -283,6 +320,31 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
   },
+  ratingsContainer: {
+
+    marginHorizontal: 15,
+    marginBottom: 10,
+  },
+  starsContainer: {
+    flexDirection: 'row', // Align stars horizontally
+  },
+  textRight: {
+    marginTop: 8,
+    fontWeight: '600'
+  },
+
+  locationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 5,
+    justifyContent: "flex-start",
+    marginLeft:12
+  },
+  location: {
+    fontSize: 16,
+    marginLeft: 5,
+  },
+
 });
 
 export default TruckDetail;

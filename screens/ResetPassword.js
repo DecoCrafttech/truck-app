@@ -107,9 +107,7 @@ const ResetPassword = () => {
             "new_pwd" : `${inputs.password}`
         }
         try {
-            console.log(resetPasswordParams)
             const response = await axiosInstance.post("/update_user_password", resetPasswordParams)
-            console.log("reset password res",response)
             if (response.data.error_code === 0) {
                
                 setInputs({

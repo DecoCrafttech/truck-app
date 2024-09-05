@@ -90,7 +90,6 @@ const ProfileTopContainer = () => {
             }
             const response = await axios.post("https://truck.truckmessage.com/get_user_profile", getUserProfileParams)
             if (response.data.error_code === 0) {
-                console.log(response.data)
                 setName(response.data.data[1].name)
                 setMobile(response.data.data[1].phone_number)
                 setCategory(response.data.data[1].category)
@@ -174,7 +173,6 @@ const ProfileTopContainer = () => {
                 setProfileImage(response.data.data[0].profile_image_name)
                 setUpdateImageModal(false)
                 Alert.alert('Upload Success', 'Image uploaded successfully!');
-                console.log("updateImageRes",response.data);
                 
             } else {
                 Toast.error(response.data.message)
@@ -189,15 +187,7 @@ const ProfileTopContainer = () => {
 
 
 
-    const logFormData = (formData) => {
-        for (let [key, value] of formData.entries()) {
-            if (value instanceof File) {
-                console.log(`${key}: ${value.name} (${value.type})`);
-            } else {
-                console.log(`${key}: ${value}`);
-            }
-        }
-    };
+
 
 
 
@@ -229,7 +219,6 @@ const ProfileTopContainer = () => {
                 }
             })
 
-            console.log("profile update",res)
 
             if (res.data.error_code === 0) {
                 setEditing(false);
@@ -242,8 +231,6 @@ const ProfileTopContainer = () => {
         }
     };
 
-    console.log("profileImage",profileImage)
-    console.log("updatedProfileImage",updatedProfileImage)
 
     // Date picker
     const showDatePicker = () => {

@@ -33,7 +33,6 @@ const ForgotPassword = () => {
 
         try {
 
-            console.log(OTPParams)
 
             await AsyncStorage.setItem("mobileNumber", `${mobileNumber}`)
 
@@ -41,7 +40,6 @@ const ForgotPassword = () => {
 
             const response = await axios.post("https://truck.truckmessage.com/send_forgot_pwd_otp", OTPParams)
 
-            console.log("forgot otp res",response.data)
 
             if (response.data.error_code === 0) {
                 Toast.success(response.data.message)

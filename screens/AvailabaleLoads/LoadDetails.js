@@ -4,15 +4,16 @@ import TruckCard from "../TruckCard";
 
 const LoadDetails = ({ filteredTrucks,status,handleEdit }) => {
   
-  console.log("filteredTrucks",filteredTrucks)
 
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {filteredTrucks.length > 0 ? (
-        filteredTrucks.map((truck, index) => (
+        filteredTrucks.reverse().map((truck, index) => (
           <TruckCard
             key={index}
+            post={truck.post}
+            profileName={truck.profileName}
             title={truck.title}
             fromLocation={truck.fromLocation}
             toLocation={truck.toLocation}

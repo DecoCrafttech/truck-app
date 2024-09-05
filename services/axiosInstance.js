@@ -4,7 +4,6 @@ import Toast from "react-native-toast-message";
 const refreshToken = async () => {
   return "new_access_token";
 };
-// console.log(process.env.REACT_NATIVE_APP_API_URL)
 const axiosInstance = axios.create({
   baseURL: "https://truck.truckmessage.com",
   headers: {
@@ -33,7 +32,6 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       refreshToken()
-      console.log("call the refresh token api here");
       // Handle 401 error, e.g., redirect to login or refresh token
     }
     return Promise.reject(error);

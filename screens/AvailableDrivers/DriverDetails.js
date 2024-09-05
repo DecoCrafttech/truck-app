@@ -9,6 +9,8 @@ const DriverDetails = ({  filteredTrucks }) => {
         filteredTrucks.map((truck, index) => (
           <TruckCard
             key={index}
+            post={truck.post}
+            profileName={truck.profileName}
             title={truck.title}
             fromLocation={truck.fromLocation}
             toLocation={truck.toLocation}
@@ -16,6 +18,7 @@ const DriverDetails = ({  filteredTrucks }) => {
             description={truck.description}
             onButton1Press={truck.onButton1Press}
             onButton2Press={truck.onButton2Press}
+            companyName = {truck.companyName}
           />
         ))
       ) : (

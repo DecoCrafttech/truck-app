@@ -21,6 +21,8 @@ import axios from "axios";
 import { OtpInput } from "react-native-otp-entry";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import RNPickerSelect from 'react-native-picker-select';
+
 
 const AvailableDrivers = ({ navigation }) => {
 
@@ -90,7 +92,6 @@ const AvailableDrivers = ({ navigation }) => {
         user_id: `${await AsyncStorage.getItem("user_id")}`
       }
       const response = await axiosInstance.post("/check_aadhar_verification", isAadhaarVerifiedParams)
-      console.log(response)
       if (response.data.error_code === 0) {
         if (response.data.data.is_aadhar_verified === true) {
           navigation.navigate("DriverNeeds");
@@ -121,21 +122,24 @@ const AvailableDrivers = ({ navigation }) => {
         const response = await axiosInstance.get("/all_driver_details");
         if (response.data.error_code === 0) {
           const transformedData = response.data.data.map((item) => ({
+            companyName : item.company_name,
+            post: item.user_post,
+            profileName: item.profile_name,
             title: item.driver_name,
             fromLocation: item.from_location,
             toLocation: item.to_location,
             labels: [
               { icon: "directions-bus", text: item.vehicle_number },
-              { icon: "attractions", text: item.no_of_tyres },
+              { icon: "attractions", text: `${item.no_of_tyres} wheels` },
               { icon: "local-shipping", text: item.truck_body_type },
-              { icon: "verified", text: item.truck_name },
+              { icon: "factory", text: item.company_name },
             ],
             description: item.description,
             onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
             onButton2Press: () => {
               setMessageReceiver(item)
               handleChatNavigate()
-              }
+            }
           }));
 
           setDriversData(transformedData);
@@ -148,7 +152,7 @@ const AvailableDrivers = ({ navigation }) => {
       } catch (error) {
         console.error("Error fetching all drivers:", error);
       } finally {
-        setisLoadings(false); 
+        setisLoadings(false);
       }
     };
 
@@ -202,9 +206,7 @@ const AvailableDrivers = ({ navigation }) => {
           id_number: `${aadhaar}`
         }
         const response = await axiosInstance.post("/aadhaar_generate_otp", generateOTPParams)
-        console.log(response.data)
         if (response.data.error_code === 0) {
-          console.log(response.data)
           AsyncStorage.setItem("client_id", response.data.data[0].client_id)
           setShowOTPInputBox(true)
           setTimeLeft(60)
@@ -223,9 +225,7 @@ const AvailableDrivers = ({ navigation }) => {
         id_number: `${aadhaar}`
       }
       const response = await axiosInstance.post("/aadhaar_generate_otp", resendParams)
-      console.log(response.data)
       if (response.data.error_code === 0) {
-        console.log(response.data)
         AsyncStorage.setItem("client_id", response.data.data[0].client_id)
       } else {
         Toast.error(response.data.message)
@@ -246,12 +246,10 @@ const AvailableDrivers = ({ navigation }) => {
     try {
 
 
-      console.log(verifyParams)
 
       const response = await axiosInstance.post("/aadhaar_submit_otp", verifyParams)
 
       if (response.data.error_code === 0) {
-        console.log(response)
         Toast.success(response.data.message)
         setIsAadhaarModal(false)
         setTimeLeft(null)
@@ -341,24 +339,26 @@ const AvailableDrivers = ({ navigation }) => {
     // }
 
     const filterParams = {
-      "driver_name" : modalValues.driverName,
-      "contact_no":"",
-      "vehicle_number" : "",
-      "company_name" : "",
+      "driver_name": modalValues.driverName,
+      "contact_no": "",
+      "vehicle_number": "",
+      "company_name": "",
       "from_location": modalValues.fromLocation,
       "to_location": modalValues.toLocation,
       "truck_body_type": modalValues.truckBodyType,
-      "truck_name" : modalValues.truckName,
+      "truck_name": modalValues.truckName,
       "no_of_tyres": modalValues.noOfTyres
     }
 
     try {
 
-      console.log(filterParams)
 
       const response = await axiosInstance.post("/user_driver_details_filter", filterParams)
       if (response.data.error_code === 0) {
         const transformedData = response.data.data.map((item) => ({
+          truckName : item.truck_name,
+          post: item.user_post,
+          profileName: item.profile_name,
           title: item.driver_name,
           fromLocation: item.from_location,
           toLocation: item.to_location,
@@ -366,14 +366,14 @@ const AvailableDrivers = ({ navigation }) => {
             { icon: "directions-bus", text: item.vehicle_number },
             { icon: "attractions", text: item.no_of_tyres },
             { icon: "local-shipping", text: item.truck_body_type },
-            { icon: "verified", text: item.truck_name },
+            { icon: "factory", text: item.truck_name },
           ],
           description: item.description,
           onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
           onButton2Press: () => {
             setMessageReceiver(item)
             handleChatNavigate()
-            }
+          }
         }));
         setDriversData(transformedData);
         toggleModal(); // Close modal after applying filter
@@ -389,20 +389,6 @@ const AvailableDrivers = ({ navigation }) => {
       console.log(err)
     }
 
-    // try {
-
-    //   console.log(filterParams)
-
-    //   const response = await axios.post("https://truck.truckmessage.com/user_driver_details_filter", filterParams)
-    //   console.log(response.data)
-    //   console.log(response.data.error_code)
-    //   if (response.data.error_code === 0) {
-    //     // Implement your logic here to use modalValues, e.g., submit form data
-    //     toggleModal(); // Close modal after applying filter
-    //   }
-    // } catch (err) {
-    //   console.log(err)
-    // }
   };
 
   if (isLoadings) {
@@ -412,6 +398,45 @@ const AvailableDrivers = ({ navigation }) => {
       </SafeAreaView>
     );
   }
+
+
+  const brandData = [
+    { label: 'Ashok Leyland', value: 'ashokLeyland' },
+    { label: 'Tata', value: 'tata' },
+    { label: 'Mahindra', value: 'mahindra' },
+    { label: 'Eicher', value: 'eicher' },
+    { label: 'Daimler India', value: 'daimlerIndia' },
+    { label: 'Bharat Benz', value: 'bharatBenz' },
+    { label: 'Maruthi Suzuki', value: 'maruthiSuzuki' },
+    { label: 'SML Lsuzu', value: 'smlLsuzu' },
+    { label: 'Force', value: 'force' }, 
+    { label: 'AMW', value: 'amw' },
+    { label: 'Man', value: 'man' },
+    { label: 'Volvo', value: 'volvo' },
+    { label: 'Scania', value: 'scania' },
+    { label: 'Others', value: 'others' },
+  ]
+
+  const bodyTypeData = [
+    { label: 'Open body', value: 'open_body' },
+    { label: 'Container', value: 'container' },
+    { label: 'Trailer', value: 'trailer' },
+    { label: 'Tanker', value: 'tanker' },
+  ];
+
+  const numberOfTyresData = [
+    { label: '4', value: '4' },
+    { label: '6', value: '6' },
+    { label: '8', value: '8' },
+    { label: '10', value: '10' },
+    { label: '12', value: '12' },
+    { label: '14', value: '14' },
+    { label: '16', value: '16' },
+    { label: '18', value: '18' },
+    { label: '20', value: '20' },
+    { label: '22', value: '22' },
+  ];
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -447,14 +472,12 @@ const AvailableDrivers = ({ navigation }) => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Filter Options</Text>
+
             <TextInput
-              style={[styles.input, errorFields.driverName && styles.inputError]}
-              placeholder="Driver Name"
-              value={modalValues.driverName}
-              onChangeText={(text) => handleInputChange('driverName', text)}
-            />
-            <TextInput
-              style={[styles.input, errorFields.fromLocation && styles.inputError]}
+              style={[
+                styles.input,
+                errorFields.fromLocation && styles.inputError,
+              ]}
               placeholder="From Location"
               value={modalValues.fromLocation}
               // onChangeText={(text) => handleInputChange('fromLocation', text)}
@@ -467,45 +490,66 @@ const AvailableDrivers = ({ navigation }) => {
               }}
             />
             <TextInput
-              style={[styles.input, errorFields.toLocation && styles.inputError]}
+              style={[
+                styles.input,
+                errorFields.toLocation && styles.inputError,
+              ]}
               placeholder="To Location"
               value={modalValues.toLocation}
-             // onChangeText={(text) => handleInputChange('toLocation', text)}
-             onPress={() => {
-              setToLocationModal(true);
-              setModalValues(prevValues => ({
-                ...prevValues,
-                toLocation: ""
-              }));
-            }}
+              // onChangeText={(text) => handleInputChange('toLocation', text)}
+              onPress={() => {
+                setToLocationModal(true);
+                setModalValues(prevValues => ({
+                  ...prevValues,
+                  toLocation: ""
+                }));
+              }}
             />
             <TextInput
-              style={[styles.input, errorFields.vehicleNumber && styles.inputError]}
-              placeholder="Vehicle Number"
-              value={modalValues.vehicleNumber}
-              onChangeText={(text) => handleInputChange('vehicleNumber', text)}
+              style={[styles.input, errorFields.material && styles.inputError]}
+              placeholder="Material"
+              value={modalValues.material}
+              onChangeText={(text) => handleInputChange("material", text)}
             />
-            <TextInput
-              style={[styles.input, errorFields.noOfTyres && styles.inputError]}
-              placeholder="Number of Tyres"
-              keyboardType="number-pad"
-              value={modalValues.noOfTyres}
-              onChangeText={(text) => handleInputChange('noOfTyres', text)}
-            />
-            <TextInput
-              style={[styles.input, errorFields.truckName && styles.inputError]}
-              placeholder="Truck Name"
-              value={modalValues.truckName}
-              onChangeText={(text) => handleInputChange('truckName', text)}
-            />
-            <TextInput
-              style={[styles.input, errorFields.truckBodyType && styles.inputError]}
-              placeholder="Truck Body Type"
-              value={modalValues.truckBodyType}
-              onChangeText={(text) => handleInputChange('truckBodyType', text)}
-            />
+
+
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({ ...modalValues, truckBodyType: value })}
+                items={bodyTypeData}
+                value={modalValues.truckBodyType}
+                placeholder={{
+                  label: 'Select truck body type',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({ ...modalValues, noOfTyres: value })}
+                items={numberOfTyresData}
+                value={modalValues.numberOfTyres}
+                placeholder={{
+                  label: 'Select number of tyres',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
             <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
               <Text style={styles.applyButtonText}>Apply Filter</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.applyButton}
+              onPress={() => {
+                 setIsLoading(!isLoading)
+                 toggleModal()
+              }}>
+              <Text style={styles.applyButtonText}>Clear filter</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.applyButtonText}>Close</Text>
@@ -546,15 +590,15 @@ const AvailableDrivers = ({ navigation }) => {
                   />
                   <View style={{ alignItems: 'center', marginVertical: 20 }}>
                     <Text>Don't receive the code ? </Text>
-                    <TouchableOpacity disabled = {timeLeft === null ? false : true}>
+                    <TouchableOpacity disabled={timeLeft === null ? false : true}>
                       <Text
-                        style={{ color: timeLeft === null ? "#4285F4" : '#ccc' , fontWeight: 'bold', textDecorationLine: 'underline', marginTop: 10 }}
+                        style={{ color: timeLeft === null ? "#4285F4" : '#ccc', fontWeight: 'bold', textDecorationLine: 'underline', marginTop: 10 }}
                         onPress={resendClick}
-                        disabled = {timeLeft === null ? false : true}
+                        disabled={timeLeft === null ? false : true}
                       >
                         {""}Resend code
                       </Text>
-                      <Text style={{display : timeLeft === null ? "none" : "inline"}}>(in {timeLeft} seconds)</Text>
+                      <Text style={{ display: timeLeft === null ? "none" : "inline" }}>(in {timeLeft} seconds)</Text>
                     </TouchableOpacity>
                   </View>
                 </>
@@ -703,18 +747,18 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    height: 40,
+    padding:13
   },
   inputError: {
     borderColor: "red",
   },
   applyButton: {
-    backgroundColor: COLORS.primary,    
+    backgroundColor: COLORS.primary,
     paddingVertical: 10,
     borderRadius: 5,
     marginTop: 10,
   },
-  closeButton:{
+  closeButton: {
     backgroundColor: "#8a1c33",
     paddingVertical: 10,
     borderRadius: 5,

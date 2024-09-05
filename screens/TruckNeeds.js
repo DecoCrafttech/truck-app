@@ -17,11 +17,14 @@ import axiosInstance from "../services/axiosInstance";
 import { LoadNeedsContext } from "../hooks/LoadNeedsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import RNPickerSelect from 'react-native-picker-select';
+import { useNavigation } from "@react-navigation/native";
+
 
 const TruckNeeds = () => {
 
   const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
-
+  const navigation = useNavigation("")
 
   const { isLoading, setIsLoading } = useContext(LoadNeedsContext);
 
@@ -30,6 +33,7 @@ const TruckNeeds = () => {
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [contactNumber, setContactNumber] = useState("");
+  const [transportName, setTransportName] = useState("")
   const [fromLocation, setFromLocation] = useState("");
   const [toLocation, setToLocation] = useState("");
   const [ton, setTon] = useState("");
@@ -42,6 +46,7 @@ const TruckNeeds = () => {
   const [vehicleNumberValid, setVehicleNumberValid] = useState(true);
   const [companyNameValid, setCompanyNameValid] = useState(true);
   const [contactNumberValid, setContactNumberValid] = useState(true);
+  const [transportNameValid, setTransportNameValid] = useState(true)
   const [fromLocationValid, setFromLocationValid] = useState(true);
   const [toLocationValid, setToLocationValid] = useState(true);
   const [tonValid, setTonValid] = useState(true);
@@ -60,6 +65,7 @@ const TruckNeeds = () => {
       vehicleNumber.trim() === "" ||
       companyName.trim() === "" ||
       contactNumber.trim() === "" ||
+      transportName.trim() === "" ||
       fromLocation.trim() === "" ||
       toLocation.trim() === "" ||
       ton.trim() === "" ||
@@ -72,6 +78,7 @@ const TruckNeeds = () => {
       setVehicleNumberValid(vehicleNumber.trim() !== "");
       setCompanyNameValid(companyName.trim() !== "");
       setContactNumberValid(contactNumber.trim() !== "");
+      setTransportNameValid(transportName.trim() !== "")
       setFromLocationValid(fromLocation.trim() !== "");
       setToLocationValid(toLocation.trim() !== "");
       setTonValid(ton.trim() !== "");
@@ -85,29 +92,31 @@ const TruckNeeds = () => {
 
     // Prepare data to send
     const postData = {
-      vehicle_number: vehicleNumber,
       company_name: companyName,
       contact_no: contactNumber,
+      description: description,
       from: fromLocation,
       to: toLocation,
+      vehicle_number: vehicleNumber,
+      name_of_the_transport: transportName,
+      no_of_tyres: numberOfTyres,
       tone: ton,
       truck_name: truckName,
+      truck_brand_name: truckName,
       truck_body_type: truckBodyType,
-      no_of_tyres: numberOfTyres,
-      description: description,
       user_id: await AsyncStorage.getItem("user_id")
     };
 
     try {
       // Send POST request to your API endpoint
       const response = await axiosInstance.post("/truck_entry", postData);
-      console.log("Post added successfully:", response.data);
       if (response.data.error_code === 0) {
         setIsLoading(!isLoading);
         setVehicleNumber("");
         setCompanyName("");
         setContactNumber("");
         setFromLocation("");
+        setTransportName("")
         setToLocation("");
         setTon("");
         setTruckName("");
@@ -115,6 +124,7 @@ const TruckNeeds = () => {
         setNumberOfTyres("");
         setDescription("");
         Alert.alert("Post added successfully!");
+        navigation.goBack()
       } else {
         Alert.alert("Failed to add post. Please try again later.");
       }
@@ -151,9 +161,6 @@ const TruckNeeds = () => {
       });
     }
 
-    console.log('Country:', country);
-    console.log('State:', state);
-    console.log('City:', city);
 
     setFromLocation(`${city} , ${state}`)
     setFromLocationModal(false)
@@ -181,9 +188,6 @@ const TruckNeeds = () => {
       });
     }
 
-    console.log('Country:', country);
-    console.log('State:', state);
-    console.log('City:', city);
 
     setToLocation(`${city} , ${state}`)
     setToLocationModal(false)
@@ -191,6 +195,42 @@ const TruckNeeds = () => {
     // You can use the extracted details as needed
   };
 
+  const brandData = [
+    { label: 'Ashok Leyland', value: 'ashokLeyland' },
+    { label: 'Tata', value: 'tata' },
+    { label: 'Mahindra', value: 'mahindra' },
+    { label: 'Eicher', value: 'eicher' },
+    { label: 'Daimler India', value: 'daimlerIndia' },
+    { label: 'Bharat Benz', value: 'bharatBenz' },
+    { label: 'Maruthi Suzuki', value: 'maruthiSuzuki' },
+    { label: 'SML Lsuzu', value: 'smlLsuzu' },
+    { label: 'Force', value: 'force' },
+    { label: 'AMW', value: 'amw' },
+    { label: 'Man', value: 'man' },
+    { label: 'Volvo', value: 'volvo' },
+    { label: 'Scania', value: 'scania' },
+    { label: 'Others', value: 'others' },
+  ]
+
+  const bodyTypeData = [
+    { label: 'Open body', value: 'open_body' },
+    { label: 'Container', value: 'container' },
+    { label: 'Trailer', value: 'trailer' },
+    { label: 'Tanker', value: 'tanker' },
+  ];
+
+  const numberOfTyresData = [
+    { label: '4', value: '4' },
+    { label: '6', value: '6' },
+    { label: '8', value: '8' },
+    { label: '10', value: '10' },
+    { label: '12', value: '12' },
+    { label: '14', value: '14' },
+    { label: '16', value: '16' },
+    { label: '18', value: '18' },
+    { label: '20', value: '20' },
+    { label: '22', value: '22' },
+  ];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -205,17 +245,17 @@ const TruckNeeds = () => {
                 styles.textInput,
                 !vehicleNumberValid && { borderColor: "red" },
               ]}
-              placeholder="Vehicle Number"
+              placeholder="Enter your vehicle number"
               onChangeText={setVehicleNumber}
               value={vehicleNumber}
             />
-            <Text style={styles.label}>Company Name</Text>
+            <Text style={styles.label}>Owner Name</Text>
             <TextInput
               style={[
                 styles.textInput,
                 !companyNameValid && { borderColor: "red" },
               ]}
-              placeholder="Company Name"
+              placeholder="Enter your owner name"
               onChangeText={setCompanyName}
               value={companyName}
             />
@@ -228,7 +268,51 @@ const TruckNeeds = () => {
               placeholder="Contact Number"
               onChangeText={setContactNumber}
               value={contactNumber}
+              keyboardType="number-pad"
+              maxLength={10}
             />
+            <Text style={styles.label}>Name of the transport</Text>
+            <TextInput
+              style={[
+                styles.textInput,
+                !companyNameValid && { borderColor: "red" },
+              ]}
+              placeholder="Enter your transport name"
+              onChangeText={setTransportName}
+              value={transportName}
+            />
+
+            <Text style={styles.label}>Ton</Text>
+            <TextInput
+              style={[styles.textInput, !tonValid && { borderColor: "red" }]}
+              placeholder="Example : 2"
+              onChangeText={setTon}
+              value={ton}
+            />
+
+            <Text style={styles.label}>Truck Name</Text>
+            {/* <TextInput
+              style={[
+                styles.textInput,
+                !truckNameValid && { borderColor: "red" },
+              ]}
+              placeholder="Truck Name"
+              onChangeText={setTruckName}
+              value={truckName}
+            /> */}
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setTruckName(value)}
+                items={brandData}
+                value={truckName}
+                placeholder={{
+                  label: 'Select truck name',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
             <Text style={styles.label}>From</Text>
             <TextInput
               style={[
@@ -252,35 +336,24 @@ const TruckNeeds = () => {
               value={toLocation}
               onPress={() => setToLocationModal(true)}
             />
-            <Text style={styles.label}>Ton</Text>
-            <TextInput
-              style={[styles.textInput, !tonValid && { borderColor: "red" }]}
-              placeholder="Weight in Tons"
-              onChangeText={setTon}
-              value={ton}
-            />
-            <Text style={styles.label}>Truck Name</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                !truckNameValid && { borderColor: "red" },
-              ]}
-              placeholder="Truck Name"
-              onChangeText={setTruckName}
-              value={truckName}
-            />
+
+
             <Text style={styles.label}>Truck Body Type</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                !truckBodyTypeValid && { borderColor: "red" },
-              ]}
-              placeholder="Truck Body Type"
-              onChangeText={setTruckBodyType}
-              value={truckBodyType}
-            />
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setTruckBodyType(value)}
+                items={bodyTypeData}
+                value={truckBodyType}
+                placeholder={{
+                  label: 'Select truck body type',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
             <Text style={styles.label}>No. of Tyres</Text>
-            <TextInput
+            {/* <TextInput
               style={[
                 styles.textInput,
                 !numberOfTyresValid && { borderColor: "red" },
@@ -288,7 +361,19 @@ const TruckNeeds = () => {
               placeholder="Number of Tyres"
               onChangeText={setNumberOfTyres}
               value={numberOfTyres}
-            />
+            /> */}
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setNumberOfTyres(value)}
+                items={numberOfTyresData}
+                value={numberOfTyres}
+                placeholder={{
+                  label: 'Select number of tyres',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
             <Text style={styles.label}>Description</Text>
             <TextInput
               style={[
@@ -429,7 +514,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.gray,
     borderRadius: 5,
-    padding: 10,
+    padding: 13,
     marginBottom: 10,
   },
   modalContainer: {

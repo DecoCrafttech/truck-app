@@ -9,6 +9,8 @@ const TruckDetails = ({ navigation, filteredTrucks }) => {
         filteredTrucks.map((truck, index) => (
           <TruckCard
             key={index}
+            post={truck.post}
+            profileName={truck.profileName}
             title={truck.title}
             fromLocation={truck.fromLocation}
             toLocation={truck.toLocation}

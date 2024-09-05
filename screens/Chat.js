@@ -32,7 +32,6 @@ const Chat = ({ username }) => {
         };
 
         const response = await axios.post('https://truck.truckmessage.com/get_user_chat_message_list', userIdParams);
-        console.log(response.data.data);
        
         // Transform the API response
         const transformedMessages = transformMessages(response.data.data);
@@ -146,7 +145,6 @@ const Chat = ({ username }) => {
 
       setInputMessage("");
 
-      // console.log(response.data);
 
     } catch (err) {
       console.log(err);

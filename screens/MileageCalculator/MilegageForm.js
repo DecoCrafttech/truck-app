@@ -115,6 +115,7 @@ const MileageForm = () => {
           placeholder="Distance"
           onChangeText={setDistance}
           value={distance}
+          keyboardType="number-pad"
         />
         <Text style={styles.label}>Fuel</Text>
         <TextInput
@@ -122,6 +123,8 @@ const MileageForm = () => {
           placeholder="Fuel"
           onChangeText={setFuel}
           value={fuel}
+          keyboardType="number-pad"
+
         />
         <Text style={styles.label}>Price</Text>
         <TextInput
@@ -129,6 +132,8 @@ const MileageForm = () => {
           placeholder="Price"
           onChangeText={setPrice}
           value={price}
+          keyboardType="number-pad"
+
         />
       </View>
 

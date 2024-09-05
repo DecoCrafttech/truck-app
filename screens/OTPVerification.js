@@ -19,14 +19,12 @@ const OTPVerification = () => {
 
 
     const resendClick = async () => {
-        console.log(AsyncStorage.getItem("mobileNumber"))
         const resendParams = {
             phone_number: await AsyncStorage.getItem("mobileNumber")
         }
         try {
             await axios.post("https://truck.truckmessage.com/send_signup_otp", resendParams)
                 .then((response) => {
-                    console.log("resend otp res",response.data)
                     if (response.data.error_code === 0) {
                         
                         
@@ -49,14 +47,9 @@ const OTPVerification = () => {
             otp: `${OTP}`,
         }
         try {
-            console.log("v-try")
-
-            console.log(verifyParams)
 
             await axios.post("https://truck.truckmessage.com/validate_otp", verifyParams)
                 .then((response) => {
-
-                    console.log("otp verify res",response)
                     if (response.data.error_code === 1) {
                         // AsyncStorage.setItem("user_id",`${response.data.data[0].user_id}`)
                         Toast.success(response.data.message)

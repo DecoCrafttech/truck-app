@@ -18,10 +18,15 @@ import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ReactGoogleAutocomplete from "react-google-autocomplete";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import RNPickerSelect from 'react-native-picker-select';
+import { useNavigation } from "@react-navigation/native";
+
 
 const LoadNeeds = () => {
 
   const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+
+  const navigate = useNavigation("")
 
   const { isLoading, setIsLoading } = useContext(LoadNeedsContext);
 
@@ -99,9 +104,9 @@ const LoadNeeds = () => {
 
       // Handle API response
       if (response.data.error_code === 0) {
-        console.log(response)
         setIsLoading(!isLoading);
         Alert.alert("Post added successfully!");
+        navigate.goBack()
         // Optionally, reset the form fields after successful submission
         setCompanyName("");
         setContactNumber("");
@@ -143,9 +148,6 @@ const LoadNeeds = () => {
       });
     }
 
-    console.log('Country:', country);
-    console.log('State:', state);
-    console.log('City:', city);
 
     setFromLocation(`${city} , ${state}`)
     setFromLocationModal(false)
@@ -173,15 +175,33 @@ const LoadNeeds = () => {
       });
     }
 
-    console.log('Country:', country);
-    console.log('State:', state);
-    console.log('City:', city);
 
     setToLocation(`${city} , ${state}`)
     setToLocationModal(false)
 
     // You can use the extracted details as needed
   };
+
+  const bodyTypeData = [
+    { label: 'Open body', value: 'open_body' },
+    { label: 'Container', value: 'container' },
+    { label: 'Trailer', value: 'trailer' },
+    { label: 'Tanker', value: 'tanker' },
+  ];
+
+  const numberOfTyresData = [
+    { label: '4', value: '4' },
+    { label: '6', value: '6' },
+    { label: '8', value: '8' },
+    { label: '10', value: '10' },
+    { label: '12', value: '12' },
+    { label: '14', value: '14' },
+    { label: '16', value: '16' },
+    { label: '18', value: '18' },
+    { label: '20', value: '20' },
+    { label: '22', value: '22' },
+  ];
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -196,7 +216,7 @@ const LoadNeeds = () => {
                 styles.textInput,
                 !companyNameValid && { borderColor: "red" },
               ]}
-              placeholder="Name of the Dealer"
+              placeholder="Name of the company"
               onChangeText={setCompanyName}
               value={companyName}
             />
@@ -206,9 +226,11 @@ const LoadNeeds = () => {
                 styles.textInput,
                 !contactNumberValid && { borderColor: "red" },
               ]}
-              placeholder="Type Your Number"
+              placeholder="Enter your contact number"
               onChangeText={setContactNumber}
               value={contactNumber}
+              keyboardType="number-pad"
+              maxLength={10}
             />
             <Text style={styles.label}>From</Text>
             <TextInput
@@ -216,7 +238,7 @@ const LoadNeeds = () => {
                 styles.textInput,
                 !fromLocationValid && { borderColor: "red" },
               ]}
-              placeholder="Starting Location"
+              placeholder="Enter your location"
               // onChangeText={setFromLocation}
               value={fromLocation}
               onPress={() => setFromLocationModal(true)}
@@ -228,7 +250,7 @@ const LoadNeeds = () => {
                 styles.textInput,
                 !toLocationValid && { borderColor: "red" },
               ]}
-              placeholder="Destination Location"
+              placeholder="Enter your location"
               // onChangeText={setToLocation}
               value={toLocation}
               onPress={() => setToLocationModal(true)}
@@ -239,19 +261,20 @@ const LoadNeeds = () => {
                 styles.textInput,
                 !materialValid && { borderColor: "red" },
               ]}
-              placeholder="Type of Material"
+              placeholder="Type of material"
               onChangeText={setMaterial}
               value={material}
             />
             <Text style={styles.label}>Ton</Text>
             <TextInput
               style={[styles.textInput, !tonValid && { borderColor: "red" }]}
-              placeholder="Weight in Tons"
+              placeholder="Example : 2 "
               onChangeText={setTon}
               value={ton}
+              keyboardType="number-pad"
             />
             <Text style={styles.label}>Truck Body Type</Text>
-            <TextInput
+            {/* <TextInput
               style={[
                 styles.textInput,
                 !truckBodyTypeValid && { borderColor: "red" },
@@ -259,9 +282,23 @@ const LoadNeeds = () => {
               placeholder="Type of Truck Body"
               onChangeText={setTruckBodyType}
               value={truckBodyType}
-            />
+            /> */}
+
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setTruckBodyType(value)}
+                items={bodyTypeData}
+                value={truckBodyType}
+                placeholder={{
+                  label: 'Select truck body type',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
             <Text style={styles.label}>No. of Tyres</Text>
-            <TextInput
+            {/* <TextInput
               style={[
                 styles.textInput,
                 !numberOfTyresValid && { borderColor: "red" },
@@ -269,7 +306,19 @@ const LoadNeeds = () => {
               placeholder="Number of Tyres"
               onChangeText={setNumberOfTyres}
               value={numberOfTyres}
-            />
+            /> */}
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setNumberOfTyres(value)}
+                items={numberOfTyresData}
+                value={numberOfTyres}
+                placeholder={{
+                  label: 'Select number of tyres',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
             <Text style={styles.label}>Description</Text>
             <TextInput
               style={[
@@ -419,7 +468,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.gray,
     borderRadius: 5,
-    padding: 10,
+    padding: 12,
     marginBottom: 10,
   },
   modalContainer: {

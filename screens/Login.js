@@ -96,12 +96,10 @@ const Login = () => {
 
                 await AsyncStorage.setItem("mobileNumber", `${inputs.mobileNumber}`)
 
-                console.log(LogInParams)
 
                 // const response = await axiosInstance.post("/send_signup_otp", LogInParams)
 
                 const response = await axios.post("https://truck.truckmessage.com/login", LogInParams)
-                console.log("login response",response.data)
                 if (response.data.error_code === 0) {
                    
                     setInputs({
@@ -132,9 +130,7 @@ const Login = () => {
 
         try {
 
-            console.log(resetPasswordPasswordParams)
             const response = await axios.post("https://truck.truckmessage.com/send_forgot_pwd_otp", resetPasswordPasswordParams)
-            console.log(response.data)
 
             if (response.data.error_code === 0) {
                 Toast.success(response.data.message)

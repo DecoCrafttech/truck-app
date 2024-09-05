@@ -53,7 +53,6 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails }) => {
   
     const filteredLabels = editedDetails.labels.filter(label => label.text !== "");
 
-    console.log(filteredLabels)
   
     return (
       <>

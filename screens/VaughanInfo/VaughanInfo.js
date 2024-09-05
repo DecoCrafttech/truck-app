@@ -17,11 +17,19 @@ import axiosInstance from "../../services/axiosInstance";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Entypo from '@expo/vector-icons/Entypo';
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 const VaughanInfo = ({ navigation }) => {
+
+    const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+
+
   const { isLoading } = useContext(LoadNeedsContext);
   const [expense, setExpenses] = useState([]);
   const [update, setUpdate] = useState(false);
+
+  const [fromLocationModal, setFromLocationModal] = useState(false)
+  const [toLocationModal, setToLocationModal] = useState(false)
 
   useEffect(() => {
     const getLoadTripExpenseDetails = async () => {
@@ -190,6 +198,61 @@ const VaughanInfo = ({ navigation }) => {
     </View>
   );
 
+
+  const handleFromLocation = (data, details) => {
+    let country = '';
+    let state = '';
+    let city = '';
+
+    if (details.address_components) {
+      details.address_components.forEach(component => {
+        if (component.types.includes('country')) {
+          country = component.long_name;
+        }
+        if (component.types.includes('administrative_area_level_1')) {
+          state = component.long_name;
+        }
+        if (component.types.includes('locality')) {
+          city = component.long_name;
+        }
+      });
+    }
+
+
+    setModalValues((prevState) => ({
+      ...prevState, fromLocation: (`${city} , ${state}`)
+    }))
+    setFromLocationModal(false)
+    // You can use the extracted details as needed
+  };
+
+  const handleToLocation = (data, details) => {
+    let country = '';
+    let state = '';
+    let city = '';
+
+    if (details.address_components) {
+      details.address_components.forEach(component => {
+        if (component.types.includes('country')) {
+          country = component.long_name;
+        }
+        if (component.types.includes('administrative_area_level_1')) {
+          state = component.long_name;
+        }
+        if (component.types.includes('locality')) {
+          city = component.long_name;
+        }
+      });
+    }
+
+
+    setModalValues((prevState) => ({
+      ...prevState, toLocation: (`${city} , ${state}`)
+    }))
+    setToLocationModal(false)
+    // You can use the extracted details as needed
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -228,8 +291,9 @@ const VaughanInfo = ({ navigation }) => {
                 errorFields.fromLocation && styles.inputError,
               ]}
               placeholder="From Location"
+              // onChangeText={(text) => handleInputChange("fromLocation", text)}
               value={modalValues.fromLocation}
-              onChangeText={(text) => handleInputChange("fromLocation", text)}
+              onPress={() => setFromLocationModal(true)}
             />
             <TextInput
               style={[
@@ -237,8 +301,9 @@ const VaughanInfo = ({ navigation }) => {
                 errorFields.toLocation && styles.inputError,
               ]}
               placeholder="To Location"
+              // onChangeText={(text) => handleInputChange("toLocation", text)}
               value={modalValues.toLocation}
-              onChangeText={(text) => handleInputChange("toLocation", text)}
+              onPress={() => setToLocationModal(true)}
             />
 
             <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
@@ -250,6 +315,88 @@ const VaughanInfo = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+
+
+
+      {/*From Location Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={fromLocationModal}
+      // onRequestClose={() => setIsAadhaarModal(false)}
+      >
+        <View style={styles.locationModalContainer}>
+          <View style={styles.locationModalContent}>
+            <Text style={styles.modalTitle}>From Location</Text>
+
+
+            <View style={styles.locationContainer}>
+              <GooglePlacesAutocomplete
+                placeholder="Search location"
+                onPress={handleFromLocation}
+                textInputProps={{
+                  autoFocus: true,
+                }}
+                query={{
+                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  language: 'en',
+                }}
+                fetchDetails={true} // This ensures that you get more detailed information about the selected location
+                styles={{
+                  textInputContainer: styles.locationTextInputContainer,
+                  textInput: styles.locationTextInput
+                }}
+              />
+            </View>
+
+
+            <TouchableOpacity style={styles.closeButton} onPress={() => setFromLocationModal(false)}>
+              <Text style={styles.applyButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/*To Location Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={toLocationModal}
+      // onRequestClose={() => setIsAadhaarModal(false)}
+      >
+        <View style={styles.locationModalContainer}>
+          <View style={styles.locationModalContent}>
+            <Text style={styles.modalTitle}>To Location</Text>
+
+
+            <View style={styles.locationContainer}>
+              <GooglePlacesAutocomplete
+                placeholder="Search location"
+                onPress={handleToLocation}
+                textInputProps={{
+                  autoFocus: true,
+                }}
+                query={{
+                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  language: 'en',
+                }}
+                fetchDetails={true} // This ensures that you get more detailed information about the selected location
+                styles={{
+                  textInputContainer: styles.locationTextInputContainer,
+                  textInput: styles.locationTextInput
+                }}
+              />
+            </View>
+
+
+            <TouchableOpacity style={styles.closeButton} onPress={() => setToLocationModal(false)}>
+              <Text style={styles.applyButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+
     </SafeAreaView>
   );
 };
@@ -395,7 +542,30 @@ const styles = StyleSheet.create({
     padding: 10, // Add padding
     borderRadius: 5, // Optional: Add border radius
     marginBottom: 10, // Add some margin below the title
+  },
 
+  locationModalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    height: "90%"
+  },
+  locationModalContent: {
+    backgroundColor: COLORS.white,
+    padding: 20,
+    width: "80%",
+    borderRadius: 10,
+    elevation: 5,
+    height: "90%"
+  },
+  locationContainer: {
+    flex: 1,
+    padding: 5,
+  },
+  locationTextInput: {
+    borderWidth: 1,
+    borderColor: COLORS.gray,
   },
 });
 

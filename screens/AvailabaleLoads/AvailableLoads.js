@@ -15,6 +15,8 @@ import Container, { Toast } from 'toastify-react-native';
 import AadhaarOTPVerification from "../AadhaarOTPVerification";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { useNavigation } from "@react-navigation/native";
+import RNPickerSelect from 'react-native-picker-select';
+
 
 const AvailableLoads = ({ navigation }) => {
 
@@ -82,7 +84,6 @@ const AvailableLoads = ({ navigation }) => {
         user_id: `${await AsyncStorage.getItem("user_id")}`
       }
       const response = await axiosInstance.post("/check_aadhar_verification", isAadhaarVerifiedParams)
-      console.log(response)
       if (response.data.error_code === 0) {
         if (response.data.data.is_aadhar_verified === true) {
           navigation.navigate("LoadNeeds");
@@ -113,6 +114,8 @@ const AvailableLoads = ({ navigation }) => {
 
         if (response.data.error_code === 0) {
           const transformedData = response.data.data.map((item) => ({
+            post: item.user_post,
+            profileName: item.profile_name,
             title: item.company_name,
             fromLocation: item.from_location,
             toLocation: item.to_location,
@@ -121,13 +124,15 @@ const AvailableLoads = ({ navigation }) => {
               { icon: "attractions", text: item.no_of_tyres },
               { icon: "monitor-weight", text: item.tone },
               { icon: "local-shipping", text: item.truck_body_type },
+              { icon: "factory", text: item.company_name },
+
             ],
             description: item.description,
             onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
             onButton2Press: () => {
               setMessageReceiver(item)
               handleChatNavigate()
-              }
+            }
           }));
 
           setAllLoadData(transformedData);
@@ -150,9 +155,11 @@ const AvailableLoads = ({ navigation }) => {
   const filteredTrucks = allLoadData.filter(
     (truck) =>
       truck.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.profileName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       truck.fromLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
       truck.toLocation.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -193,9 +200,7 @@ const AvailableLoads = ({ navigation }) => {
           id_number: `${aadhaar}`
         }
         const response = await axiosInstance.post("/aadhaar_generate_otp", generateOTPParams)
-        console.log(response.data)
         if (response.data.error_code === 0) {
-          console.log(response.data)
           AsyncStorage.setItem("client_id", response.data.data[0].client_id)
           setShowOTPInputBox(true)
           setTimeLeft(60)
@@ -214,9 +219,7 @@ const AvailableLoads = ({ navigation }) => {
         id_number: `${aadhaar}`
       }
       const response = await axiosInstance.post("/aadhaar_generate_otp", resendParams)
-      console.log(response.data)
       if (response.data.error_code === 0) {
-        console.log(response.data)
         AsyncStorage.setItem("client_id", response.data.data[0].client_id)
       } else {
         Toast.error(response.data.message)
@@ -237,12 +240,10 @@ const AvailableLoads = ({ navigation }) => {
     try {
 
 
-      console.log(verifyParams)
 
       const response = await axiosInstance.post("/aadhaar_submit_otp", verifyParams)
 
       if (response.data.error_code === 0) {
-        console.log(response)
         Toast.success(response.data.message)
         setIsAadhaarModal(false)
         setTimeLeft(null)
@@ -347,6 +348,8 @@ const AvailableLoads = ({ navigation }) => {
 
       if (response.data.error_code === 0) {
         const transformedData = response.data.data.map((item) => ({
+          post: item.user_post,
+          profileName: item.profile_name,
           title: item.company_name,
           fromLocation: item.from_location,
           toLocation: item.to_location,
@@ -355,13 +358,14 @@ const AvailableLoads = ({ navigation }) => {
             { icon: "attractions", text: item.no_of_tyres },
             { icon: "monitor-weight", text: item.tone },
             { icon: "local-shipping", text: item.truck_body_type },
+            { icon: "factory", text: item.company_name },
           ],
           description: item.description,
           onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
           onButton2Press: () => {
             setMessageReceiver(item)
             handleChatNavigate()
-            }
+          }
         }));
 
         setAllLoadData(transformedData);
@@ -375,7 +379,7 @@ const AvailableLoads = ({ navigation }) => {
         );
       }
 
-  
+
     } catch (err) {
       console.log(err)
     }
@@ -389,6 +393,28 @@ const AvailableLoads = ({ navigation }) => {
     );
   }
 
+
+  const bodyTypeData = [
+    { label: 'Open body', value: 'open_body' },
+    { label: 'Container', value: 'container' },
+    { label: 'Trailer', value: 'trailer' },
+    { label: 'Tanker', value: 'tanker' },
+  ];
+
+  const numberOfTyresData = [
+    { label: '4', value: '4' },
+    { label: '6', value: '6' },
+    { label: '8', value: '8' },
+    { label: '10', value: '10' },
+    { label: '12', value: '12' },
+    { label: '14', value: '14' },
+    { label: '16', value: '16' },
+    { label: '18', value: '18' },
+    { label: '20', value: '20' },
+    { label: '22', value: '22' },
+  ];
+
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#e8f4ff" }}>
 
@@ -400,8 +426,6 @@ const AvailableLoads = ({ navigation }) => {
         height={60}
         textStyle={{ backgroundColor: '', fontSize: 12 }}
       />
-
-
       <View style={{ flex: 1, backgroundColor: COLORS.white }}>
         <HeaderWithOutBS title="Available Loads" />
         <View style={styles.container}>
@@ -432,12 +456,7 @@ const AvailableLoads = ({ navigation }) => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Filter Options</Text>
-            <TextInput
-              style={[styles.input, errorFields.companyName && styles.inputError]}
-              placeholder="Company Name"
-              value={modalValues.companyName}
-              onChangeText={(text) => handleInputChange('companyName', text)}
-            />
+
             <TextInput
               style={[styles.input, errorFields.fromLocation && styles.inputError]}
               placeholder="From Location"
@@ -464,19 +483,51 @@ const AvailableLoads = ({ navigation }) => {
                 }));
               }}
             />
+            {/* <TextInput
+              style={[styles.input, errorFields.truckBodyType && styles.inputError]}
+              placeholder="Truck Body Type"
+              value={modalValues.truckBodyType}
+              onChangeText={(text) => handleInputChange('truckBodyType', text)}
+            /> */}
+
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({ ...modalValues, truckBodyType: value })}
+                items={bodyTypeData}
+                value={modalValues.truckBodyType}
+                placeholder={{
+                  label: 'Select truck body type',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+            {/* <TextInput
+              style={[styles.input, errorFields.noOfTyres && styles.inputError]}
+              placeholder="Number of Tyres"
+              keyboardType="number-pad"
+              value={modalValues.noOfTyres}
+              onChangeText={(text) => handleInputChange('noOfTyres', text)}
+            /> */}
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({ ...modalValues, noOfTyres: value })}
+                items={numberOfTyresData}
+                value={modalValues.noOfTyres}
+                placeholder={{
+                  label: 'Select number of tyres',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
             <TextInput
               style={[styles.input, errorFields.material && styles.inputError]}
               placeholder="Material"
               value={modalValues.material}
               onChangeText={(text) => handleInputChange('material', text)}
             />
-            <TextInput
-              style={[styles.input, errorFields.noOfTyres && styles.inputError]}
-              placeholder="Number of Tyres"
-              keyboardType="number-pad"
-              value={modalValues.noOfTyres}
-              onChangeText={(text) => handleInputChange('noOfTyres', text)}
-            />
+
             <TextInput
               style={[styles.input, errorFields.tons && styles.inputError]}
               placeholder="Tons"
@@ -484,14 +535,17 @@ const AvailableLoads = ({ navigation }) => {
               value={modalValues.tons}
               onChangeText={(text) => handleInputChange('tons', text)}
             />
-            <TextInput
-              style={[styles.input, errorFields.truckBodyType && styles.inputError]}
-              placeholder="Truck Body Type"
-              value={modalValues.truckBodyType}
-              onChangeText={(text) => handleInputChange('truckBodyType', text)}
-            />
+
             <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
-              <Text style={styles.applyButtonText}>Apply Filter</Text>
+              <Text style={styles.applyButtonText}>Apply filter</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.applyButton}
+              onPress={() => {
+                 setIsLoading(!isLoading)
+                 toggleModal()
+              }}>
+              <Text style={styles.applyButtonText}>Clear filter</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.applyButtonText}>Close</Text>
@@ -691,7 +745,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    height: 40,
+    // height: 40,
+    padding: 12,
+
   },
   inputError: {
     borderColor: "red",

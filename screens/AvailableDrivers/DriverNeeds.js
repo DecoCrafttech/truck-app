@@ -17,6 +17,8 @@ import axiosInstance from "../../services/axiosInstance";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import RNPickerSelect from 'react-native-picker-select';
+
 
 const DriverNeeds = () => {
 
@@ -27,7 +29,7 @@ const DriverNeeds = () => {
 
 
   const [spinner, setSpinner] = useState(false);
-  
+
 
   const [driverName, setDriverName] = useState("");
   const [vehicleNumber, setVehicleNumber] = useState("");
@@ -96,7 +98,7 @@ const DriverNeeds = () => {
       truck_body_type: truckBodyType,
       no_of_tyres: numberOfTyres,
       description: description,
-      user_id:await AsyncStorage.getItem("user_id")
+      user_id: await AsyncStorage.getItem("user_id")
     };
 
     try {
@@ -104,7 +106,6 @@ const DriverNeeds = () => {
       if (response.data.error_code === 0) {
         setSpinner(false);
         setIsLoading(!isLoading);
-        console.log("API Response:", response.data);
         // Reset input fields
         setDriverName("");
         setVehicleNumber("");
@@ -160,10 +161,6 @@ const DriverNeeds = () => {
       });
     }
 
-    console.log('Country:', country);
-    console.log('State:', state);
-    console.log('City:', city);
-
     setFromLocation(`${city} , ${state}`)
     setFromLocationModal(false)
 
@@ -190,15 +187,31 @@ const DriverNeeds = () => {
       });
     }
 
-    console.log('Country:', country);
-    console.log('State:', state);
-    console.log('City:', city);
-
     setToLocation(`${city} , ${state}`)
     setToLocationModal(false)
 
     // You can use the extracted details as needed
   };
+
+  const bodyTypeData = [
+    { label: 'Open body', value: 'open_body' },
+    { label: 'Container', value: 'container' },
+    { label: 'Trailer', value: 'trailer' },
+    { label: 'Tanker', value: 'tanker' },
+  ];
+
+  const numberOfTyresData = [
+    { label: '4', value: '4' },
+    { label: '6', value: '6' },
+    { label: '8', value: '8' },
+    { label: '10', value: '10' },
+    { label: '12', value: '12' },
+    { label: '14', value: '14' },
+    { label: '16', value: '16' },
+    { label: '18', value: '18' },
+    { label: '20', value: '20' },
+    { label: '22', value: '22' },
+  ];
 
 
   return (
@@ -208,43 +221,47 @@ const DriverNeeds = () => {
 
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <View style={styles.textInputContainer}>
-            <Text style={styles.label}>Driver Name</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                !driverNameValid && { borderColor: "red" },
-              ]}
-              placeholder="Driver Name"
-              onChangeText={setDriverName}
-              value={driverName}
-            />
+
             <Text style={styles.label}>Vehicle Number</Text>
             <TextInput
               style={[
                 styles.textInput,
                 !vehicleNumberValid && { borderColor: "red" },
               ]}
-              placeholder="Vehicle Number"
+              placeholder="Enter your vehicle number"
               onChangeText={setVehicleNumber}
               value={vehicleNumber}
             />
+
             <Text style={styles.label}>Company Name</Text>
             <TextInput
               style={[
                 styles.textInput,
                 !companyNameValid && { borderColor: "red" },
               ]}
-              placeholder="Company Name"
+              placeholder="Enter your company name"
               onChangeText={setCompanyName}
               value={companyName}
             />
+
+            <Text style={styles.label}>Owner Name</Text>
+            <TextInput
+              style={[
+                styles.textInput,
+                !driverNameValid && { borderColor: "red" },
+              ]}
+              placeholder="Enter your owner name"
+              onChangeText={setDriverName}
+              value={driverName}
+            />
+
             <Text style={styles.label}>Contact Number</Text>
             <TextInput
               style={[
                 styles.textInput,
                 !contactNumberValid && { borderColor: "red" },
               ]}
-              placeholder="Contact Number"
+              placeholder="Enter your contact number"
               onChangeText={setContactNumber}
               value={contactNumber}
             />
@@ -271,36 +288,37 @@ const DriverNeeds = () => {
               value={toLocation}
               onPress={() => setToLocationModal(true)}
             />
-            <Text style={styles.label}>Truck Name</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                !truckNameValid && { borderColor: "red" },
-              ]}
-              placeholder="Truck Name"
-              onChangeText={setTruckName}
-              value={truckName}
-            />
             <Text style={styles.label}>Truck Body Type</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                !truckBodyTypeValid && { borderColor: "red" },
-              ]}
-              placeholder="Truck Body Type"
-              onChangeText={setTruckBodyType}
-              value={truckBodyType}
-            />
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setTruckBodyType(value)}
+                items={bodyTypeData}
+                value={truckBodyType}
+                placeholder={{
+                  label: 'Select truck body type',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
             <Text style={styles.label}>No. of Tyres</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                !numberOfTyresValid && { borderColor: "red" },
-              ]}
-              placeholder="Number of Tyres"
-              onChangeText={setNumberOfTyres}
-              value={numberOfTyres}
-            />
+
+
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setNumberOfTyres(value)}
+                items={numberOfTyresData}
+                value={numberOfTyres}
+                placeholder={{
+                  label: 'Select number of tyres',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+
             <Text style={styles.label}>Description</Text>
             <TextInput
               style={[
@@ -313,7 +331,7 @@ const DriverNeeds = () => {
             />
           </View>
 
-          
+
 
           {spinner ? (
             <TouchableOpacity style={styles.postButton}>
@@ -340,8 +358,6 @@ const DriverNeeds = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>From Location</Text>
-
-
             <View style={styles.locationContainer}>
               <GooglePlacesAutocomplete
                 placeholder="Search location"
@@ -446,7 +462,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.gray,
     borderRadius: 5,
-    padding: 10,
+    padding: 13,
     marginBottom: 10,
   },
   spinnerContainer: {

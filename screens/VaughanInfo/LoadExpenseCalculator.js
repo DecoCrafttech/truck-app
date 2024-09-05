@@ -76,7 +76,6 @@ const LoadExpenseCalculator = ({ route }) => {
           getCashFlowParamter
         );
 
-        console.log(response.data)
 
         if (response.data.error_code === 0) {
           setInitialCash({
@@ -142,7 +141,6 @@ const LoadExpenseCalculator = ({ route }) => {
             cash_flow_type: cashStatus === "Cash In" ? "IN" : "OUT",
             amount: modalValues.amount
         };
-        console.log("Parameters:", loadTripCashFlowEntryParameters);
 
         const response = await axiosInstance.post("/load_trip_cash_flow_entry", loadTripCashFlowEntryParameters);
 

@@ -2,6 +2,8 @@ import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { COLORS } from "../constants";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import Icon1 from 'react-native-vector-icons/FontAwesome';
+
 
 const TruckCard = ({
   title,
@@ -11,12 +13,31 @@ const TruckCard = ({
   description,
   onButton1Press,
   onButton2Press,
-  status
+  status,
+  profileName,
+  post,
+  companyName
+
 }) => {
   return (
     <View style={styles.card}>
+
+      <View style={[styles.ratingsContainer]}>
+        <View style={styles.starsContainer}>
+          {[...Array(5)].map((_, index) => (
+            <Icon1
+              key={index}
+              name={index > 2 ? "star-o" : "star"}
+              size={13}
+              color="#FFD700"
+            />
+          ))}
+        </View>
+        <Text style={styles.textRight}>Posts : {post}</Text>
+      </View>
+
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title}>{profileName}</Text>
       </View>
       <View style={styles.locationContainer}>
         <Icon name="place" size={24} color={COLORS.iconPickup} />
@@ -36,19 +57,22 @@ const TruckCard = ({
         ))}
       </View>
 
-      <Text style={styles.description}>{description}</Text>
+      <View>
+        <Text style={{ fontWeight: "bold" }}>Description</Text>
+        <Text style={styles.description}>{description}</Text>
+      </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.buttonGreen]}
           onPress={onButton1Press}
         >
-          <Text style={styles.buttonText}>{status === "editAndDelete" ? "Edit": "Call"}</Text>
+          <Text style={styles.buttonText}>{status === "editAndDelete" ? "Edit" : "Call"}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.buttonRed]}
           onPress={onButton2Press}
         >
-          <Text style={styles.buttonText}>{status === "editAndDelete" ? "Delete": "Message"}</Text>
+          <Text style={styles.buttonText}>{status === "editAndDelete" ? "Delete" : "Message"}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -77,7 +101,7 @@ const styles = StyleSheet.create({
     padding: 10, // Add padding
     borderRadius: 5, // Optional: Add border radius
     marginBottom: 10, // Add some margin below the title
-    
+
   },
   locationContainer: {
     flexDirection: "row",
@@ -107,7 +131,8 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    marginVertical: 10,
+    marginTop: 5,
+    marginBottom: 10,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -130,6 +155,22 @@ const styles = StyleSheet.create({
   buttonText: {
     color: COLORS.white,
     fontWeight: "bold",
+  },
+  ratingsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center', // Center vertically if needed
+    marginHorizontal:5,
+    marginBottom:10,
+    paddingTop:10
+  },
+  starsContainer: {
+    flexDirection: 'row', // Align stars horizontally
+  },
+  textRight: {
+    textAlign: 'right',
+    fontWeight:'600'
+    // Additional styling for the "Hi" text if needed
   },
 });
 

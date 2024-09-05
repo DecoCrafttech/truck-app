@@ -50,7 +50,7 @@ const ProductCategoryList = ({ navigation, searchQuery, filteredProducts, onPres
                   />
                 ))}
               </View>
-              <Text style={styles.textRight}>Posts : </Text>
+              <Text style={styles.textRight}>Posts :{1} </Text>
             </View>
 
             <Image
