@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -66,6 +66,8 @@ const Refer = () => {
  
 
   const handleEdit = (item) => {
+
+    
     setEditItem(item);
     setEditModalVisible(true);
   };
@@ -189,14 +191,8 @@ const Refer = () => {
     }
   };
 
-  // const handleSaveChanges = async (updatedDetails) => {
-  //   try {
-  //     setEditModalVisible(false);
-  //     fetchData(selectedValue);
-  //   } catch (error) {
-  //     console.log("Error updating load details:", error);
-  //   }
-  // };
+
+
   const fetchData = async (selectedValue) => {
     setLoading(true);
 
@@ -210,10 +206,15 @@ const Refer = () => {
         userPostParameters
       );
 
+      console.log("response.data",response.data)
+
       if (response.data.error_code === 0) {
         switch (selectedValue) {
           case "user_load_details":
             const transformedData = response.data.data.map((item) => ({
+              companyName :  item.company_name,
+              contactNumber : item.contact_number,
+              truckBodyType: item.truck_body_type,
               title: item.company_name,
               fromLocation: item.from_location,
               toLocation: item.to_location,
@@ -292,6 +293,10 @@ const Refer = () => {
     setFeedbackModalVisible(false);
   };
 
+
+  // console.log("editItem",editItem)
+  // console.log("allLoadData",allLoadData)
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -330,6 +335,7 @@ const Refer = () => {
           onClose={() => setEditModalVisible(false)}
           onSave={handleSaveChanges}
           loadDetails={editItem}
+          selectedValue={selectedValue}
         />
 
         <Modal

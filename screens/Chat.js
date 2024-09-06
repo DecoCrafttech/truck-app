@@ -1,81 +1,112 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet, TextInput } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
-import { COLORS, icons, images, SIZES } from '../constants';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Feather, FontAwesome } from '@expo/vector-icons';
-import { Bubble, GiftedChat } from 'react-native-gifted-chat';
-import { useNavigation } from '@react-navigation/native';
-import { LoadNeedsContext } from '../hooks/LoadNeedsContext';
-import EvilIcons from '@expo/vector-icons/EvilIcons';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useContext, useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  TextInput,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { useNavigation } from "@react-navigation/native";
+import { COLORS, icons, SIZES } from "../constants";
+import { LoadNeedsContext } from "../hooks/LoadNeedsContext";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-const Chat = ({ username }) => {
-
+const Chat = () => {
   const navigation = useNavigation();
-  const {
-    currentUser,
-    setCurrentUser,
-    messageReceiver,
-    setMessageReceiver
-  } = useContext(LoadNeedsContext);
+  const { currentUser, messageReceiver } = useContext(LoadNeedsContext);
 
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
 
+ 
+
   useEffect(() => {
-    const getChatMessages = async () => {
+
+    const fetchChatMessages = async () => {
       try {
-        const userIdParams = {
-          user_id: await AsyncStorage.getItem("user_id"),
-          person_id: messageReceiver.person_id,
-        };
-
-        const response = await axios.post('https://truck.truckmessage.com/get_user_chat_message_list', userIdParams);
-       
-        // Transform the API response
-        const transformedMessages = transformMessages(response.data.data);
-
-        // Set the transformed messages in the state
+        const userId = await AsyncStorage.getItem("user_id");
+        const response = await axios.post(
+          "https://truck.truckmessage.com/get_user_chat_message_list",
+          {
+            user_id: userId,
+            person_id: messageReceiver?.person_id,
+          }
+        );
+        
+        const transformedMessages = response.data.data.map((msg, index) => ({
+          _id: index,
+          text: msg.message,
+          createdAt: new Date(msg.updt),
+          user: {
+            _id: msg.chat_id === parseInt(userId) ? 1 : 2,
+            name:
+              msg.chat_id === parseInt(userId)
+                ? "You"
+                : messageReceiver?.profile_name || "Unknown",
+            avatar:
+              msg.chat_id === parseInt(userId)
+                ? currentUser?.avatar || null
+                : messageReceiver?.avatar || null,
+          },
+        }));
+  
         setMessages(transformedMessages);
-
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     };
+  
 
-    (async () => getChatMessages())();
-  }, [messageReceiver]);
+    fetchChatMessages();
 
-  const transformMessages = (apiMessages) => {
-    return apiMessages.map(msg => ({
-      _id: msg.id,
-      text: msg.message,
-      createdAt: msg.updt,
-      user: {
-        _id: msg.sender_id,
-        name: msg.sender_name,
-        avatar: msg.sender_avatar,
-      }
-    }));
-  };
+    // if (messageReceiver && currentUser) {
+      
+    // }
+  }, [messageReceiver, currentUser]);
 
-  const handleInputText = (text) => {
-    setInputMessage(text);
+  const handleInputText = (text) => setInputMessage(text);
+
+  const handleSendClick = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("user_id");
+      const currentTime = new Date().getTime();
+
+      await axios.post("https://truck.truckmessage.com/user_chat_message", {
+        user_id: userId,
+        person_id: messageReceiver.person_id,
+        message: inputMessage,
+      });
+
+      const newMessage = {
+        _id: Math.random().toString(36).substring(7),
+        text: inputMessage,
+        createdAt: currentTime,
+        user: { _id: 1 },
+      };
+
+      setMessages((prevMessages) => GiftedChat.append(prevMessages, [newMessage]));
+      setInputMessage("");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const renderMessage = (props) => {
     const { currentMessage } = props;
-
-    // Check if the message is from the current user or the opposite user
     const isCurrentUser = currentMessage.user._id === 1;
 
     return (
       <View
         style={{
           flex: 1,
-          flexDirection: isCurrentUser ? 'row-reverse' : 'row', // Align right or left based on user
-          justifyContent: isCurrentUser ? 'flex-end' : 'flex-start',
+          flexDirection: isCurrentUser ? "row-reverse" : "row",
+          justifyContent: isCurrentUser ? "flex-end" : "flex-start",
           marginVertical: 8,
         }}
       >
@@ -83,23 +114,23 @@ const Chat = ({ username }) => {
           {...props}
           wrapperStyle={{
             right: {
-              backgroundColor: isCurrentUser ? COLORS.primary : 'lightgrey',
+              backgroundColor: COLORS.primary,
               borderRadius: 20,
               marginHorizontal: 12,
             },
             left: {
-              backgroundColor: isCurrentUser ? 'lightgrey' : COLORS.secondaryWhite,
+              backgroundColor: COLORS.secondaryWhite,
               borderRadius: 20,
               marginHorizontal: 12,
             },
           }}
           textStyle={{
             right: {
-              color: isCurrentUser ? COLORS.white : COLORS.black,
+              color: COLORS.white,
               fontSize: 14,
             },
             left: {
-              color: isCurrentUser ? COLORS.black : COLORS.black,
+              color: COLORS.black,
               fontSize: 14,
             },
           }}
@@ -108,182 +139,67 @@ const Chat = ({ username }) => {
     );
   };
 
-  const receiveOppositeMessage = () => {
-    let CurrentTime = new Date().getTime();
-
-    let message = {
-      _id: Math.random().toString(36).substring(7),
-      text: "This is a reply from the opposite user",
-      createdAt: CurrentTime,
-      user: { _id: 2 }
-    };
-    setMessages((prevMessage) =>
-      GiftedChat.append(prevMessage, [message])
-    );
-  };
-
-  const handleSendClick = async () => {
-    try {
-      let CurrentTime = new Date().getTime();
-
-      const response = await axios.post('https://truck.truckmessage.com/user_chat_message', {
-        user_id: await AsyncStorage.getItem("user_id"),
-        person_id: messageReceiver.person_id,
-        message: inputMessage,
-      });
-
-      let message = {
-        _id: Math.random().toString(36).substring(7),
-        text: inputMessage,
-        createdAt: CurrentTime,
-        user: { _id: 1 }
-      };
-
-      setMessages((prevMessage) =>
-        GiftedChat.append(prevMessage, [message])
-      );
-
-      setInputMessage("");
-
-
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   return (
     <SafeAreaView style={{ backgroundColor: COLORS.white, flex: 1 }}>
-
-      {/* Render header */}
-      <View style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingVertical: 16,
-        borderBottomColor: 'grey',
-        borderBottomWidth: 0.2,
-      }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{ marginHorizontal: 12 }}
-          >
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBackBtn}>
             <Image
               source={icons.arrowLeft}
-              style={{
-                width: 24,
-                height: 24,
-                tintColor: COLORS.black
-              }}
+              style={styles.headerBackIcon}
             />
           </TouchableOpacity>
-
           <View>
             <Image
               source={require("../assets/images/apple.png")}
-              resizeMode='contain'
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 999
-              }}
+              resizeMode="contain"
+              style={styles.headerAvatar}
             />
-            <View style={{
-              position: 'absolute',
-              width: 10,
-              height: 10,
-              backgroundColor: COLORS.primary,
-              bottom: 0,
-              right: 4,
-              borderRadius: 5,
-              borderWidth: 2,
-              borderColor: 'white',
-              zIndex: 999
-            }} />
+            <View style={styles.headerOnlineIndicator} />
           </View>
-
-          <View style={{ marginLeft: 16 }}>
-            <Text style={{
-              fontSize: 14,
-              marginBottom: 2
-            }}>{messageReceiver.profile_name}</Text>
-            <Text style={{
-              fontSize: 10,
-              color: COLORS.primary
-            }}>Online</Text>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerName}>{messageReceiver.profile_name}</Text>
+            <Text style={styles.headerStatus}>Online</Text>
           </View>
         </View>
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <TouchableOpacity>
-            <EvilIcons name="refresh" size={30} color="black" />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity>
+          <EvilIcons name="refresh" size={30} color="black" />
+        </TouchableOpacity>
       </View>
 
-      {/* Render chat */}
+      {/* Chat */}
       <GiftedChat
         messages={messages}
-        renderInputToolbar={() => { return null }}
+        renderInputToolbar={() => null}
         user={{ _id: 1 }}
         minInputToolbarHeight={0}
         renderMessage={renderMessage}
       />
 
-      {/* Render input bar */}
+      {/* Input Bar */}
       <View style={styles.inputContainer}>
         <View style={styles.inputMessageContainer}>
           <TextInput
             style={styles.input}
-            placeholder='Type here..'
+            placeholder="Type here.."
             placeholderTextColor="grey"
             multiline
             numberOfLines={3}
             value={inputMessage}
             onChangeText={handleInputText}
           />
-          <View style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-            <TouchableOpacity style={{ marginHorizontal: 10 }}>
-              <Image
-                source={icons.camera}
-                resizeMode='contain'
-                style={{
-                  width: 20,
-                  height: 20,
-                }}
-              />
+          <View style={styles.inputIcons}>
+            <TouchableOpacity style={styles.iconBtn}>
+              <Image source={icons.camera} style={styles.icon} />
             </TouchableOpacity>
-            <TouchableOpacity style={{ marginHorizontal: 10 }}>
-              <Image
-                source={icons.stickyNote}
-                resizeMode='contain'
-                style={{
-                  width: 20,
-                  height: 20
-                }}
-              />
+            <TouchableOpacity style={styles.iconBtn}>
+              <Image source={icons.stickyNote} style={styles.icon} />
             </TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            style={styles.sendBtn}
-            onPress={handleSendClick}
-          >
-            <FontAwesome
-              name='send'
-              size={24}
-              style={{
-                color: COLORS.primary,
-              }}
-            />
+          <TouchableOpacity style={styles.sendBtn} onPress={handleSendClick}>
+            <FontAwesome name="send" size={24} color={COLORS.primary} />
           </TouchableOpacity>
-
         </View>
       </View>
     </SafeAreaView>
@@ -291,19 +207,67 @@ const Chat = ({ username }) => {
 };
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomColor: "grey",
+    borderBottomWidth: 0.2,
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerBackBtn: {
+    marginHorizontal: 12,
+  },
+  headerBackIcon: {
+    width: 24,
+    height: 24,
+    tintColor: COLORS.black,
+  },
+  headerAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 999,
+  },
+  headerOnlineIndicator: {
+    position: "absolute",
+    width: 10,
+    height: 10,
+    backgroundColor: COLORS.primary,
+    bottom: 0,
+    right: 4,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: "white",
+    zIndex: 999,
+  },
+  headerTextContainer: {
+    marginLeft: 16,
+  },
+  headerName: {
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  headerStatus: {
+    fontSize: 10,
+    color: COLORS.primary,
+  },
   inputContainer: {
     height: 72,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   inputMessageContainer: {
     height: 54,
     backgroundColor: COLORS.secondaryWhite,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     width: SIZES.width - 28,
     borderRadius: 16,
-    borderColor: 'rgba(128,128,128,0.4)',
+    borderColor: "rgba(128,128,128,0.4)",
     borderWidth: 1,
   },
   input: {
@@ -311,12 +275,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 3,
   },
+  inputIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconBtn: {
+    marginHorizontal: 10,
+  },
+  icon: {
+    width: 20,
+    height: 20,
+  },
   sendBtn: {
     backgroundColor: COLORS.secondaryWhite,
     marginHorizontal: 6,
     padding: 4,
-    borderRadius: 999
-  }
+    borderRadius: 999,
+  },
 });
 
 export default Chat;

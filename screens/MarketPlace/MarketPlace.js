@@ -20,6 +20,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import AadhaarOTPVerification from "../AadhaarOTPVerification";
 import Toast from "react-native-toast-message";
 import RNPickerSelect from 'react-native-picker-select';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 
 const MarketPlace = ({ navigation }) => {
@@ -133,21 +134,21 @@ const MarketPlace = ({ navigation }) => {
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
 
-    setModalValues({
-      brand: "",
-      price: "",
-      kmsDriven: "",
-      model: "",
-      location: "",
-    });
-    setErrorFields({
-      brand: false,
-      model: false,
-      location: false,
-      price : false,
-      kmsDriven: false,
+    // setModalValues({
+    //   brand: "",
+    //   price: "",
+    //   kmsDriven: "",
+    //   model: "",
+    //   location: "",
+    // });
+    // setErrorFields({
+    //   brand: false,
+    //   model: false,
+    //   location: false,
+    //   price : false,
+    //   kmsDriven: false,
 
-    });
+    // });
   };
 
   const handleInputChange = (field, value) => {
@@ -287,6 +288,26 @@ const MarketPlace = ({ navigation }) => {
     setLocationModal(false)
   };
 
+  const handleClearFilter = () => {
+    setIsLoading(!isLoading);
+    toggleModal()
+    setModalValues({
+      brand: "",
+      price: "",
+      kmsDriven: "",
+      model: "",
+      location: "",
+    });
+    setErrorFields({
+      brand: false,
+      model: false,
+      location: false,
+      price: false,
+      kmsDriven: false,
+
+    });
+  }
+
   const brandData = [
     { label: 'Ashok Leyland', value: 'ashokLeyland' },
     { label: 'Tata', value: 'tata' },
@@ -389,14 +410,12 @@ const MarketPlace = ({ navigation }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Filter Options</Text>
-            {/* <TextInput
-              style={[styles.input, errorFields.brand && styles.inputError]}
-              placeholder="Brand"
-              value={modalValues.brand}
-              onChangeText={(text) => handleInputChange("brand", text)}
-              onPress={() => setBrandPicker(true)}
-            /> */}
+            <View style={styles.filterHeadingContainer}>
+              <Text style={styles.modalTitle}>Filter Options</Text>
+              <Text style={styles.closeIcon}>
+                <AntDesign name="close" size={18} color="black" />
+              </Text>
+            </View>
             <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
                 onValueChange={(value) => setModalValues({ ...modalValues, kmsDriven: value })}
@@ -423,13 +442,6 @@ const MarketPlace = ({ navigation }) => {
               />
             </View>
 
-            {/* <TextInput
-            style={[styles.input, errorFields.model && styles.inputError]}
-            placeholder="Model"
-            value={modalValues.model}
-            onChangeText={(text) => handleInputChange("model", text)}
-          /> */}
-
             <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
                 onValueChange={(value) => setModalValues({ ...modalValues, model: value })}
@@ -455,8 +467,9 @@ const MarketPlace = ({ navigation }) => {
               />
             </View>
             <TextInput
-              style={[styles.input, errorFields.location && styles.inputError, { borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, height: 55, marginBottom: 10 }]}
+              style={[styles.input, errorFields.location && styles.inputError, { fontSize: 16, borderColor: COLORS.gray, borderWidth: 1, paddingLeft: 17, borderRadius: 5, height: 55, marginBottom: 10 }]}
               placeholder="Search location"
+              placeholderTextColor="#c2c2c2"
               value={modalValues.location}
               // onChangeText={(text) => handleInputChange("location", text)}
               onPress={() => {
@@ -470,10 +483,7 @@ const MarketPlace = ({ navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.applyButton}
-              onPress={() => {
-                setIsLoading(!isLoading);
-                toggleModal()
-              }}>
+              onPress={() => handleClearFilter()}>
               <Text style={styles.applyButtonText}>Clear filter</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
@@ -674,6 +684,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 10,
   },
+  closeIcon: {
+    position: 'absolute',
+    end: 20,
+    top: 15
+  },
+  
 });
 
 export default MarketPlace;
