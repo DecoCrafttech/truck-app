@@ -22,6 +22,8 @@ const AvailableLoads = ({ navigation }) => {
 
   const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
 
+
+
   const {
     isLoading,
     setIsLoading,
@@ -316,21 +318,6 @@ const AvailableLoads = ({ navigation }) => {
 
 
   const applyFilter = async () => {
-    // Validate inputs
-    // let hasError = false;
-    // const errors = {};
-
-    // Object.keys(modalValues).forEach((key) => {
-    //   if (!modalValues[key]) {
-    //     errors[key] = true;
-    //     hasError = true;
-    //   }
-    // });
-
-    // if (hasError) {
-    //   setErrorFields(errors);
-    //   return;
-    // }
 
     const filterParams = {
       "company_name": modalValues.companyName,
@@ -399,6 +386,8 @@ const AvailableLoads = ({ navigation }) => {
     { label: 'Container', value: 'container' },
     { label: 'Trailer', value: 'trailer' },
     { label: 'Tanker', value: 'tanker' },
+    { label: 'Tipper', value: 'tipper' },
+    { label: 'LCV', value: 'lcv' },
   ];
 
   const numberOfTyresData = [

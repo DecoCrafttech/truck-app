@@ -28,14 +28,14 @@ import ResetPasswordOTPVerification from "../screens/ResetPasswordOTPVerificatio
 import ResetPassword from "../screens/ResetPassword";
 
 const Stack = createNativeStackNavigator();
-
+Login
 const AppNavigation = () => {
   return (
     <NavigationContainer>
       <Toast />
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName="Login"
+        initialRouteName="Main"
       >
 
         <Stack.Screen name="SignUp" component={SignUp} />

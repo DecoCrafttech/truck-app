@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 import { COLORS } from "../../constants";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
@@ -13,11 +14,11 @@ import RNPickerSelect from 'react-native-picker-select';
 
 
 
-const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue }) => {
+const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,editedDetails,setEditedDetails }) => {
 
   const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
 
-  const [editedDetails, setEditedDetails] = useState(null);
+  // const [editedDetails, setEditedDetails] = useState(null);
 
 
   const [truckBodyType, setTruckBodyType] = useState("");
@@ -28,14 +29,14 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
   const [toLocationModal, setToLocationModal] = useState(false)
 
 
-  console.log("loadDetails", loadDetails)
+  // console.log("loadDetails", loadDetails)
 
 
   useEffect(() => {
     if (loadDetails) {
       setEditedDetails({
-        companyName: loadDetails.company_name,
-        contactNumber: loadDetails.contact_no,
+        companyName: loadDetails.company_name || "",
+        contactNumber: loadDetails.contact_no || "",
         fromLocation: loadDetails.from_location || "",
         toLocation: loadDetails.to_location || "",
         truckBodyType: loadDetails.truck_body_type || "",
@@ -48,9 +49,25 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
         transportName : loadDetails.name_of_the_transport || "",
         truckBrandName : loadDetails.truck_brand_name || "",
         kmsDriven : loadDetails.kms_driven || "",
-        model : loadDetails.model,
-        price : loadDetails.price || "",
-        location : loadDetails.location,
+        model : loadDetails.model || "",
+        price : loadDetails.price || "",  
+        location : loadDetails.location || "",
+        userId : loadDetails.user_id || "",
+        userPost : loadDetails.user_post || "",
+        updatedTime : loadDetails.updt || "",
+        loadId : loadDetails.load_id || "",
+        id : loadDetails.id || "",
+        driverId : loadDetails.driver_id || "",
+        driverName : loadDetails.driver_name || "",
+        from : loadDetails.from || "" ,
+        to : loadDetails.to || "",
+        profileName :  loadDetails.profile_name || "",
+        truckId : loadDetails.truck_id || "",
+        truckName : loadDetails.truck_name || "",
+
+
+
+
         // labels: [
         //   { icon: "table-view", text: loadDetails.labels[0]?.text || "" },
         //   { icon: "attractions", text: loadDetails.labels[1]?.text || "" },
@@ -87,11 +104,40 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
     setEditedDetails({ ...editedDetails, labels: updatedLabels });
   };
 
+
+
   const renderInputs = () => {
     if (!editedDetails) return null;
 
     const filteredLabels = editedDetails.labels.filter(label => label.text !== "");
 
+
+
+    const handleLocation = (data, details) => {
+      let country = '';
+      let state = '';
+      let city = '';
+
+      if (details.address_components) {
+        details.address_components.forEach(component => {
+          if (component.types.includes('country')) {
+            country = component.long_name;
+          }
+          if (component.types.includes('administrative_area_level_1')) {
+            state = component.long_name;
+          }
+          if (component.types.includes('locality')) {
+            city = component.long_name;
+          }
+        });
+      }
+
+
+
+      setLocation(`${city} , ${state}`)
+      setLocationModal(false)
+      // You can use the extracted details as needed
+    };
 
     const handleFromLocation = (data, details) => {
       let country = '';
@@ -154,6 +200,8 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
       { label: 'Container', value: 'container' },
       { label: 'Trailer', value: 'trailer' },
       { label: 'Tanker', value: 'tanker' },
+      { label: 'Tipper', value: 'tipper' },
+      { label: 'LCV', value: 'lcv' },
     ];
 
     const numberOfTyresData = [
@@ -238,12 +286,12 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
       switch (selectedValue) {
         case "user_load_details":
           return (
-            <>
+            <ScrollView style={{width:"100%",height:"70%"}}>
               <TextInput
                 style={styles.input}
                 value={editedDetails.companyName}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, description: text })
+                  setEditedDetails({ ...editedDetails, companyName: text })
                 }
                 placeholder="Company name"
               />
@@ -252,7 +300,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 style={styles.input}
                 value={editedDetails.contactNumber}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, description: text })
+                  setEditedDetails({ ...editedDetails, contactNumber: text })
                 }
                 placeholder="Contact Number"
               />
@@ -281,7 +329,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 style={styles.input}
                 value={editedDetails.material}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, description: text })
+                  setEditedDetails({ ...editedDetails, material: text })
                 }
                 placeholder="Material"
               />
@@ -290,14 +338,16 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 style={styles.input}
                 value={editedDetails.ton}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, description: text })
+                  setEditedDetails({ ...editedDetails, ton: text })
                 }
                 placeholder="Ton"
+                keyboardType="number-pad"
+
               />
 
               <View style={{ borderColor: COLORS.gray, borderWidth: 1, width: "100%", padding: 0, borderRadius: 5, marginVertical: 8 }}>
                 <RNPickerSelect
-                  onValueChange={(value) => setTruckBodyType(value)}
+                  onValueChange={(value) => setEditedDetails({...editedDetails, truckBodyType : value})}
                   items={bodyTypeData}
                   value={editedDetails.truckBodyType}
                   placeholder={{
@@ -310,7 +360,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
 
               <View style={{ borderColor: COLORS.gray, borderWidth: 1, width: "100%", padding: 0, borderRadius: 5, marginBottom: 8 }}>
                 <RNPickerSelect
-                  onValueChange={(value) => setNumberOfTyres(value)}
+                  onValueChange={(value) => setEditedDetails({...editedDetails, numberOfTyres : value})}
                   items={numberOfTyresData}
                   value={editedDetails.numberOfTyres}
                   placeholder={{
@@ -329,12 +379,12 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 }
                 placeholder="Description"
               />
-            </>
+            </ScrollView>
           )
 
         case "user_driver_details":
           return (
-            <>
+            <ScrollView style={{width:"100%",height:"70%"}}>
 
               <TextInput
                 style={styles.input}
@@ -345,18 +395,18 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 placeholder="Vehicle number"
               />
 
-              <TextInput
+              {/* <TextInput
                 style={styles.input}
                 value={editedDetails.companyName}
                 onChangeText={(text) =>
                   setEditedDetails({ ...editedDetails, companyName: text })
                 }
                 placeholder="Company name"
-              />
+              /> */}
 
               <TextInput
                 style={styles.input}
-                value={editedDetails.ownerName}
+                value={editedDetails.companyName}
                 onChangeText={(text) =>
                   setEditedDetails({ ...editedDetails, companyName: text })
                 }
@@ -367,9 +417,11 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 style={styles.input}
                 value={editedDetails.contactNumber}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, description: text })
+                  setEditedDetails({ ...editedDetails, contactNumber: text })
                 }
                 placeholder="Contact Number"
+                keyboardType="number-pad"
+
               />
 
               <TextInput
@@ -396,7 +448,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
 
               <View style={{ borderColor: COLORS.gray, borderWidth: 1, width: "100%", padding: 0, borderRadius: 5, marginVertical: 8 }}>
                 <RNPickerSelect
-                  onValueChange={(value) => setTruckBodyType(value)}
+                  onValueChange={(value) => setEditedDetails({...editedDetails,truckBodyType : value})}
                   items={bodyTypeData}
                   value={editedDetails.truckBodyType}
                   placeholder={{
@@ -409,7 +461,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
 
               <View style={{ borderColor: COLORS.gray, borderWidth: 1, width: "100%", padding: 0, borderRadius: 5, marginBottom: 8 }}>
                 <RNPickerSelect
-                  onValueChange={(value) => setNumberOfTyres(value)}
+                  onValueChange={(value) => setEditedDetails({...editedDetails,numberOfTyres : value})}
                   items={numberOfTyresData}
                   value={editedDetails.numberOfTyres}
                   placeholder={{
@@ -428,12 +480,12 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 }
                 placeholder="Description"
               />
-            </>
+            </ScrollView>
           )
 
         case "user_truck_details":
           return (
-            <>
+            <ScrollView style={{width:"100%",height:"70%"}}>
 
               <TextInput
                 style={styles.input}
@@ -447,7 +499,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
 
               <TextInput
                 style={styles.input}
-                value={editedDetails.ownerName}
+                value={editedDetails.companyName}
                 onChangeText={(text) =>
                   setEditedDetails({ ...editedDetails, companyName: text })
                 }
@@ -458,16 +510,18 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 style={styles.input}
                 value={editedDetails.contactNumber}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, description: text })
+                  setEditedDetails({ ...editedDetails, contactNumber: text })
                 }
                 placeholder="Contact Number"
+                keyboardType="number-pad"
+
               />
 
               <TextInput
                 style={styles.input}
-                value={editedDetails.transparentName}
+                value={editedDetails.transportName}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, companyName: text })
+                  setEditedDetails({ ...editedDetails, transportName: text })
                 }
                 placeholder="Name of the transport"
               />
@@ -476,16 +530,18 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 style={styles.input}
                 value={editedDetails.ton}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, description: text })
+                  setEditedDetails({ ...editedDetails, ton: text })
                 }
                 placeholder="Ton"
+                keyboardType="number-pad"
+
               />
 
               <TextInput
                 style={styles.input}
-                value={editedDetails.truckName}
+                value={editedDetails.truckBrandName}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, companyName: text })
+                  setEditedDetails({ ...editedDetails, truckBrandName: text })
                 }
                 placeholder="Truck name"
               />
@@ -514,7 +570,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
 
               <View style={{ borderColor: COLORS.gray, borderWidth: 1, width: "100%", padding: 0, borderRadius: 5, marginVertical: 8 }}>
                 <RNPickerSelect
-                  onValueChange={(value) => setTruckBodyType(value)}
+                  onValueChange={(value) => setEditedDetails({...editedDetails,truckBodyType : value})}
                   items={bodyTypeData}
                   value={editedDetails.truckBodyType}
                   placeholder={{
@@ -527,7 +583,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
 
               <View style={{ borderColor: COLORS.gray, borderWidth: 1, width: "100%", padding: 0, borderRadius: 5, marginBottom: 8 }}>
                 <RNPickerSelect
-                  onValueChange={(value) => setNumberOfTyres(value)}
+                  onValueChange={(value) => setEditedDetails({...editedDetails,numberOfTyres : value})}
                   items={numberOfTyresData}
                   value={editedDetails.numberOfTyres}
                   placeholder={{
@@ -546,29 +602,26 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 }
                 placeholder="Description"
               />
-            </>
+            </ScrollView>
           )
 
         case "user_buy_sell_details":
           return (
-            <>
+            <ScrollView style={{width:"100%",height:"70%"}}>
               <TextInput
                 style={styles.input}
                 value={editedDetails.ownerName}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, companyName: text })
+                  setEditedDetails({ ...editedDetails, ownerName: text })
                 }
                 placeholder="Owner name"
               />
-
-
-
 
               <TextInput
                 style={styles.input}
                 value={editedDetails.contactNumber}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, description: text })
+                  setEditedDetails({ ...editedDetails, contactNumber: text })
                 }
                 placeholder="Contact Number"
               />
@@ -586,14 +639,14 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 style={styles.input}
                 value={editedDetails.kmsDriven}
                 onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, vehicleNumber: text })
+                  setEditedDetails({ ...editedDetails, kmsDriven: text })
                 }
                 placeholder="Kms driven"
               />
 
               <View style={{ borderColor: COLORS.gray, borderWidth: 1, width: "100%", padding: 0, borderRadius: 5, marginVertical: 8 }}>
                 <RNPickerSelect
-                  onValueChange={(value) => setTruckBodyType(value)}
+                  onValueChange={(value) => setEditedDetails({...editedDetails,brand : value})}
                   items={brandData}
                   value={editedDetails.brand}
                   placeholder={{
@@ -606,7 +659,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
 
               <View style={{ borderColor: COLORS.gray, borderWidth: 1, width: "100%", padding: 0, borderRadius: 5, marginVertical: 8 }}>
                 <RNPickerSelect
-                  onValueChange={(value) => setTruckBodyType(value)}
+                  onValueChange={(value) => setEditedDetails({...editedDetails,model : value})}
                   items={yearsData}
                   value={editedDetails.model}
                   placeholder={{
@@ -619,7 +672,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
 
               <View style={{ borderColor: COLORS.gray, borderWidth: 1, width: "100%", padding: 0, borderRadius: 5, marginVertical: 8 }}>
                 <RNPickerSelect
-                  onValueChange={(value) => setTruckBodyType(value)}
+                  onValueChange={(value) => setEditedDetails({...editedDetails,price : value})}
                   items={priceData}
                   value={editedDetails.price}
                   placeholder={{
@@ -629,11 +682,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                   }}
                 />
               </View>
-
-
-
-
-              
+           
 
               <TextInput
                 style={styles.input}
@@ -655,7 +704,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue })
                 }
                 placeholder="Description"
               />
-            </>
+            </ScrollView>
           )
 
 
@@ -873,7 +922,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     justifyContent: "center",
     alignItems: "center",
-
   },
   input: {
     borderWidth: 1,

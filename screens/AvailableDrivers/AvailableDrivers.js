@@ -33,7 +33,9 @@ const AvailableDrivers = ({ navigation }) => {
     setIsLoading,
     aadhaarOTP,
     setAadhaarOTP,
-    setMessageReceiver
+    setMessageReceiver,
+    userStatesFromProfile,
+    setUserStatesFromProfile
 
   } = useContext(LoadNeedsContext)
 
@@ -69,6 +71,19 @@ const AvailableDrivers = ({ navigation }) => {
 
   const [fromLocationModal, setFromLocationModal] = useState(false)
   const [toLocationModal, setToLocationModal] = useState(false)
+
+  const [userToLocationStatesData, setUserToLocationStatesData] = useState({})
+
+
+
+  useEffect(() => {
+    setUserToLocationStatesData(
+      userStatesFromProfile.map(state => ({
+        label: state,
+        value: state
+      }))
+    )
+  }, [])
 
 
   useEffect(() => {
@@ -122,7 +137,7 @@ const AvailableDrivers = ({ navigation }) => {
         const response = await axiosInstance.get("/all_driver_details");
         if (response.data.error_code === 0) {
           const transformedData = response.data.data.map((item) => ({
-            companyName : item.company_name,
+            companyName: item.company_name,
             post: item.user_post,
             profileName: item.profile_name,
             title: item.driver_name,
@@ -356,7 +371,7 @@ const AvailableDrivers = ({ navigation }) => {
       const response = await axiosInstance.post("/user_driver_details_filter", filterParams)
       if (response.data.error_code === 0) {
         const transformedData = response.data.data.map((item) => ({
-          truckName : item.truck_name,
+          truckName: item.truck_name,
           post: item.user_post,
           profileName: item.profile_name,
           title: item.driver_name,
@@ -409,7 +424,7 @@ const AvailableDrivers = ({ navigation }) => {
     { label: 'Bharat Benz', value: 'bharatBenz' },
     { label: 'Maruthi Suzuki', value: 'maruthiSuzuki' },
     { label: 'SML Lsuzu', value: 'smlLsuzu' },
-    { label: 'Force', value: 'force' }, 
+    { label: 'Force', value: 'force' },
     { label: 'AMW', value: 'amw' },
     { label: 'Man', value: 'man' },
     { label: 'Volvo', value: 'volvo' },
@@ -422,6 +437,8 @@ const AvailableDrivers = ({ navigation }) => {
     { label: 'Container', value: 'container' },
     { label: 'Trailer', value: 'trailer' },
     { label: 'Tanker', value: 'tanker' },
+    { label: 'Tipper', value: 'tipper' },
+    { label: 'LCV', value: 'lcv' },
   ];
 
   const numberOfTyresData = [
@@ -489,22 +506,18 @@ const AvailableDrivers = ({ navigation }) => {
                 }));
               }}
             />
-            <TextInput
-              style={[
-                styles.input,
-                errorFields.toLocation && styles.inputError,
-              ]}
-              placeholder="To Location"
-              value={modalValues.toLocation}
-              // onChangeText={(text) => handleInputChange('toLocation', text)}
-              onPress={() => {
-                setToLocationModal(true);
-                setModalValues(prevValues => ({
-                  ...prevValues,
-                  toLocation: ""
-                }));
-              }}
-            />
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({ ...modalValues, toLocation: value })}
+                items={userToLocationStatesData}
+                value={modalValues.truckName}
+                placeholder={{
+                  label: 'To Location',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
             <TextInput
               style={[styles.input, errorFields.material && styles.inputError]}
               placeholder="Material"
@@ -546,8 +559,8 @@ const AvailableDrivers = ({ navigation }) => {
             <TouchableOpacity
               style={styles.applyButton}
               onPress={() => {
-                 setIsLoading(!isLoading)
-                 toggleModal()
+                setIsLoading(!isLoading)
+                toggleModal()
               }}>
               <Text style={styles.applyButtonText}>Clear filter</Text>
             </TouchableOpacity>
@@ -747,7 +760,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    padding:13
+    padding: 13
   },
   inputError: {
     borderColor: "red",

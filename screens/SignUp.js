@@ -424,19 +424,7 @@ const SignUp = () => {
                                 </View>
                             </View> */}
 
-                            <View style={styles.inputField}>
-                                <View>
-                                    <Text style={styles.label}>Operating States</Text>
-                                </View>
-                                <View>
-                                    <MultiSelectComponent
-                                        listOfData={statesData}
-                                        selectedStates={selectedStates}
-                                        setSelectedStates={setSelectedStates}
-                                        setOperatingStates={setOperatingStates}
-                                    />
-                                </View>
-                            </View>
+
 
                             <View style={styles.inputField}>
                                 <View>

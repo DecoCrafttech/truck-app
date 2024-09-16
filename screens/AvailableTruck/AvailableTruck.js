@@ -33,7 +33,9 @@ const AvailableTruck = ({ navigation }) => {
     setIsLoading,
     aadhaarOTP,
     setAadhaarOTP,
-    setMessageReceiver
+    setMessageReceiver,
+    userStatesFromProfile,
+    setUserStatesFromProfile
 
   } = useContext(LoadNeedsContext)
 
@@ -43,6 +45,8 @@ const AvailableTruck = ({ navigation }) => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAadhaarModal, setIsAadhaarModal] = useState(false)
+
+  const [userToLocationStatesData,setUserToLocationStatesData] = useState({})
 
   const [modalValues, setModalValues] = useState({
     companyName: "",
@@ -85,6 +89,21 @@ const AvailableTruck = ({ navigation }) => {
 
     return () => clearInterval(intervalId);
   }, [timeLeft]);
+
+
+
+
+  useEffect(() => {
+      setUserToLocationStatesData(
+          userStatesFromProfile.map(state => ({
+            label : state,
+            value : state
+          }))
+      )
+  },[])
+
+
+
 
   const navigateToSellYourTruck = async () => {
 
@@ -378,14 +397,14 @@ const AvailableTruck = ({ navigation }) => {
   }
 
   const brandData = [
-    { label: 'Ashok Leyland', value: 'ashokLeyland' },
+    { label: 'Ashok Leyland', value: 'ashok_leyland' },
     { label: 'Tata', value: 'tata' },
     { label: 'Mahindra', value: 'mahindra' },
     { label: 'Eicher', value: 'eicher' },
-    { label: 'Daimler India', value: 'daimlerIndia' },
-    { label: 'Bharat Benz', value: 'bharatBenz' },
-    { label: 'Maruthi Suzuki', value: 'maruthiSuzuki' },
-    { label: 'SML Lsuzu', value: 'smlLsuzu' },
+    { label: 'Daimler India', value: 'daimler_india' },
+    { label: 'Bharat Benz', value: 'bharat_benz' },
+    { label: 'Maruthi Suzuki', value: 'maruthi_suzuki' },
+    { label: 'SML Lsuzu', value: 'sml_isuzu' },
     { label: 'Force', value: 'force' },
     { label: 'AMW', value: 'amw' },
     { label: 'Man', value: 'man' },
@@ -399,6 +418,8 @@ const AvailableTruck = ({ navigation }) => {
     { label: 'Container', value: 'container' },
     { label: 'Trailer', value: 'trailer' },
     { label: 'Tanker', value: 'tanker' },
+    { label: 'Tipper', value: 'tipper' },
+    { label: 'LCV', value: 'lcv' },
   ];
 
   const numberOfTyresData = [
@@ -413,6 +434,18 @@ const AvailableTruck = ({ navigation }) => {
     { label: '20', value: '20' },
     { label: '22', value: '22' },
   ];
+
+
+
+  // const userToLocationStatesData = [
+  //   userStatesFromProfile.map((state,index) => {
+  //     return(
+  //       <>
+  //         {}
+  //       </>
+  //     )
+  //   })
+  // ]
 
 
   return (
@@ -462,14 +495,13 @@ const AvailableTruck = ({ navigation }) => {
                 }));
               }}
             />
-            <TextInput
+            {/* <TextInput
               style={[
                 styles.input,
                 errorFields.toLocation && styles.inputError,
               ]}
               placeholder="To Location"
               value={modalValues.toLocation}
-              // onChangeText={(text) => handleInputChange('toLocation', text)}
               onPress={() => {
                 setToLocationModal(true);
                 setModalValues(prevValues => ({
@@ -477,7 +509,23 @@ const AvailableTruck = ({ navigation }) => {
                   toLocation: ""
                 }));
               }}
-            />
+            /> */}
+
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({ ...modalValues, toLocation: value })}
+                items={userToLocationStatesData}
+                value={modalValues.truckName}
+                placeholder={{
+                  label: 'To Location',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+
+
             <TextInput
               style={[styles.input, errorFields.material && styles.inputError]}
               placeholder="Material"
@@ -509,7 +557,7 @@ const AvailableTruck = ({ navigation }) => {
             /> */}
             <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
-                onValueChange={(value) => setModalValues({...modalValues,truckName : value})}
+                onValueChange={(value) => setModalValues({ ...modalValues, truckName: value })}
                 items={brandData}
                 value={modalValues.truckName}
                 placeholder={{
@@ -522,7 +570,7 @@ const AvailableTruck = ({ navigation }) => {
 
             <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
-                onValueChange={(value) => setModalValues({...modalValues,truckBodyType : value})}
+                onValueChange={(value) => setModalValues({ ...modalValues, truckBodyType: value })}
                 items={bodyTypeData}
                 value={modalValues.truckBodyType}
                 placeholder={{
@@ -536,7 +584,7 @@ const AvailableTruck = ({ navigation }) => {
 
             <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
-                onValueChange={(value) => setModalValues({...modalValues,noOfTyres : value})}
+                onValueChange={(value) => setModalValues({ ...modalValues, noOfTyres: value })}
                 items={numberOfTyresData}
                 value={modalValues.numberOfTyres}
                 placeholder={{
@@ -553,8 +601,8 @@ const AvailableTruck = ({ navigation }) => {
             <TouchableOpacity
               style={styles.applyButton}
               onPress={() => {
-                 setIsLoading(!isLoading)
-                 toggleModal()
+                setIsLoading(!isLoading)
+                toggleModal()
               }}>
               <Text style={styles.applyButtonText}>Clear filter</Text>
             </TouchableOpacity>
@@ -754,7 +802,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10,
     // height: 40,
-    padding:12
+    padding: 12
   },
   inputError: {
     borderColor: "red",

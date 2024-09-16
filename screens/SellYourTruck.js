@@ -182,14 +182,14 @@ const SellYourTruck = () => {
   };
 
   const brandData = [
-    { label: 'Ashok Leyland', value: 'ashokLeyland' },
+       { label: 'Ashok Leyland', value: 'ashok_leyland' },
     { label: 'Tata', value: 'tata' },
     { label: 'Mahindra', value: 'mahindra' },
     { label: 'Eicher', value: 'eicher' },
-    { label: 'Daimler India', value: 'daimlerIndia' },
-    { label: 'Bharat Benz', value: 'bharatBenz' },
-    { label: 'Maruthi Suzuki', value: 'maruthiSuzuki' },
-    { label: 'SML Lsuzu', value: 'smlLsuzu' },
+    { label: 'Daimler India', value: 'daimler_india' },
+    { label: 'Bharat Benz', value: 'bharat_benz' },
+    { label: 'Maruthi Suzuki', value: 'maruthi_suzuki' },
+    { label: 'SML Lsuzu', value: 'sml_isuzu' },
     { label: 'Force', value: 'force' },
     { label: 'AMW', value: 'amw' },
     { label: 'Man', value: 'man' },
@@ -276,6 +276,7 @@ const SellYourTruck = () => {
               placeholder="Type Your Number"
               onChangeText={setContactNumber}
               value={contactNumber}
+              maxLength={10}
             />
             <Text style={styles.label}>Vehicle Number</Text>
             <TextInput

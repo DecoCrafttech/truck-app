@@ -19,12 +19,18 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const Chat = () => {
   const navigation = useNavigation();
-  const { currentUser, messageReceiver } = useContext(LoadNeedsContext);
+  const { 
+    currentUser, 
+    messageReceiver,
+    pageRefresh,
+    setPageRefresh 
+  
+  } = useContext(LoadNeedsContext);
 
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
 
- 
+
 
   useEffect(() => {
 
@@ -38,7 +44,9 @@ const Chat = () => {
             person_id: messageReceiver?.person_id,
           }
         );
-        
+
+        console.log(response.data.data)
+
         const transformedMessages = response.data.data.map((msg, index) => ({
           _id: index,
           text: msg.message,
@@ -55,18 +63,18 @@ const Chat = () => {
                 : messageReceiver?.avatar || null,
           },
         }));
-  
+
         setMessages(transformedMessages);
       } catch (err) {
         console.error(err);
       }
     };
-  
+
 
     fetchChatMessages();
 
     // if (messageReceiver && currentUser) {
-      
+
     // }
   }, [messageReceiver, currentUser]);
 
@@ -90,6 +98,7 @@ const Chat = () => {
         user: { _id: 1 },
       };
 
+      setPageRefresh(!pageRefresh)
       setMessages((prevMessages) => GiftedChat.append(prevMessages, [newMessage]));
       setInputMessage("");
     } catch (err) {
@@ -152,7 +161,7 @@ const Chat = () => {
           </TouchableOpacity>
           <View>
             <Image
-              source={require("../assets/images/apple.png")}
+              source={{uri : messageReceiver.profile_image_name}}
               resizeMode="contain"
               style={styles.headerAvatar}
             />
@@ -163,7 +172,7 @@ const Chat = () => {
             <Text style={styles.headerStatus}>Online</Text>
           </View>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity >
           <EvilIcons name="refresh" size={30} color="black" />
         </TouchableOpacity>
       </View>
@@ -197,9 +206,22 @@ const Chat = () => {
               <Image source={icons.stickyNote} style={styles.icon} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.sendBtn} onPress={handleSendClick}>
-            <FontAwesome name="send" size={24} color={COLORS.primary} />
-          </TouchableOpacity>
+
+          {/* <TouchableOpacity style={styles.sendBtn} onPress={handleSendClick}>
+                <FontAwesome name="send" size={24} color={COLORS.primary} />
+              </TouchableOpacity> */}
+
+          {
+            inputMessage.length === 0 ?
+              <TouchableOpacity style={styles.sendBtn} disabled onPress={handleSendClick}>
+                <FontAwesome name="send" size={24} color={COLORS.gray} />
+              </TouchableOpacity> 
+              :
+              <TouchableOpacity style={styles.sendBtn} onPress={handleSendClick}>
+                <FontAwesome name="send" size={24} color={COLORS.primary} />
+              </TouchableOpacity>
+
+          }
         </View>
       </View>
     </SafeAreaView>
@@ -210,6 +232,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomColor: "grey",

@@ -37,6 +37,8 @@ const TruckDetail = ({ route }) => {
   });
 
 
+  console.log("fullProductDetails",fullProductDetails)
+
   useEffect(() => {
     const fetchFullProductDetails = async () => {
       try {
@@ -101,7 +103,9 @@ const TruckDetail = ({ route }) => {
   }
 
   const handleChatNavigate = () => {
+    setMessageReceiver(fullProductDetails)
     navigation.navigate("Chat")
+    
   }
 
   return (

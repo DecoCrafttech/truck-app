@@ -20,7 +20,9 @@ const Message = () => {
     currentUser,
     setCurrentUser,
     messageReceiver,
-    setMessageReceiver
+    setMessageReceiver,
+    pageRefresh,
+    setPageRefresh
   } = useContext(LoadNeedsContext)
 
   const messagesData = [
@@ -153,23 +155,21 @@ const Message = () => {
   useEffect(() => {
     const getChatList = async () => {
         try{
-
           const userIdParams = {
             user_id : await AsyncStorage.getItem("user_id")
           }
-
           const response = await axios.post('https://truck.truckmessage.com/get_user_chat_list', userIdParams);
-          console.log(response.data.data)
+          console.log("message",response.data.data)
           setAllPersons(response.data.data)
           setFilteredUsers(response.data.data)
         }catch(err){
-
+          console.log(err)
         }
     }
 
     (async () => getChatList())()
 
-  },[])
+  },[pageRefresh])
 
   const handleSearch = (text) => {
     console.log(text)
@@ -203,9 +203,7 @@ const Message = () => {
               <View style={styles.onlineIndicator} />
             )}
             <Image
-              // source={item.userImg}
-              source={{uri: 'https://www.bootdey.com/img/Content/avatar/avatar1.png'}}
-
+              source={{uri: item.profile_image_name}}
               resizeMode='contain'
               style={styles.userImage}
             />
@@ -218,7 +216,7 @@ const Message = () => {
             <View style={styles.userInfoContainer}>
               <Text style={styles.fullName}>{item.profile_name}</Text>
               {/* <Text style={styles.lastMessage}>{item.lastMessage}</Text> */}
-              <Text style={styles.lastMessage}>lastMessage</Text>
+              <Text style={styles.lastMessage}>{item.last_msg}</Text>
             </View>
 
             <View style={{
@@ -226,8 +224,8 @@ const Message = () => {
               right: 4,
               alignItems: 'center',
             }}>
-              <Text style={styles.lastMessageTime}>{item.lastMessageTime}</Text>
-              {
+              <Text style={styles.lastMessageTime}>{item.last_time}</Text>
+              {/* {
                 item.messageInQueue !== 0 && (
                   <TouchableOpacity style={{
                     width: 20,
@@ -241,7 +239,7 @@ const Message = () => {
                     <Text style={styles.messageInQueue}>{item.messageInQueue}</Text>
                   </TouchableOpacity>
                 )
-              }
+              } */}
             </View>
           </View>
         </TouchableOpacity>
@@ -290,11 +288,12 @@ const Message = () => {
           {/* Render Flatlist for chats */}
           <View>
             <FlatList
-              data={filteredUsers}
+              // data={filteredUsers}
+              data={filteredUsers.sort((a, b) => a.last_time - b.last_time)}
               showsVerticalScrollIndicator={false}
               renderItem={renderItem}
-              keyExtractor={(value) => value.person_id.toString()}
-            />
+              keyExtractor={(item, index) => `${item.person_id}_${index}`}  // Use a combination of person_id and index
+              />
           </View>
         </View>
       </View>

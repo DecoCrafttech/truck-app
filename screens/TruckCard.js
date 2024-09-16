@@ -16,28 +16,44 @@ const TruckCard = ({
   status,
   profileName,
   post,
-  companyName
+  companyName,
+  selectedValue
 
 }) => {
   return (
     <View style={styles.card}>
 
-      <View style={[styles.ratingsContainer]}>
-        <View style={styles.starsContainer}>
-          {[...Array(5)].map((_, index) => (
-            <Icon1
-              key={index}
-              name={index > 2 ? "star-o" : "star"}
-              size={13}
-              color="#FFD700"
-            />
-          ))}
-        </View>
-        <Text style={styles.textRight}>Posts : {post}</Text>
-      </View>
+
+
+      {
+        selectedValue === "user_load_details" ||
+          selectedValue === "user_driver_details" ||
+          selectedValue === "user_truck_details" ||
+          selectedValue === "user_buy_sell_details" ?
+          null :
+          <View style={[styles.ratingsContainer]}>
+            <View style={styles.starsContainer}>
+              {[...Array(5)].map((_, index) => (
+                <Icon1
+                  key={index}
+                  name={index > 2 ? "star-o" : "star"}
+                  size={13}
+                  color="#FFD700"
+                />
+              ))}
+            </View>
+            <Text style={styles.textRight}>Posts : {post}</Text>
+          </View>
+      }
+
 
       <View style={styles.titleContainer}>
         <Text style={styles.title}>{profileName}</Text>
+        <View style={[styles.labelsContainer,{justifyContent:'center'}]}>
+          <Icon name={labels[3].icon} size={20} color={COLORS.black} />
+          <Text style={styles.label}>{labels[3].text}</Text>
+        </View>
+
       </View>
       <View style={styles.locationContainer}>
         <Icon name="place" size={24} color={COLORS.iconPickup} />
@@ -49,7 +65,7 @@ const TruckCard = ({
       </View>
 
       <View style={styles.labelsContainer}>
-        {labels.map((label, index) => (
+        {labels.slice(0, 4).map((label, index) => (
           <View key={index} style={styles.labelRow}>
             <Icon name={label.icon} size={20} color={COLORS.black} />
             <Text style={styles.label}>{label.text}</Text>
@@ -160,16 +176,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center', // Center vertically if needed
-    marginHorizontal:5,
-    marginBottom:10,
-    paddingTop:10
+    marginHorizontal: 5,
+    marginBottom: 10,
+    paddingTop: 10
   },
   starsContainer: {
     flexDirection: 'row', // Align stars horizontally
   },
   textRight: {
     textAlign: 'right',
-    fontWeight:'600'
+    fontWeight: '600'
     // Additional styling for the "Hi" text if needed
   },
 });

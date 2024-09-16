@@ -15,7 +15,10 @@ export const LoadNeedsProvider = ({ children }) => {
   //   lastMessage : "heloo"
   // })
   const [messageReceiver, setMessageReceiver] = useState(null)
-  
+  const [pageRefresh, setPageRefresh] = useState(false)
+  const [userStatesFromProfile, setUserStatesFromProfile] = useState([])
+
+
 
   const toggleLoading = () => {
     setIsLoading((prevLoading) => !prevLoading);
@@ -32,7 +35,11 @@ export const LoadNeedsProvider = ({ children }) => {
         aadhaarOTP,
         setAadhaarOTP,
         messageReceiver,
-        setMessageReceiver
+        setMessageReceiver,
+        pageRefresh,
+        setPageRefresh,
+        userStatesFromProfile,
+        setUserStatesFromProfile
       }}
     >
       {children}

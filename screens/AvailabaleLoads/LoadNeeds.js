@@ -187,6 +187,8 @@ const LoadNeeds = () => {
     { label: 'Container', value: 'container' },
     { label: 'Trailer', value: 'trailer' },
     { label: 'Tanker', value: 'tanker' },
+    { label: 'Tipper', value: 'tipper' },
+    { label: 'LCV', value: 'lcv' },
   ];
 
   const numberOfTyresData = [

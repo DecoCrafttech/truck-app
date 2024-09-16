@@ -22,12 +22,16 @@ import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Refer = () => {
+
+
+
   const [selectedValue, setSelectedValue] = useState(null);
   const [allLoadData, setAllLoadData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [feedbackModalVisible, setFeedbackModalVisible] = useState(false);
   const [editItem, setEditItem] = useState(null);
+  const [editedDetails, setEditedDetails] = useState(null);
 
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
@@ -39,63 +43,171 @@ const Refer = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-       BackHandler.addEventListener('hardwareBackPress',handleBackPress)
+      BackHandler.addEventListener('hardwareBackPress', handleBackPress)
 
-       return() => {
-         BackHandler.removeEventListener('hardwareBackPress',handleBackPress)
-       }
+      return () => {
+        BackHandler.removeEventListener('hardwareBackPress', handleBackPress)
+      }
     })
   )
 
+
   const handleBackPress = () => {
-    Alert.alert('Exit App','Are you sure want to exit?',
+    Alert.alert('Exit App', 'Are you sure want to exit?',
       [
         {
-          text : 'Cancel',
-          onPress : () => null,
-          style : 'cancel'
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel'
         },
         {
-          text : 'Exit',
-          onPress : () => BackHandler.exitApp()
+          text: 'Exit',
+          onPress: () => BackHandler.exitApp()
         }
       ]
     )
     return true
   }
- 
+
 
   const handleEdit = (item) => {
 
-    
+
     setEditItem(item);
     setEditModalVisible(true);
   };
 
-  const handleSaveChanges = async (updatedDetails) => {
+  const handleSaveChanges = async () => {
     try {
       setEditModalVisible(false);
-      await saveEditedDetails(updatedDetails);
+      await saveEditedDetails();
     } catch (error) {
       console.log("Error updating load details:", error);
     }
   };
 
-  const saveEditedDetails = async (updatedDetails) => {
-    
-    try {
-      const response = await axiosInstance.post(
-        "/update_load_details",
-        updatedDetails
-      );
 
-      if (response.data.error_code === 0) {
-        fetchData(selectedValue);
+
+
+  const saveEditedDetails = async () => {
+    let editingParams;
+    if (selectedValue === "user_load_details") {
+      editingParams = {
+        "company_name": editedDetails.companyName,
+        "contact_no": editedDetails.contactNumber,
+        "description": editedDetails.description,
+        "from_location": editedDetails.fromLocation,
+        "id": editedDetails.id,
+        "load_id": editedDetails.loadId,
+        "material": editedDetails.material,
+        "no_of_tyres": editedDetails.numberOfTyres,
+        "profile_name": editedDetails.fromLocation,
+        "to_location": editedDetails.fromLocation,
+        "tone": editedDetails.ton,
+        "truck_body_type": editedDetails.truckBodyType,
+        "updt": editedDetails.updatedTime,
+        "user_id": editedDetails.userId,
+        "user_post": editedDetails.userPost,
+        "from": editedDetails.fromLocation,
+        "to": editedDetails.toLocation
       }
-    } catch (error) {
-      console.error("Error:", error);
+
+      try {
+
+        const response = await axiosInstance.post(
+          "/load_details",
+          editingParams
+        );
+
+
+        if (response.data.error_code === 0) {
+          fetchData(selectedValue);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+
+
+
+    } else if (selectedValue === "user_driver_details") {
+      editingParams = {
+        "company_name": editedDetails.companyName,
+        "contact_no": editedDetails.contactNumber,
+        "description": editedDetails.description,
+        "driver_id": editedDetails.driverId,
+        "driver_name": editedDetails.driverName,
+        "from": editedDetails.fromLocation,
+        "to": editedDetails.toLocation,
+        "no_of_tyres": editedDetails.numberOfTyres,
+        "truck_body_type": editedDetails.truckBodyType,
+        "truck_name": editedDetails.truckName,
+        "user_id": editedDetails.userId,
+        "vehicle_number": editedDetails.vehicleNumber,
+      }
+
+      try {
+
+
+        const response = await axiosInstance.post(
+          "/driver_entry",
+          editingParams
+        );
+
+        if (response.data.error_code === 0) {
+          fetchData(selectedValue);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+
+    } else if (selectedValue === "user_truck_details") {
+      editingParams = {
+        "company_name": editedDetails.companyName,
+        "contact_no": editedDetails.contactNumber,
+        "description": editedDetails.description,
+        "from_location": editedDetails.fromLocation,
+        "from": editedDetails.fromLocation,
+        "id": editedDetails.id,
+        "name_of_the_transport": editedDetails.transportName,
+        "no_of_tyres": editedDetails.numberOfTyres,
+        "profile_name": editedDetails.profileName,
+        "to": editedDetails.toLocation,
+        "to_location": editedDetails.toLocation,
+        "tone": editedDetails.ton,
+        "truck_body_type": editedDetails.truckBodyType,
+        "truck_brand_name": editedDetails.truckBrandName,
+        "truck_id" : editedDetails.truckId,
+        "truck_name" : editedDetails.truckName,
+        "updt": editedDetails.updatedTime,
+        "user_id": editedDetails.userId,
+        "user_post": editedDetails.userPost,
+        "vehicle_number": editedDetails.vehicleNumber,
+      }
+
+      try {
+
+
+        const response = await axiosInstance.post(
+          "/truck_entry",
+          editingParams
+        );
+
+        if (response.data.error_code === 0) {
+          fetchData(selectedValue);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+
     }
+
+
+
+
+
   };
+
+
 
   const [showFeedbackInput, setShowFeedbackInput] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -192,6 +304,11 @@ const Refer = () => {
   };
 
 
+  useEffect(() => {
+    setSelectedValue("user_load_details")
+    fetchData("user_load_details"); // Trigger fetchData when selectedValue changes
+  }, []);
+
 
   const fetchData = async (selectedValue) => {
     setLoading(true);
@@ -206,14 +323,14 @@ const Refer = () => {
         userPostParameters
       );
 
-      console.log("response.data",response.data)
 
       if (response.data.error_code === 0) {
+
         switch (selectedValue) {
           case "user_load_details":
             const transformedData = response.data.data.map((item) => ({
-              companyName :  item.company_name,
-              contactNumber : item.contact_number,
+              companyName: item.company_name,
+              contactNumber: item.contact_number,
               truckBodyType: item.truck_body_type,
               title: item.company_name,
               fromLocation: item.from_location,
@@ -235,6 +352,7 @@ const Refer = () => {
           case "user_driver_details":
             setAllLoadData([]);
             const transformedDriverData = response.data.data.map((item) => ({
+              companyName: item.company_name,
               title: item.driver_name,
               fromLocation: item.from_location,
               toLocation: item.to_location,
@@ -255,6 +373,8 @@ const Refer = () => {
           case "user_truck_details":
             setAllLoadData([]);
             const transformedAllTruckData = response.data.data.map((item) => ({
+        
+              companyName: item.company_name,
               title: item.company_name,
               fromLocation: item.from_location,
               toLocation: item.to_location,
@@ -263,7 +383,8 @@ const Refer = () => {
                 { icon: "directions-bus", text: item.vehicle_number },
                 { icon: "attractions", text: item.no_of_tyres },
                 { icon: "local-shipping", text: item.truck_body_type },
-                { icon: "verified", text: "RC verified" },
+                { icon: "factory", text: item.name_of_the_transport },
+                { icon: "line-weight", text: item.tone },
               ],
               description: item.description,
               onButton1Press: () => handleEdit(item),
@@ -321,12 +442,13 @@ const Refer = () => {
               <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
           ) : selectedValue === "user_buy_sell_details" ? (
-            <MarketPlace allData={allLoadData} />
+            <MarketPlace allData={allLoadData} editedDetails={editedDetails} />
           ) : (
             <LoadDetails
               filteredTrucks={allLoadData}
               status="editAndDelete"
               handleEdit={handleEdit}
+              selectedValue={selectedValue}
             />
           )}
         </View>
@@ -336,6 +458,9 @@ const Refer = () => {
           onSave={handleSaveChanges}
           loadDetails={editItem}
           selectedValue={selectedValue}
+          editedDetails={editedDetails}
+          setEditedDetails={setEditedDetails}
+
         />
 
         <Modal

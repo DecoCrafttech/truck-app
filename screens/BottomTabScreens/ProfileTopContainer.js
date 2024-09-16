@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, Image, Text, Button, Modal, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Fontisto from '@expo/vector-icons/Fontisto';
@@ -19,14 +19,26 @@ import MultiSelectComponentUpdation from '../../components/MultiSelectComponentU
 import { Toast } from 'toastify-react-native';
 import axiosInstance from '../../services/axiosInstance';
 import { launchImageLibrary } from 'react-native-image-picker';
+import CustomButton from '../../components/CustomButton';
+import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import { MaterialIcons as Icon } from '@expo/vector-icons';
+import { LoadNeedsContext } from '../../hooks/LoadNeedsContext';
+
 
 
 
 
 const ProfileTopContainer = () => {
 
+    
+  const {
+    userStatesFromProfile,
+    setUserStatesFromProfile
+  } = useContext(LoadNeedsContext)
+
     const refRBSheetCitites = useRef()
     const refRBSheetStates = useRef()
+    const refRBSheetViewStates = useRef()
 
     const [editing, setEditing] = useState(false);
     const [name, setName] = useState("");
@@ -35,11 +47,23 @@ const ProfileTopContainer = () => {
     const [category, setCategory] = useState("Category");
     const [profileImage, setProfileImage] = useState(null)
 
-    const [userCities, setUserCities] = useState(['Coimbatore', 'Trivandrum'])
-    const [userStates, setUserStates] = useState(['Tamilnadu', 'Kerala'])
+    const [userCities, setUserCities] = useState([])
+    const [userStates, setUserStates] = useState([])
 
-    const [citiesModalOpen, setCitiesModalOpen] = useState(false)
-    const [statesModalOpen, setStatesModalOpen] = useState(false)
+
+
+    const [selectedStates, setSelectedStates] = useState([]);
+    const [operatingStates, setOperatingStates] = useState([])
+    const [statesUpdated, setStatesUpdated] = useState(false)
+
+    const [editSelectedStates, setEditSelectedStates] = useState([])
+    const [editStates, setEditStates] = useState([])
+    const [editStatesClick, setEditStatesClick] = useState(false)
+    const [updateSelectedStates, setUpdateSelectedStates] = useState([])
+    const [updateStates, setUpdateStates] = useState([])
+
+
+
 
     const [pageRefresh, setPageRefresh] = useState(false)
     // update states
@@ -47,7 +71,6 @@ const ProfileTopContainer = () => {
     const [updatedMobile, setUpdatedMobile] = useState("");
     const [updatedDob, setUpdatedDob] = useState(new Date());
     const [updatedCategory, setUpdatedCategory] = useState("Category");
-    const [updatedCategory1, setUpdatedCategory1] = useState([]);
 
     const [updatedProfileImage, setUpdatedProfileImage] = useState(null)
     const [updateImageModal, setUpdateImageModal] = useState(false)
@@ -58,20 +81,7 @@ const ProfileTopContainer = () => {
 
     const [date, setDate] = useState(new Date())
     const [show, setShow] = useState(false);
-    const [dropdownOpen, setDropdownOpen] = useState(false)
 
-    const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(null);
-    const [items, setItems] = useState([
-        { label: 'Item 1', category: '1' },
-        { label: 'Item 2', category: '2' },
-        { label: 'Item 3', category: '3' },
-        { label: 'Item 4', category: '4' },
-        { label: 'Item 5', category: '5' },
-        { label: 'Item 6', category: '6' },
-        { label: 'Item 7', category: '7' },
-        { label: 'Item 8', category: '8' },
-    ]);
 
     // Dropdown data
     const categoryData = [
@@ -90,12 +100,13 @@ const ProfileTopContainer = () => {
             }
             const response = await axios.post("https://truck.truckmessage.com/get_user_profile", getUserProfileParams)
             if (response.data.error_code === 0) {
+
                 setName(response.data.data[1].name)
                 setMobile(response.data.data[1].phone_number)
                 setCategory(response.data.data[1].category)
                 setDob(response.data.data[1].date_of_birth)
                 setUserCities(response.data.data[1].operating_city)
-                setUserStates(response.data.data[1].state)
+                // setUserStates(response.data.data[1].state)
                 setProfileImage(response.data.data[1].profile_image_name)
             } else {
                 console.log(response.data.message)
@@ -105,6 +116,34 @@ const ProfileTopContainer = () => {
     }, [pageRefresh])
 
 
+    const getStates = async () => {
+        try {
+            const updateProfileParams = {
+                "user_id": `${await AsyncStorage.getItem("user_id")}`,
+            }
+
+            const res = await axiosInstance.post("/get_user_state_list", updateProfileParams)
+
+            if (res.data.error_code === 0) {
+                setUserStates(res.data.data[0].state_list)
+                setUserStatesFromProfile(res.data.data[0].state_list)
+            } else {
+                console.log(res.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+
+
+    useEffect(() => {
+        (async () => getStates())()
+    }, [])
+
+    console.log("userStatesFromProfile-Profilepage",userStatesFromProfile)
+
+
     const handleEditPress = () => {
         setEditing(true);
         setUpdatedName(name)
@@ -112,8 +151,8 @@ const ProfileTopContainer = () => {
         setUpdatedDob(dob)
         setUpdatedCategory(category)
         // setUpdatedProfileImage(profileImage)
-        setUpdatedOperatingCities(userCities)
-        setUpdatedOperatingStates(userStates)
+        // setUpdatedOperatingCities(userCities)
+        // setUpdatedOperatingStates(userStates)
     };
 
 
@@ -173,7 +212,7 @@ const ProfileTopContainer = () => {
                 setProfileImage(response.data.data[0].profile_image_name)
                 setUpdateImageModal(false)
                 Alert.alert('Upload Success', 'Image uploaded successfully!');
-                
+
             } else {
                 Toast.error(response.data.message)
             }
@@ -209,8 +248,8 @@ const ProfileTopContainer = () => {
                 "date_of_birth": `${updatedDob}`,
                 "phone_number": `${updatedMobile}`,
                 "category": `${updatedCategory}`,
-                "operating_city": updatedOperatingCities,
-                "state": updatedOperatingStates
+                "operating_city": [],
+                "state": []
             }
 
             const res = await axios.post("https://truck.truckmessage.com/update_profile", updateProfileParams, {
@@ -243,6 +282,107 @@ const ProfileTopContainer = () => {
             setUpdatedDob(userSelectedDate.toISOString().split('T')[0])
         }
     };
+
+    const handleStatesSubmit = async () => {
+        try {
+
+            const addStatesParams = {
+                "user_id": `${await AsyncStorage.getItem("user_id")}`,
+                "state_name": operatingStates
+            }
+
+            const res = await axiosInstance.post("/user_state_entry", addStatesParams)
+
+            if (res.data.error_code === 0) {
+                setPageRefresh(!pageRefresh)
+                refRBSheetStates.current.close()
+                setOperatingStates([])
+                setSelectedStates([])
+
+                getStates()
+            } else {
+                console.log(res.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+
+
+    const handleEditStates = () => {
+        setEditStatesClick(true);
+        setEditSelectedStates(userStates.map(stateName => {
+            const stateObj = statesData.find(state => state.name === stateName);
+            return stateObj ? stateObj.id : null;
+        }).filter(id => id !== null));
+        setEditStates(userStates)
+        
+    };
+
+
+    const handleEditStatesChange = async (selectedItemIds) => {
+        // Log previously selected states
+        const prevSelectedStateNames = editSelectedStates.map(id => {
+            const state = statesData.find(state => state.id === id);
+            return state ? state.name : null;
+        }).filter(name => name !== null);
+
+
+        // Update selected states
+        setEditSelectedStates(selectedItemIds);
+
+        // Log currently selected states
+        const selectedStateNames = selectedItemIds.map(id => {
+            const state = statesData.find(state => state.id === id);
+            return state ? state.name : null;
+        }).filter(name => name !== null);
+        setUpdateSelectedStates(selectedStateNames)
+    };
+
+
+
+    const handleUpdateStates = async () => {
+        try {
+            const removeStatesParams = {
+                "user_id": `${await AsyncStorage.getItem("user_id")}`,
+                "state_name": editStates
+            }
+
+            const res = await axiosInstance.post("/remove_user_state_list", removeStatesParams)
+
+            if (res.data.error_code === 0) {
+                console.log(res.data)
+                await updateStatesFunction()
+            } else {
+                console.log(res.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    const updateStatesFunction = async () => {
+        try {
+            const updateStatesParams = {
+                "user_id": `${await AsyncStorage.getItem("user_id")}`,
+                "state_name": updateSelectedStates
+            }
+
+            const res = await axiosInstance.post("/user_state_entry", updateStatesParams)
+
+        if (res.data.error_code === 0) {
+            setPageRefresh(!pageRefresh)
+            setEditStatesClick(false)
+            getStates()
+        } else {
+            console.log(res.data.message)
+        }
+        } catch (err) {
+            console.log(err)
+        }
+
+    }
 
 
     return (
@@ -283,17 +423,18 @@ const ProfileTopContainer = () => {
                     <Text style={styles.statLabel}>Category</Text>
                     <Text style={styles.statValue}>{category}</Text>
                 </View>
-                <View style={styles.stat}>
-                    <Text style={styles.statLabel}>City</Text>
-                    {/* <Text style={styles.statValue}>{city}</Text> */}
-                    <Text onPress={() => refRBSheetCitites.current.open()}>View Cities</Text>
 
-                </View>
-                <View style={styles.stat}>
-                    <Text style={styles.statLabel}>State</Text>
-                    {/* <Text style={styles.statValue}>{state}</Text> */}
-                    <Text onPress={() => refRBSheetStates.current.open()}>View States</Text>
-                </View>
+
+                <TouchableOpacity style={[styles.addButton, { marginEnd: 10 }]} onPress={() => refRBSheetStates.current.open()} >
+                    <Text style={styles.buttonText}>Add states</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.addButton} onPress={() => refRBSheetViewStates.current.open()} >
+                    <Text style={styles.buttonText}>View states</Text>
+                </TouchableOpacity>
+
+
+
             </View>
 
             <Modal visible={editing} animationType="slide" transparent={true}>
@@ -492,6 +633,26 @@ const ProfileTopContainer = () => {
                 >
                     <View>
                         <ScrollView>
+
+                            <View style={styles.inputField}>
+                                <View>
+                                    <Text style={styles.label}>Operating States</Text>
+                                </View>
+                                <View>
+                                    <MultiSelectComponent
+                                        listOfData={statesData}
+                                        selectedStates={selectedStates}
+                                        setSelectedStates={setSelectedStates}
+                                        setOperatingStates={setOperatingStates}
+                                    />
+                                </View>
+                            </View>
+
+
+
+
+
+
                             <View>
                                 <Text
                                     style={{
@@ -565,16 +726,135 @@ const ProfileTopContainer = () => {
                     <View>
                         <ScrollView>
                             <View>
-                                <Text
-                                    style={{
-                                        textAlign: "center",
-                                        fontWeight: "bold",
-                                        color: COLORS.brand,
-                                        fontSize: 16
-                                    }}
-                                >Your Operating States {'\n'}</Text>
+                                <Text style={{ fontSize: 18, fontWeight: "700", marginBottom: 18, color: COLORS.primary }}>Add States</Text>
                             </View>
-                            <Text style={{ textAlign: "center", fontWeight: "500", color: COLORS.secondary, fontSize: 14 }}>
+                            <View style={{ width: 320 }}>
+                                <MultiSelectComponent
+                                    listOfData={statesData}
+                                    selectedStates={selectedStates}
+                                    setSelectedStates={setSelectedStates}
+                                    setOperatingStates={setOperatingStates}
+                                />
+                            </View>
+
+                            <View style={{ marginTop: 20 }}>
+                                <TouchableOpacity style={styles.addButton} onPress={() => handleStatesSubmit()} >
+                                    <Text style={[styles.buttonText, { textAlign: 'center' }]}>Submit</Text>
+                                </TouchableOpacity>
+                            </View>
+
+
+                        </ScrollView>
+                    </View>
+                </RBSheet>
+            </View>
+
+            <View>
+                <RBSheet
+                    ref={refRBSheetViewStates}
+                    height={500}
+                    openDuration={250}
+                    closeOnDragDown={true}
+                    closeOnPressBack={true}
+                    closeOnPressMask={true}
+                    customStyles={{
+                        wrapper: {
+                            backgroundColor: "rgba(0,0,0,0.5)",
+                        },
+                        draggableIcon: {
+                            backgroundColor: COLORS.gray,
+                            width: 100,
+                        },
+                        container: {
+                            borderTopLeftRadius: 30,
+                            borderTopRightRadius: 30,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: 20,
+                        },
+                    }}
+                >
+                    <View>
+                        <ScrollView>
+
+
+                            <View style={{ width: 320 }}>
+                                {
+                                    editStatesClick === true ?
+                                        <>
+                                            <View style={{ width: 320 }}>
+                                                {/* <MultiSelectComponent
+                                                    listOfData={statesData}
+                                                    selectedStates={selectedStates}
+                                                    setSelectedStates={setSelectedStates}
+                                                    setOperatingStates={setOperatingStates}
+                                                /> */}
+                                                <SectionedMultiSelect
+                                                    items={statesData}
+                                                    IconRenderer={Icon}
+                                                    uniqueKey="id"
+                                                    searchPlaceholderText="Search state"
+                                                    selectedText="selected"
+                                                    selectText="Select"
+                                                    confirmText="Done"
+                                                    onSelectedItemsChange={handleEditStatesChange}  // Call to update selected items
+                                                    selectedItems={editSelectedStates}  // Initialize with current user states
+                                                    styles={{
+                                                        backdrop: styles.multiSelectBackdrop,
+                                                        selectToggle: styles.multiSelectBox,
+                                                        chipContainer: styles.multiSelectChipContainer,
+                                                        chipText: styles.multiSelectChipText,
+                                                        selectToggleText: styles.selectToggleText,
+                                                        selectedItemText: styles.selectedItemText,
+                                                        selectText: styles.selectText,
+                                                        button: { backgroundColor: '#CE093A' },
+                                                    }}
+                                                />
+                                            </View>
+
+                                            <View style={{ marginTop: 20 }}>
+                                                <TouchableOpacity style={styles.addButton} onPress={() => handleUpdateStates()} >
+                                                    <Text style={[styles.buttonText, { textAlign: 'center' }]}>Update</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        </>
+                                        : null
+                                }
+
+                                <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-between' }}>
+                                    <Text
+                                        style={{
+                                            fontWeight: "bold",
+                                            color: COLORS.brand,
+                                            fontSize: 16,
+                                        }}
+                                    >Your Operating States {'\n'}
+                                    </Text>
+                                    <Text
+                                        onPress={() => handleEditStates()}
+                                    >Edit
+                                    </Text>
+
+                                </View>
+                                {/* <View>
+                                    <Text
+                                        style={{
+                                            fontWeight: "bold",
+                                            color: COLORS.brand,
+                                            fontSize: 16,
+                                            marginTop: 20,
+                                        }}
+                                    >Your Operating States {'\n'}
+                                    </Text>
+                                    <Text
+                                        style={{ position: 'absolute', right: "0%", bottom: "35%" }}
+                                        onPress={() => handleEditStates()}
+                                    >Edit
+                                    </Text>
+
+                                </View> */}
+                            </View>
+                            <Text style={{ fontWeight: "500", color: COLORS.secondary, fontSize: 14 }}>
 
                                 {
                                     updatedOperatingStates.length === 0 ?
@@ -817,6 +1097,48 @@ const styles = {
     cancelButton: {
         backgroundColor: "#999",
     },
+    addButton: {
+        backgroundColor: COLORS.primary,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 8,
+    },
+    buttonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+
+    multiSelectBackdrop: {
+        backgroundColor: 'rgba(0, 0, 0, 0.01)',
+    },
+    multiSelectBox: {
+        borderWidth: 1,
+        borderRadius: 8,
+        borderColor: 'grey',
+        padding: 10,
+        paddingLeft: 15,
+        marginBottom: 4,
+    },
+    selectToggleText: {
+        color: '#000',
+        fontSize: 14
+    },
+    selectText: {
+        color: 'red'
+    },
+    selectedItemText: {
+        color: COLORS.primary,
+    },
+    multiSelectChipContainer: {
+        borderWidth: 0,
+        backgroundColor: '#ddd',
+        borderRadius: 8,
+    },
+    multiSelectChipText: {
+        color: '#222',
+        fontSize: 12,
+    }
 };
 
 export default ProfileTopContainer;
