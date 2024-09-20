@@ -73,7 +73,7 @@ const ForgotPassword = () => {
                     <View style={styles.avatarContainer}>
                         <Image
                             style={styles.avatar}
-                            source={require("../assets/images/app-logo.png")}
+                            source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
                         />
                     </View>
 

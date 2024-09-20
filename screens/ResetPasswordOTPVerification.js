@@ -78,7 +78,7 @@ const ResetPasswordOTPVerification = () => {
                 <View style={{ flex: 1, backgroundColor: COLORS.white, padding: 16, alignItems: 'center' }}>
                     {/* <StatusBar hidden /> */}
                     <Image
-                         source={require("../assets/images/app-logo.png")}
+                         source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
                         resizeMode='contain'
                         style={{
                             width: SIZES.width * 0.4,

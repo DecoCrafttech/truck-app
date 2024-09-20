@@ -1,5 +1,5 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, Button, ScrollView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, FONTS, images, SIZES } from '../constants/index.js';
 import { StatusBar } from 'expo-status-bar';
@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 // import Button from '../components/Button.js';
 import Container, { Toast } from 'toastify-react-native';
+import { LoadNeedsContext } from '../hooks/LoadNeedsContext.js';
 
 
 const OTPVerification = () => {
@@ -16,6 +17,13 @@ const OTPVerification = () => {
     const navigation = useNavigation()
 
     const [OTP, setOTP] = useState("")
+
+
+
+    const {
+        isFirstSignup,
+        setIsFirstSignup
+    } = useContext(LoadNeedsContext)
 
 
     const resendClick = async () => {
@@ -26,8 +34,8 @@ const OTPVerification = () => {
             await axios.post("https://truck.truckmessage.com/send_signup_otp", resendParams)
                 .then((response) => {
                     if (response.data.error_code === 0) {
-                        
-                        
+
+
                         Toast.success(response.data.message)
                     } else {
                         Toast.error(response.data.message)
@@ -43,7 +51,7 @@ const OTPVerification = () => {
 
     const verifyOTPFunction = async () => {
         const verifyParams = {
-            phone_number:  `${await AsyncStorage.getItem("mobileNumber")}`,
+            phone_number: `${await AsyncStorage.getItem("mobileNumber")}`,
             otp: `${OTP}`,
         }
         try {
@@ -53,6 +61,7 @@ const OTPVerification = () => {
                     if (response.data.error_code === 1) {
                         // AsyncStorage.setItem("user_id",`${response.data.data[0].user_id}`)
                         Toast.success(response.data.message)
+                        setIsFirstSignup(true)
                         navigation.navigate("Main")
                     } else {
                         Toast.error(response.data.message)
@@ -86,7 +95,7 @@ const OTPVerification = () => {
                 <View style={{ flex: 1, backgroundColor: COLORS.white, padding: 16, alignItems: 'center' }}>
                     {/* <StatusBar hidden /> */}
                     <Image
-                        source={require("../assets/images/app-black-logo.png")}
+                        source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
                         resizeMode='contain'
                         style={{
                             width: SIZES.width * 0.4,
@@ -95,7 +104,7 @@ const OTPVerification = () => {
                             marginBottom: 16,
                         }}
                     />
-                    <Text style={{ fontSize : 20, marginBottom: 15, fontWeight: '900' }}>Enter Verification Code</Text>
+                    <Text style={{ fontSize: 20, marginBottom: 15, fontWeight: '900' }}>Enter Verification Code</Text>
                     <Text style={{ ...FONTS.h6, marginBottom: 5, }}>We are automatically detecting SMS</Text>
                     <Text style={{ ...FONTS.h6, marginBottom: 10, }}>send to your phone number</Text>
                     <View style={{ marginVertical: 15, width: SIZES.width - 72 }}>
@@ -126,10 +135,10 @@ const OTPVerification = () => {
                     <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
                         <Text>Don't receive the code ?</Text>
                         <TouchableOpacity>
-                            <Text 
+                            <Text
                                 style={{ color: '#4285F4', fontWeight: 'bold', textDecorationLine: 'underline' }}
                                 onPress={resendClick}
-                                >
+                            >
                                 {"  "}Resend code</Text>
                         </TouchableOpacity>
                     </View>
@@ -183,7 +192,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         textAlign: 'center',
-        fontWeight : "bold"
+        fontWeight: "bold"
     },
 })
 

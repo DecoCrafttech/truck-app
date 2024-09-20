@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { COLORS } from "../constants";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Icon1 from 'react-native-vector-icons/FontAwesome';
@@ -20,6 +20,9 @@ const TruckCard = ({
   selectedValue
 
 }) => {
+
+
+
   return (
     <View style={styles.card}>
 
@@ -48,11 +51,35 @@ const TruckCard = ({
 
 
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>{profileName}</Text>
-        <View style={[styles.labelsContainer,{justifyContent:'center'}]}>
-          <Icon name={labels[3].icon} size={20} color={COLORS.black} />
-          <Text style={styles.label}>{labels[3].text}</Text>
-        </View>
+        {
+          selectedValue === "user_load_details" ||
+            selectedValue === "user_driver_details" ||
+            selectedValue === "user_truck_details" ||
+            selectedValue === "user_buy_sell_details" ?
+            <Text style={styles.title}>{companyName}</Text>
+            :
+            <>
+              <Text style={styles.title}>{profileName}</Text>
+              {/* <Text style={styles.title}>{companyName}</Text> */}
+            </>
+        }
+
+        {
+          selectedValue === "user_load_details" ||
+            selectedValue === "user_driver_details" ||
+            selectedValue === "user_truck_details" ||
+            selectedValue === "user_buy_sell_details" ?
+            null :
+            <>
+              <View style={[styles.labelsContainer, { justifyContent: 'center' }]}>
+                <Icon1 name="building-o" size={20} color={COLORS.black} />
+                <Text style={styles.label}>{companyName}</Text>
+              </View>
+            </>
+          
+            
+        }
+
 
       </View>
       <View style={styles.locationContainer}>
@@ -91,6 +118,7 @@ const TruckCard = ({
           <Text style={styles.buttonText}>{status === "editAndDelete" ? "Delete" : "Message"}</Text>
         </TouchableOpacity>
       </View>
+
     </View>
   );
 };

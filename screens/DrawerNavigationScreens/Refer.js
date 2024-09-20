@@ -38,7 +38,7 @@ const Refer = () => {
     { label: "Load Posts", value: "user_load_details" },
     { label: "Driver Posts", value: "user_driver_details" },
     { label: "Truck Posts", value: "user_truck_details" },
-    { label: "Market Posts", value: "user_buy_sell_details" },
+    { label: "Buy and Sell Posts", value: "user_buy_sell_details" },
   ]);
 
   useFocusEffect(
@@ -360,7 +360,7 @@ const Refer = () => {
                 { icon: "directions-bus", text: item.vehicle_number },
                 { icon: "attractions", text: item.no_of_tyres },
                 { icon: "local-shipping", text: item.truck_body_type },
-                { icon: "verified", text: item.truck_name },
+                // { icon: "verified", text: item.truck_name },
               ],
               description: item.description,
               onButton1Press: () => handleEdit(item),
@@ -414,9 +414,6 @@ const Refer = () => {
     setFeedbackModalVisible(false);
   };
 
-
-  // console.log("editItem",editItem)
-  // console.log("allLoadData",allLoadData)
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>

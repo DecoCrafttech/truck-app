@@ -1,5 +1,5 @@
 import { View, Text, Image, BackHandler, Alert } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   DrawerItem,
   DrawerItemList,
@@ -14,26 +14,38 @@ import Language from "../screens/DrawerNavigationScreens/Language";
 import AboutUs from "../screens/DrawerNavigationScreens/AboutUs";
 import Blogs from "../screens/DrawerNavigationScreens/Blogs";
 import TermsAndCondition from "../screens/DrawerNavigationScreens/TermsAndCondition";
-import Logout from "../screens/Logout";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LoadNeedsContext } from "../hooks/LoadNeedsContext";
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigation = () => {
 
   const navigation = useNavigation()
 
+  const {
+    isLoggedIn,
+    setIsLoggedIn,
+    isSignedUp,
+    setIsSignedUp
+  } = useContext(LoadNeedsContext)
+
   const [userName,setUserName] = useState("")
   const [mobileNumber,setMobileNumber] = useState("")
+
+
   
-  useEffect(() => {
-      const fun = async () => {
-        const name = 
-        setUserName(await AsyncStorage.getItem("userName"))
-        setMobileNumber(await AsyncStorage.getItem("mobileNumber"))
-      }
-      fun()
-  },[])
+   useEffect(() => {
+    const fetchData = async () => {
+      setUserName(await AsyncStorage.getItem("userName"))
+      setMobileNumber(await AsyncStorage.getItem("mobileNumber"))
+    };
+
+    (async =>  fetchData())() // Call the async function here
+  }, [isLoggedIn,isSignedUp]); // Empty dependency array means this runs once after component mounts
+
+
+
 
   const handleLogout = async () => {
 
@@ -43,6 +55,8 @@ const DrawerNavigation = () => {
           text : "Yes",
           onPress : () => {
             const logoutFunction = async () => {
+              setIsLoggedIn(false)
+              setIsSignedUp(false)
               await AsyncStorage.removeItem("user_id")
               await AsyncStorage.removeItem("userName")
               await AsyncStorage.removeItem("mobileNumber")
@@ -74,7 +88,7 @@ const DrawerNavigation = () => {
               }}
             >
               <Image
-                source={require("../assets/images/app-logo.png")}
+                source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
                 style={{
                   width: 100,
                   height: 100,

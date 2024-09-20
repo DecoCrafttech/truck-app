@@ -38,6 +38,7 @@ const AppNavigation = () => {
         initialRouteName="Main"
       >
 
+
         <Stack.Screen name="SignUp" component={SignUp} />
 
         <Stack.Screen name="Login" component={Login} />

@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
@@ -19,33 +20,43 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const Chat = () => {
   const navigation = useNavigation();
-  const { 
-    currentUser, 
+  const {
+    currentUser,
     messageReceiver,
     pageRefresh,
-    setPageRefresh 
-  
+    setPageRefresh
+
   } = useContext(LoadNeedsContext);
 
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
 
+  const [chatMessagesRefresh, setChatMessagesRefresh] = useState(false)
+  const [chatMessageLoading, setChatMessageLoading] = useState(false)
+
+
 
 
   useEffect(() => {
 
+    
     const fetchChatMessages = async () => {
       try {
+        // setChatMessageLoading(true)
         const userId = await AsyncStorage.getItem("user_id");
         const response = await axios.post(
           "https://truck.truckmessage.com/get_user_chat_message_list",
           {
             user_id: userId,
-            person_id: messageReceiver?.person_id,
+            person_id: messageReceiver.person_id ? messageReceiver?.person_id : messageReceiver?.user_id,
           }
         );
 
-        console.log(response.data.data)
+        // setTimeout(() => {
+        //   setChatMessageLoading(false)
+        // },1000)
+
+
 
         const transformedMessages = response.data.data.map((msg, index) => ({
           _id: index,
@@ -87,7 +98,7 @@ const Chat = () => {
 
       await axios.post("https://truck.truckmessage.com/user_chat_message", {
         user_id: userId,
-        person_id: messageReceiver.person_id,
+        person_id: messageReceiver.person_id ? messageReceiver?.person_id : messageReceiver?.user_id ,
         message: inputMessage,
       });
 
@@ -98,6 +109,7 @@ const Chat = () => {
         user: { _id: 1 },
       };
 
+      console.log("inputMessageSent",inputMessage)
       setPageRefresh(!pageRefresh)
       setMessages((prevMessages) => GiftedChat.append(prevMessages, [newMessage]));
       setInputMessage("");
@@ -105,6 +117,7 @@ const Chat = () => {
       console.error(err);
     }
   };
+
 
   const renderMessage = (props) => {
     const { currentMessage } = props;
@@ -159,32 +172,41 @@ const Chat = () => {
               style={styles.headerBackIcon}
             />
           </TouchableOpacity>
-          <View>
+          {/* <View>
             <Image
               source={{uri : messageReceiver.profile_image_name}}
               resizeMode="contain"
               style={styles.headerAvatar}
             />
             <View style={styles.headerOnlineIndicator} />
-          </View>
+          </View> */}
           <View style={styles.headerTextContainer}>
             <Text style={styles.headerName}>{messageReceiver.profile_name}</Text>
-            <Text style={styles.headerStatus}>Online</Text>
+            {/* <Text style={styles.headerStatus}>Online</Text> */}
           </View>
         </View>
         <TouchableOpacity >
-          <EvilIcons name="refresh" size={30} color="black" />
+          <EvilIcons name="refresh" size={30} color="black" onPress={() => setChatMessagesRefresh(!chatMessagesRefresh)} />
         </TouchableOpacity>
       </View>
 
       {/* Chat */}
-      <GiftedChat
-        messages={messages}
-        renderInputToolbar={() => null}
-        user={{ _id: 1 }}
-        minInputToolbarHeight={0}
-        renderMessage={renderMessage}
-      />
+
+      {
+        chatMessageLoading ?
+          <View style={{ flex: 1, justifyContent: 'center' }}>
+            <ActivityIndicator size={"large"} />
+          </View>
+          :
+          <GiftedChat
+            messages={messages}
+            renderInputToolbar={() => null}
+            user={{ _id: 1 }}
+            minInputToolbarHeight={0}
+            renderMessage={renderMessage}
+          />
+      }
+
 
       {/* Input Bar */}
       <View style={styles.inputContainer}>
@@ -215,7 +237,7 @@ const Chat = () => {
             inputMessage.length === 0 ?
               <TouchableOpacity style={styles.sendBtn} disabled onPress={handleSendClick}>
                 <FontAwesome name="send" size={24} color={COLORS.gray} />
-              </TouchableOpacity> 
+              </TouchableOpacity>
               :
               <TouchableOpacity style={styles.sendBtn} onPress={handleSendClick}>
                 <FontAwesome name="send" size={24} color={COLORS.primary} />

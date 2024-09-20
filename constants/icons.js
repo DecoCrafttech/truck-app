@@ -14,6 +14,8 @@ const menu = require("../assets/icons/menu.png");
 const arrowLeft = require("../assets/icons/arrow-left.png");
 const more = require("../assets/icons/more.png");
 const myPostIcon = require("../assets/icons/myPostIcon.png")
+const message = require("../assets/icons/message.png")
+const messageOutline = require("../assets/icons/messageOutline.png")
 
 
 const fastag = require("../assets/icons/fastag.jpeg")
@@ -56,5 +58,7 @@ export default {
     menu,
     arrowLeft,
     more,
-    myPostIcon
+    myPostIcon,
+    message,
+    messageOutline
 }

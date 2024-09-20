@@ -1,11 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Button } from "react-native";
-import { images } from "../../constants";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Button, ActivityIndicator } from "react-native";
+import { COLORS, images } from "../../constants";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import Container, { Toast } from 'toastify-react-native';
+import axiosInstance from "../../services/axiosInstance";
+import { Alert } from "react-native";
 
 
 const VehicleProfileDetails = () => {
@@ -19,6 +21,10 @@ const VehicleProfileDetails = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [isInputValid, setIsInputValid] = useState(true);
+  const [pageLoaded, setPageLoaded] = useState(false)
+  const [pageRefresh, setPageRefresh] = useState(false)
+
+
 
   // Example array of users
   // const users = [
@@ -45,14 +51,40 @@ const VehicleProfileDetails = () => {
 
       if (response.data.error_code === 0) {
         setUsers(response.data.data[0].vehicle_data)
+        setTimeout(() => {
+          setPageLoaded(true)
+        }, 1000);
       } else {
         console.log(response.data.message)
       }
-
     }
     (async () => getProfilePage())()
+  }, [isLoading, pageRefresh])
 
-  }, [isLoading])
+
+
+
+  // useEffect(() => {
+  //   const viewFullVehicleDetails = async () => {
+  //     const viewVehicleParams = {
+  //       "vehicle_no": `${vehicleNo}`
+  //     }
+  //     try {
+  //       const response = await axios.post("https://truck.truckmessage.com/get_vehicle_details", viewVehicleParams)
+  //       if (response.data.error_code === 0) {
+  //         setVehicleData(response.data.data)
+  //       } else {
+  //         console.log(response.data.message)
+  //       }
+  //     } catch (err) {
+  //       console.log(err)
+  //     }
+  //   }
+
+  //   (async => viewFullVehicleDetails())()
+
+
+  // }, [])
 
 
   const handleAddTruck = () => {
@@ -95,28 +127,63 @@ const VehicleProfileDetails = () => {
   };
 
   const handleViewVehicleDetails = async (vehicleNo) => {
-    const viewVehicleParams = {
-      "vehicle_no": `${vehicleNo}`
-    }
+    // const viewVehicleParams = {
+    //   "vehicle_no": `${vehicleNo}`
+    // }
 
-    try {
-      const response = await axios.post("https://truck.truckmessage.com/get_vehicle_details", viewVehicleParams)
-      if (response.data.error_code === 0) {
-        navigation.navigate("ViewFullDetails", { vehicleNo })
-      } else {
-        console.log(response.data.message)
-      }
-    } catch (err) {
-      console.log(err)
-    }
+    // try {
+    //   const response = await axios.post("https://truck.truckmessage.com/get_vehicle_details", viewVehicleParams)
+    //   if (response.data.error_code === 0) {
+    //     navigation.navigate("ViewFullDetails", { vehicleNo })
+    //   } else {
+    //     console.log(response.data.message)
+    //   }
+    // } catch (err) {
+    //   console.log(err)
+    // }
 
 
   };
 
-  const handleDeleteProfile = (userId) => {
-    console.log(`Delete Profile pressed for user ID: ${userId}`);
-    // Implement logic for deleting profile of user with userId
+
+
+  const handleDeleteProfile = async (vehicleNo) => {
+
+    Alert.alert("Delete post", "Are you sure want to delete this vehicle?",
+      [
+        {
+          text: "Yes",
+          onPress: async () => {
+            const removeVehicleParams = {
+              user_id: await AsyncStorage.getItem("user_id"),
+              vehicle_no: vehicleNo
+            }
+            try {
+              const response = await axiosInstance.post("/remove_user_vehicle_details", removeVehicleParams)
+              if (response.data.error_code === 0) {
+                alert(response.data.message)
+                setPageRefresh(!pageRefresh)
+
+              } else {
+                console.log(response.data.message)
+              }
+
+            } catch (err) {
+              console.log(err)
+            }
+          }
+        },
+        {
+          text: "Cancel",
+          onPress: () => null
+        }
+      ]
+    )
+
   };
+
+
+
 
   return (
     <>
@@ -128,25 +195,66 @@ const VehicleProfileDetails = () => {
         height={60}
         textStyle={{ backgroundColor: '', fontSize: 12 }}
       />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>Truck Details</Text>
-            <TouchableOpacity style={styles.addButton} onPress={handleAddTruck}>
-              <Text style={styles.buttonText}>Add Truck</Text>
-            </TouchableOpacity>
+      {
+        pageLoaded === false ?
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator size='large' color={COLORS.primary} />
           </View>
-          {users.map((user, index) => (
-            <View key={index} style={styles.userCard}>
-              <Image
+          :
+          <ScrollView contentContainerStyle={[styles.scrollContainer]}>
+            <View style={styles.container}>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>Truck Details</Text>
+                <TouchableOpacity style={styles.addButton} onPress={handleAddTruck}>
+                  <Text style={styles.buttonText}>Add Truck</Text>
+                </TouchableOpacity>
+              </View>
+              {
+                users.length === 0 ?
+                <View style={styles.noResultContainer}>
+                <View>
+                  <Image
+                    source={require("../../assets/images/Folder_empty.png")}
+                    width={50}
+                    height={50}
+                    resizeMode="center"
+                  />
+                </View>
+                <Text style={styles.noResultsText}>No records</Text>
+              </View>
+                  :
+                  <>
+                    {users.map((user, index) => (
+                      <View key={index} style={styles.userCard}>
+                        {/* <Image
                 source={images.truck}
                 style={styles.userPhoto}
-              />
-              <View style={styles.userInfo}>
-                <Text style={styles.vehicleNumber}>{user.vehicle_no}</Text>
-                <Text style={styles.userFollowers}>Vehicle Number</Text>
-              </View>
-              <TouchableOpacity
+              /> */}
+                        <View style={styles.userInfo}>
+                          <Text style={styles.vehicleNumber}>{user.vehicle_no}</Text>
+                          <View style={{ marginBottom: 10 }}>
+                            <Text style="">Fitness UpTo</Text>
+                            <Text style={styles.userFollowers}>{user.fit_up_to}</Text>
+                          </View>
+                          <View style={{ marginBottom: 10 }}>
+                            <Text style="">Insurance</Text>
+                            <Text style={styles.userFollowers}>{user.insurance_company ? user.insurance_company : "none"}</Text>
+                          </View>
+                          <View style={{ marginBottom: 10 }}>
+                            <Text style="">Pollution Certificate</Text>
+                            <Text style={styles.userFollowers}>{user.pucc_upto ? user.pucc_upto : "none"}</Text>
+                          </View>
+                          <View style={{ marginBottom: 10 }}>
+                            <Text style="">Road Tax</Text>
+                            <Text style={styles.userFollowers}>{user.tax_paid_upto ? user.tax_paid_upto : "none"}</Text>
+                          </View>
+                          <View style={{ marginBottom: 10 }}>
+                            <Text style="">RC Status</Text>
+                            <Text style={styles.userFollowers}>{user.rc_status ? user.rc_status : "none"}</Text>
+                          </View>
+
+                        </View>
+                        {/* <TouchableOpacity
                 style={styles.editButton}
                 onPress={() => handleViewVehicleDetails(user.vehicle_no)}
               >
@@ -155,51 +263,54 @@ const VehicleProfileDetails = () => {
                   style={styles.icon}
                   resizeMode="contain"
                 />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => handleDeleteProfile(user.id)}
-              >
-                <Image
-                  source={images.deleteIcon}
-                  style={styles.icon}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View>
-          ))}
+              </TouchableOpacity> */}
+                        <TouchableOpacity
+                          style={styles.editButton}
+                          onPress={() => handleDeleteProfile(user.vehicle_no)}
+                        >
+                          <Image
+                            source={images.deleteIcon}
+                            style={styles.icon}
+                            resizeMode="contain"
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </>
+              }
 
-          {/* Modal for adding truck */}
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => {
-              setModalVisible(false);
-              setIsInputValid(true); // Reset input validation state
-            }}
-          >
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Add Truck</Text>
-                <TextInput
-                  style={[styles.input, !isInputValid && styles.inputError]} // Conditional styling based on validation
-                  placeholder="Enter Vehicle Number"
-                  value={vehicleNumber}
-                  onChangeText={(text) => {
-                    setVehicleNumber(text);
-                    setIsInputValid(true); // Reset validation when typing
-                  }}
-                />
-                {!isInputValid && (
-                  <Text style={styles.errorText}>Please enter a valid vehicle number</Text>
-                )}
-                <Button title="Submit" onPress={handleSubmit} />
-              </View>
+              {/* Modal for adding truck */}
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                  setModalVisible(false);
+                  setIsInputValid(true); // Reset input validation state
+                }}
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>Add Truck</Text>
+                    <TextInput
+                      style={[styles.input, !isInputValid && styles.inputError]} // Conditional styling based on validation
+                      placeholder="Enter Vehicle Number"
+                      value={vehicleNumber}
+                      onChangeText={(text) => {
+                        setVehicleNumber(text);
+                        setIsInputValid(true); // Reset validation when typing
+                      }}
+                    />
+                    {!isInputValid && (
+                      <Text style={styles.errorText}>Please enter a valid vehicle number</Text>
+                    )}
+                    <Button title="Submit" onPress={handleSubmit} />
+                  </View>
+                </View>
+              </Modal>
             </View>
-          </Modal>
-        </View>
-      </ScrollView>
+          </ScrollView>
+      }
     </>
 
 
@@ -209,9 +320,11 @@ const VehicleProfileDetails = () => {
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
+    backgroundColor: '#F1F2FF'
   },
   editButton: {
-    marginHorizontal: 5
+    marginHorizontal: 5,
+    alignSelf: 'flex-start'
   },
   container: {
     paddingHorizontal: 20,
@@ -225,6 +338,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     borderRadius: 8,
     marginBottom: 10,
+    backgroundColor: '#F1F2FF'
   },
   headerText: {
     fontSize: 18,
@@ -246,7 +360,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
-    backgroundColor: "#fff",
+    backgroundColor: "#F6F8FF",
     borderRadius: 10,
     marginBottom: 10,
     shadowColor: "#000",
@@ -254,6 +368,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 2,
+    shadowColor: '#303030',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3.5,
+    Color: '#F6F8FF',
+    borderColor: '#fff',
+    borderWidth: 2,
   },
   userPhoto: {
     width: 50,
@@ -263,11 +384,12 @@ const styles = StyleSheet.create({
   userInfo: {
     flex: 1,
     marginLeft: 10,
+
   },
   vehicleNumber: {
     fontWeight: "bold",
     fontSize: 18,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   userFollowers: {
     color: "#999",
@@ -310,6 +432,19 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     marginBottom: 10,
+  },
+  noResultContainer: {
+    marginTop: -40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // flex:1,
+  },
+  noResultsText: {
+    textAlign: "center",
+    marginTop: -90,
+    marginBottom:30,
+    color: "grey",
+    fontSize: 16,
   },
 });
 

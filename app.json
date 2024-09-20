@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "https://ddyz8ollngqwo.cloudfront.net/splash_screen.png",
       "resizeMode": "contain",
       "backgroundColor": "#ce0a3a"
     },

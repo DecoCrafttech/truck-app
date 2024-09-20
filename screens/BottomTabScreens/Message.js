@@ -25,149 +25,31 @@ const Message = () => {
     setPageRefresh
   } = useContext(LoadNeedsContext)
 
-  const messagesData = [
-    {
-      id: "1",
-      fullName: "Jhon Smith",
-      isOnline: false,
-      userImg: images.user1,
-      lastSeen: "2023-11-16T04:52:06.501Z",
-      lastMessage: 'See you soon baby',
-      messageInQueue: 2,
-      lastMessageTime: "12:25 PM",
-    },
-    {
-      id: "2",
-      fullName: "Anuska Sharma",
-      isOnline: true,
-      userImg: images.user2,
-      lastSeen: "2023-11-18T04:52:06.501Z",
-      lastMessage: 'I Know. you are so busy man.',
-      messageInQueue: 0,
-      lastMessageTime: "12:15 PM",
-    },
-    {
-      id: "3",
-      fullName: "Virat Kohili",
-      isOnline: true,
-      userImg: images.user3,
-      lastSeen: "2023-11-20T04:52:06.501Z",
-      lastMessage: 'Ok, see u soon',
-      messageInQueue: 0,
-      lastMessageTime: "09:12 PM",
-    },
-    {
-      id: "4",
-      fullName: "Shikhor Dhaon",
-      isOnline: false,
-      userImg: images.user4,
-      lastSeen: "2023-11-18T04:52:06.501Z",
-      lastMessage: 'Great! Do you Like it.',
-      messageInQueue: 0,
-      lastMessageTime: "04:12 PM",
-    },
-    {
-      id: "5",
-      fullName: "Shakib Hasan",
-      isOnline: false,
-      userImg: images.user5,
-      lastSeen: "2023-11-21T04:52:06.501Z",
-      lastMessage: 'Thank you !',
-      messageInQueue: 2,
-      lastMessageTime: "10:30 AM",
-    },
-    {
-      id: "6",
-      fullName: "Jacksoon",
-      isOnline: false,
-      userImg: images.user6,
-      lastSeen: "2023-11-20T04:52:06.501Z",
-      lastMessage: 'Do you want to go out dinner',
-      messageInQueue: 3,
-      lastMessageTime: "10:05 PM",
-    },
-    {
-      id: "7",
-      fullName: "Tom Jerry",
-      userImg: images.user7,
-      lastSeen: "2023-11-20T04:52:06.501Z",
-      lastMessage: 'Do you want to go out dinner',
-      messageInQueue: 2,
-      lastMessageTime: "11:05 PM",
-      isOnline: true
-    },
-    {
-      id: "8",
-      fullName: "Lucky Luck",
-      isOnline: false,
-      userImg: images.user8,
-      lastSeen: "2023-11-20T04:52:06.501Z",
-      lastMessage: 'Can you share the design with me?',
-      messageInQueue: 2,
-      lastMessageTime: "09:11 PM",
-    },
-    {
-      id: "9",
-      fullName: "Nate Jack",
-      userImg: images.user9,
-      lastSeen: "2023-11-20T04:52:06.501Z",
-      lastMessage: 'Tell me what you want?',
-      messageInQueue: 0,
-      lastMessageTime: "06:43 PM",
-      isOnline: true
-    },
-    {
-      id: "10",
-      fullName: "Nate Jack",
-      userImg: images.user9,
-      lastSeen: "2023-11-20T04:52:06.501Z",
-      lastMessage: 'Tell me what you want?',
-      messageInQueue: 0,
-      lastMessageTime: "06:43 PM",
-      isOnline: true
-    },
-    {
-      id: "11",
-      fullName: "Nate Jack",
-      userImg: images.user9,
-      lastSeen: "2023-11-20T04:52:06.501Z",
-      lastMessage: 'Tell me what you want?',
-      messageInQueue: 0,
-      lastMessageTime: "06:43 PM",
-      isOnline: true
-    },
-    {
-      id: "12",
-      fullName: "Nate Jack",
-      userImg: images.user9,
-      lastSeen: "2023-11-20T04:52:06.501Z",
-      lastMessage: 'Tell me what you want?',
-      messageInQueue: 0,
-      lastMessageTime: "06:43 PM",
-      isOnline: true
-    },
-  ]
+
 
   const [search, setSearch] = useState("")
   const [allPersons, setAllPersons] = useState([])
   const [filteredUsers, setFilteredUsers] = useState([]);
 
-  useEffect(() => {
-    const getChatList = async () => {
-        try{
-          const userIdParams = {
-            user_id : await AsyncStorage.getItem("user_id")
-          }
-          const response = await axios.post('https://truck.truckmessage.com/get_user_chat_list', userIdParams);
-          console.log("message",response.data.data)
-          setAllPersons(response.data.data)
-          setFilteredUsers(response.data.data)
-        }catch(err){
-          console.log(err)
-        }
-    }
 
-    (async () => getChatList())()
+  const getChatList = async () => {
+    try{
+      const userIdParams = {
+        user_id : await AsyncStorage.getItem("user_id")
+      }
+      const response = await axios.post('https://truck.truckmessage.com/get_user_chat_list', userIdParams);
+      console.log("message",response.data.data)
+   
+      setAllPersons(response.data.data)
+      setFilteredUsers(response.data.data)
+    }catch(err){
+      console.log(err)
+    }
+}
+
+  useEffect(() => {
+
+      getChatList()
 
   },[pageRefresh])
 
@@ -189,13 +71,13 @@ const Message = () => {
 
   const renderItem = ({ item, index }) => {
     return (
-      <>
+      <View style={{backgroundColor:'red'}}>
         <TouchableOpacity
           key={index}
           onPress={() => handleNavigateToChat(item)}
           style={[
             styles.userContainer,
-            index % 2 !== 0 ? styles.oddBackground : null,
+            styles.oddBackground
           ]}
         >
           <View style={styles.userImageContainer}>
@@ -243,7 +125,7 @@ const Message = () => {
             </View>
           </View>
         </TouchableOpacity>
-      </>
+      </View>
     )
   }
 
@@ -338,7 +220,7 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.secondaryWhite,
     borderBottomWidth: 1,
     marginHorizontal: 'auto',
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   oddBackground: {
     backgroundColor: COLORS.white

@@ -29,9 +29,6 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
   const [toLocationModal, setToLocationModal] = useState(false)
 
 
-  // console.log("loadDetails", loadDetails)
-
-
   useEffect(() => {
     if (loadDetails) {
       setEditedDetails({

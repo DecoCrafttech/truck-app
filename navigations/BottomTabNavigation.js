@@ -75,11 +75,11 @@ const BottomTabNavigation = () => {
           tabBarIcon: ({ focused }) => {
             return (
               <Image
-                source={focused ? icons.chat : icons.chatOutline}
+                source={focused ? icons.message : icons.messageOutline}
                 resizeMode="contain"
                 style={{
-                  height: 24,
-                  width: 24,
+                  height: 27,
+                  width: 27,
                   tintColor: focused ? COLORS.brand : COLORS.brand,
                 }}
               />

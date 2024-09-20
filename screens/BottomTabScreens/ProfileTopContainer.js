@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, Image, Text, Button, Modal, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
+import { View, Image, Text, Button, Modal, TextInput, TouchableOpacity, Platform, Alert, ActivityIndicator } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import Feather from '@expo/vector-icons/Feather';
@@ -23,6 +23,8 @@ import CustomButton from '../../components/CustomButton';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import { MaterialIcons as Icon } from '@expo/vector-icons';
 import { LoadNeedsContext } from '../../hooks/LoadNeedsContext';
+import RNPickerSelect from 'react-native-picker-select';
+
 
 
 
@@ -30,11 +32,11 @@ import { LoadNeedsContext } from '../../hooks/LoadNeedsContext';
 
 const ProfileTopContainer = () => {
 
-    
-  const {
-    userStatesFromProfile,
-    setUserStatesFromProfile
-  } = useContext(LoadNeedsContext)
+
+    const {
+        userStatesFromProfile,
+        setUserStatesFromProfile
+    } = useContext(LoadNeedsContext)
 
     const refRBSheetCitites = useRef()
     const refRBSheetStates = useRef()
@@ -46,6 +48,7 @@ const ProfileTopContainer = () => {
     const [dob, setDob] = useState("");
     const [category, setCategory] = useState("Category");
     const [profileImage, setProfileImage] = useState(null)
+    const [isImagePicked, setImagePicked] = useState(false)
 
     const [userCities, setUserCities] = useState([])
     const [userStates, setUserStates] = useState([])
@@ -64,7 +67,7 @@ const ProfileTopContainer = () => {
 
 
 
-
+    const [pageLoaded, setPageLoaded] = useState(false)
     const [pageRefresh, setPageRefresh] = useState(false)
     // update states
     const [updatedName, setUpdatedName] = useState("");
@@ -83,15 +86,15 @@ const ProfileTopContainer = () => {
     const [show, setShow] = useState(false);
 
 
-    // Dropdown data
     const categoryData = [
-        { label: 'Lorry owners', category: 'Lorry owners' },
-        { label: 'Logistics', category: 'Logistics' },
-        { label: 'Lorry contractors', category: 'Lorry contractors' },
-        { label: 'Load booking agent', category: 'Load booking agent' },
-        { label: 'Driver', category: 'Driver' },
-        { label: 'Lorry Buy & Sell dealers / Owners', category: 'Lorry Buy &Sell dealers / Owners' },
-    ];
+        { label: 'Lorry owners', value: 'lorry_owners' },
+        { label: 'Logistics', value: 'logistics' },
+        { label: 'Lorry contractors', value: 'lorry_contractors' },
+        { label: 'Load booking agent', value: 'load_booking_agent' },
+        { label: 'Driver', value: 'driver' },
+        { label: 'Lorry Buy & Sell dealers / Owners', value: 'Lorry Buy &Sell dealers / Owners' },
+    ]
+
 
     useEffect(() => {
         const getProfilePage = async () => {
@@ -100,14 +103,16 @@ const ProfileTopContainer = () => {
             }
             const response = await axios.post("https://truck.truckmessage.com/get_user_profile", getUserProfileParams)
             if (response.data.error_code === 0) {
-
+                setTimeout(() => {
+                    setPageLoaded(true)
+                }, 2000);
                 setName(response.data.data[1].name)
                 setMobile(response.data.data[1].phone_number)
                 setCategory(response.data.data[1].category)
                 setDob(response.data.data[1].date_of_birth)
                 setUserCities(response.data.data[1].operating_city)
-                // setUserStates(response.data.data[1].state)
                 setProfileImage(response.data.data[1].profile_image_name)
+
             } else {
                 console.log(response.data.message)
             }
@@ -141,7 +146,6 @@ const ProfileTopContainer = () => {
         (async () => getStates())()
     }, [])
 
-    console.log("userStatesFromProfile-Profilepage",userStatesFromProfile)
 
 
     const handleEditPress = () => {
@@ -185,6 +189,7 @@ const ProfileTopContainer = () => {
         if (!result.canceled) {
             const { uri } = result.assets[0];
             setUpdatedProfileImage(uri);
+            setImagePicked(true)
         }
     };
 
@@ -212,6 +217,7 @@ const ProfileTopContainer = () => {
                 setProfileImage(response.data.data[0].profile_image_name)
                 setUpdateImageModal(false)
                 Alert.alert('Upload Success', 'Image uploaded successfully!');
+                setImagePicked(false)
 
             } else {
                 Toast.error(response.data.message)
@@ -317,7 +323,7 @@ const ProfileTopContainer = () => {
             return stateObj ? stateObj.id : null;
         }).filter(id => id !== null));
         setEditStates(userStates)
-        
+
     };
 
 
@@ -371,13 +377,13 @@ const ProfileTopContainer = () => {
 
             const res = await axiosInstance.post("/user_state_entry", updateStatesParams)
 
-        if (res.data.error_code === 0) {
-            setPageRefresh(!pageRefresh)
-            setEditStatesClick(false)
-            getStates()
-        } else {
-            console.log(res.data.message)
-        }
+            if (res.data.error_code === 0) {
+                setPageRefresh(!pageRefresh)
+                setEditStatesClick(false)
+                getStates()
+            } else {
+                console.log(res.data.message)
+            }
         } catch (err) {
             console.log(err)
         }
@@ -387,54 +393,64 @@ const ProfileTopContainer = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.editIcon} >
-                <TouchableOpacity onPress={handleEditPress}>
-                    <Feather name="edit" size={24} color="black" />
-                </TouchableOpacity>
-            </Text>
+            {/* <Text  onPress={() => alert('hey')}>Edit</Text> */}
+
             <View style={styles.header}>
-                <View>
-                    <Image
-                        style={styles.avatar}
-                        source={{ uri: profileImage }} />
-                    <Feather style={styles.modalImageEditIcon}
-                        name="edit"
-                        size={20}
-                        color="#000"
-                        onPress={() => setUpdateImageModal(true)}
-                    />
-                </View>
-                <View style={styles.info}>
+                {
+                    pageLoaded ?
+                        <>
+                            <TouchableOpacity style={styles.editIcon} onPress={() => handleEditPress()}>
+                                <Feather name="edit" size={24} color="black" />
+                            </TouchableOpacity>
+                            <View>
 
+                                <Image
+                                    style={styles.avatar}
+                                    source={{ uri: profileImage }} />
 
-                    <Text style={styles.name} >{name}</Text>
-                    <Text style={[styles.phone]}>
-                        <Text><FontAwesome name="phone" size={15} color="black" /></Text>
-                        <Text style={{ marginLeft: 50 }}>{`   +91${mobile}`}</Text>
-                    </Text>
-                    <Text style={[styles.dob]}>
-                        <Text><Fontisto name="date" size={15} color="black" /></Text>
-                        <Text style={{ marginLeft: 50 }}>{`  ${dob}`}</Text>
-                    </Text>
-                </View>
+                                <Feather style={styles.modalImageEditIcon}
+                                    name="edit"
+                                    size={20}
+                                    color="#000"
+                                    onPress={() => setUpdateImageModal(true)}
+                                />
+                            </View>
+                            <View style={styles.info}>
+                                <Text style={styles.name} >{name}</Text>
+                                <Text style={[styles.phone]}>
+                                    <Text><FontAwesome name="phone" size={15} color="black" /></Text>
+                                    <Text style={{ marginLeft: 50 }}>{`   +91${mobile}`}</Text>
+                                </Text>
+                                <Text style={[styles.phone]}>
+                                    <Text><Fontisto name="date" size={15} color="black" /></Text>
+                                    <Text style={{ marginLeft: 50 }}>{`  ${dob}`}</Text>
+                                </Text>
+                                <Text style={[styles.phone]}>
+                                    <Text><Fontisto name="date" size={15} color="black" /></Text>
+                                    <Text style={{ marginLeft: 50 }}>{`  ${category}`}</Text>
+                                </Text>
+                            </View>
+                        </>
+                        :
+                        <View style={{ marginHorizontal: 'auto', height: 150, justifyContent: "center" }}>
+                            <ActivityIndicator size='large' color={COLORS.primary} />
+                        </View>
+                }
             </View>
+
+
             <View style={styles.stats}>
-                <View style={styles.stat}>
-                    <Text style={styles.statLabel}>Category</Text>
-                    <Text style={styles.statValue}>{category}</Text>
-                </View>
-
-
-                <TouchableOpacity style={[styles.addButton, { marginEnd: 10 }]} onPress={() => refRBSheetStates.current.open()} >
-                    <Text style={styles.buttonText}>Add states</Text>
+                <TouchableOpacity
+                    style={[styles.addButton, { flex: 1, marginEnd: 10 }]}
+                    onPress={() => {
+                        setEditStatesClick(false);
+                        refRBSheetViewStates.current.open()
+                    }} >
+                    <Text style={[styles.buttonText, { textAlign: 'center' }]}>View states</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity style={styles.addButton} onPress={() => refRBSheetViewStates.current.open()} >
-                    <Text style={styles.buttonText}>View states</Text>
+                <TouchableOpacity style={[styles.addButton,]} onPress={() => refRBSheetStates.current.open()} >
+                    <Text style={styles.buttonText}>+</Text>
                 </TouchableOpacity>
-
-
-
             </View>
 
             <Modal visible={editing} animationType="slide" transparent={true}>
@@ -442,18 +458,6 @@ const ProfileTopContainer = () => {
 
                     <View style={styles.modalContent}>
                         <Text style={{ fontSize: 17, fontWeight: 'bold', marginBottom: 20 }}>Edit Profile</Text>
-                        {/* <View>
-                            <Image style={styles.modalAvatar}
-                                source={{ uri: updatedProfileImage }}
-                            />
-                            <Feather style={styles.modalImageEditIcon}
-                                name="edit"
-                                size={20}
-                                color="#000"
-                                onPress={() => pickProfileImage()}
-                            />
-                        </View> */}
-
                         <TextInput
                             style={styles.input}
                             value={updatedName}
@@ -466,12 +470,6 @@ const ProfileTopContainer = () => {
                             onChangeText={(text) => setUpdatedMobile(text)}
                             placeholder="Mobile Number"
                         />
-                        {/* <TextInput
-                            style={styles.input}
-                            value={dob}
-                            onChangeText={(text) => setDob(text)}
-                            placeholder="Date of Birth"
-                        /> */}
                         <View >
                             <TextInput
                                 placeholder={`Enter your date of birth`}
@@ -481,9 +479,6 @@ const ProfileTopContainer = () => {
                                 value={updatedDob}
                             >
                             </TextInput>
-
-
-
                             {show === true ?
                                 <DateTimePicker
                                     value={date}
@@ -492,16 +487,9 @@ const ProfileTopContainer = () => {
                                     onChange={onChange}
                                 /> : null
                             }
-
                         </View>
 
-                        {/* <TextInput
-                            style={styles.input}
-                            value={category}
-                            onChangeText={(text) => setCategory(text)}
-                            placeholder="Category"
-                        /> */}
-                        <Dropdown
+                        {/* <Dropdown
                             style={styles.input}
                             placeholderStyle={styles.placeholderStyle}
                             selectedTextStyle={styles.selectedTextStyle}
@@ -517,26 +505,9 @@ const ProfileTopContainer = () => {
                             searchPlaceholder="Search..."
                             value={updatedCategory}
                             onChange={item => setUpdatedCategory(item.category)}
-                        />
-                        {/* <DropDownPicker
-                            open={open}
-                            value={value}
-                            items={items}
-                            setOpen={setOpen}
-                            setValue={setValue}
-                            setItems={setItems}
-                            multiple={true}
-                            mode="BADGE"
-                            badgeDotColors={["#e76f51", "#00b4d8", "#e9c46a", "#e76f51", "#8ac926", "#00b4d8", "#e9c46a"]}
-                            style={styles.input}
                         /> */}
-                        {/* <TextInput
-                            style={styles.input}
-                            value={updatedCity}
-                            onChangeText={(text) => setUpdatedCity(text)}
-                            placeholder="City"
-                        /> */}
-                        <View style={{ marginBottom: 6 }}>
+
+                        {/* <View style={{ marginBottom: 6 }}>
                             <MultiSelectComponentUpdation
                                 listOfData={citiesData}
                                 userCities={userCities}
@@ -544,14 +515,9 @@ const ProfileTopContainer = () => {
                                 updatedOperatingCities={updatedOperatingCities}
                                 setUpdatedOperatingCities={setUpdatedOperatingCities}
                             />
-                        </View>
-                        {/* <TextInput
-                            style={styles.input}
-                            value={updatedState}
-                            onChangeText={(text) => setUpdatedState(text)}
-                            placeholder="State"
-                        /> */}
-                        <View style={{ marginBottom: 6 }}>
+                        </View> */}
+
+                        {/* <View style={{ marginBottom: 6 }}>
                             <MultiSelectComponentUpdation
                                 listOfData={statesData}
                                 userStates={userStates}
@@ -559,10 +525,22 @@ const ProfileTopContainer = () => {
                                 updatedOperatingStates={updatedOperatingStates}
                                 setUpdatedOperatingStates={setUpdatedOperatingStates}
                             />
+                        </View> */}
+                        <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10, height: 50, alignItems: 'center', justifyContent: 'center' }}>
+                            <RNPickerSelect
+                                onValueChange={(value) => setUpdatedCategory(value)}
+                                items={categoryData}
+                                value={updatedCategory}
+                                placeholder={{
+                                    label: 'Select category',
+                                    value: null,
+                                    color: 'grey',
+                                }}
+                            />
                         </View>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSave}>
-                                <Text style={styles.buttonText}>Save</Text>
+                                <Text style={[styles.buttonText, { textAlign: "center" }]}>Save</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
                                 <Text style={styles.buttonText}>Cancel</Text>
@@ -592,9 +570,9 @@ const ProfileTopContainer = () => {
 
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
-                                style={[styles.button, styles.saveButton]}
-                                onPress={() => updateProfileImageAPI(updatedProfileImage)}>
-                                <Text style={styles.buttonText}>Save</Text>
+                                style={[styles.button, styles.saveButton, { width: "50%" }]}
+                                onPress={() => isImagePicked === true ? updateProfileImageAPI(updatedProfileImage) : alert("Please choose image first")}>
+                                <Text style={[styles.buttonText, { textAlign: 'center', }]}>Save</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.button, styles.cancelButton]}
@@ -701,7 +679,7 @@ const ProfileTopContainer = () => {
             <View>
                 <RBSheet
                     ref={refRBSheetStates}
-                    height={400}
+                    height={500}
                     openDuration={250}
                     closeOnDragDown={true}
                     closeOnPressBack={true}
@@ -756,7 +734,7 @@ const ProfileTopContainer = () => {
                     openDuration={250}
                     closeOnDragDown={true}
                     closeOnPressBack={true}
-                    closeOnPressMask={true}
+                    closeOnPressMask={false}
                     customStyles={{
                         wrapper: {
                             backgroundColor: "rgba(0,0,0,0.5)",
@@ -776,19 +754,11 @@ const ProfileTopContainer = () => {
                 >
                     <View>
                         <ScrollView>
-
-
                             <View style={{ width: 320 }}>
                                 {
                                     editStatesClick === true ?
                                         <>
                                             <View style={{ width: 320 }}>
-                                                {/* <MultiSelectComponent
-                                                    listOfData={statesData}
-                                                    selectedStates={selectedStates}
-                                                    setSelectedStates={setSelectedStates}
-                                                    setOperatingStates={setOperatingStates}
-                                                /> */}
                                                 <SectionedMultiSelect
                                                     items={statesData}
                                                     IconRenderer={Icon}
@@ -894,15 +864,13 @@ const ProfileTopContainer = () => {
 
 const styles = {
     container: {
-        // backgroundColor: '#fff',
+        backgroundColor: '#F1F2FF',
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
-        // marginTop: 10,
-
     },
     editIcon: {
         position: 'absolute',
-        right: 10,
+        right: 15,
         top: 10
     },
     header: {
@@ -911,6 +879,11 @@ const styles = {
         alignItems: 'center',
         padding: 20,
         paddingVertical: 10,
+        borderWidth: 0.5,
+        borderColor: '#ccc',
+        marginHorizontal: 20,
+        borderRadius: 10,
+        backgroundColor: '#fff',
 
     },
     avatar: {
@@ -976,6 +949,7 @@ const styles = {
     },
     stats: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
         padding: 20,
     },
@@ -1087,7 +1061,7 @@ const styles = {
     },
     buttonContainer: {
         flexDirection: "row",
-        justifyContent: "space-around",
+        justifyContent: "space-between",
         marginTop: 20,
     },
     saveButton: {

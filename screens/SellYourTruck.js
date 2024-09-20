@@ -21,8 +21,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { Picker } from "react-native-web";
 import { Dropdown } from "react-native-element-dropdown";
-import RNPickerSelect from 'react-native-picker-select';
 import { useNavigation } from "@react-navigation/native";
+import RNPickerSelect from 'react-native-picker-select';
+
 
 
 const SellYourTruck = () => {
@@ -43,6 +44,10 @@ const SellYourTruck = () => {
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
+  const [truckBodyType, setTruckBodyType] = useState("");
+  const [numberOfTyres, setNumberOfTyres] = useState("");
+  const [ton, setTon] = useState("");
+
 
   const [ownerNameValid, setOwnerNameValid] = useState(true);
   const [contactNumberValid, setContactNumberValid] = useState(true);
@@ -51,6 +56,8 @@ const SellYourTruck = () => {
   const [brandValid, setBrandValid] = useState(true);
   const [modelValid, setModelValid] = useState(true);
   const [priceValid, setPriceValid] = useState(true)
+  const [tonValid, setTonValid] = useState(true);
+
   const [locationValid, setLocationValid] = useState(true);
   const [descriptionValid, setDescriptionValid] = useState(true);
 
@@ -58,6 +65,8 @@ const SellYourTruck = () => {
   const [locationModal, setLocationModal] = useState(false)
 
   const handlePostAdd = async () => {
+    
+ 
     if (
       ownerName.trim() === "" ||
       contactNumber.trim() === "" ||
@@ -67,6 +76,7 @@ const SellYourTruck = () => {
       model.trim() === "" ||
       price.trim() === "" ||
       location.trim() === "" ||
+      ton.trim() === "" ||
       description.trim() === "" ||
       images.length === 0
     ) {
@@ -80,6 +90,8 @@ const SellYourTruck = () => {
       setPriceValid(price.trim() !== "");
       setLocationValid(location.trim() !== "");
       setDescriptionValid(description.trim() !== "");
+      setTonValid(ton.trim() !== "");
+
       return;
     }
 
@@ -94,7 +106,11 @@ const SellYourTruck = () => {
     formData.append('model', model);
     formData.append('price', price);
     formData.append('location', location);
+    formData.append("truck_body_type",truckBodyType)
+    formData.append("no_of_tyres",numberOfTyres)
     formData.append('description', description);
+    formData.append('tonnage', ton);
+    
 
 
     // Append images to FormData
@@ -124,6 +140,8 @@ const SellYourTruck = () => {
         setPrice("");
         setLocation("");
         setDescription("");
+        setTon("");
+
         setImages([])
         Alert.alert("Post added successfully!");
         navigation.goBack()
@@ -182,7 +200,7 @@ const SellYourTruck = () => {
   };
 
   const brandData = [
-       { label: 'Ashok Leyland', value: 'ashok_leyland' },
+    { label: 'Ashok Leyland', value: 'ashok_leyland' },
     { label: 'Tata', value: 'tata' },
     { label: 'Mahindra', value: 'mahindra' },
     { label: 'Eicher', value: 'eicher' },
@@ -230,6 +248,29 @@ const SellYourTruck = () => {
     { label: '90,00,001 and above lakhs', value: '90_above_lakhs' },
   ];
 
+  const bodyTypeData = [
+    { label: 'Open body', value: 'open_body' },
+    { label: 'Container', value: 'container' },
+    { label: 'Trailer', value: 'trailer' },
+    { label: 'Tanker', value: 'tanker' },
+    { label: 'Tipper', value: 'tipper' },
+    { label: 'LCV', value: 'lcv' },
+  ];
+
+  const numberOfTyresData = [
+    { label: '4', value: '4' },
+    { label: '6', value: '6' },
+    { label: '8', value: '8' },
+    { label: '10', value: '10' },
+    { label: '12', value: '12' },
+    { label: '14', value: '14' },
+    { label: '16', value: '16' },
+    { label: '18', value: '18' },
+    { label: '20', value: '20' },
+    { label: '22', value: '22' },
+  ];
+
+
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 40 }, (_, index) => {
@@ -256,6 +297,26 @@ const SellYourTruck = () => {
 
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <View style={styles.textInputContainer}>
+
+            <Text style={styles.label}>Model Year</Text>
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+
+              <RNPickerSelect
+                onValueChange={(value) => setModel(value)}
+                items={yearsData}
+                value={model}
+              />
+            </View>
+
+            <Text style={styles.label}>Brand</Text>
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setBrand(value)}
+                items={brandData}
+                value={brand}
+              />
+            </View>
+
             <Text style={styles.label}>Owner Name</Text>
             <TextInput
               style={[
@@ -266,18 +327,8 @@ const SellYourTruck = () => {
               onChangeText={setOwnerName}
               value={ownerName}
             />
-            <Text style={styles.label}>Contact Number</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                !contactNumberValid && { borderColor: "red" },
-              ]}
-              keyboardType="number-pad"
-              placeholder="Type Your Number"
-              onChangeText={setContactNumber}
-              value={contactNumber}
-              maxLength={10}
-            />
+
+
             <Text style={styles.label}>Vehicle Number</Text>
             <TextInput
               style={[
@@ -288,6 +339,7 @@ const SellYourTruck = () => {
               onChangeText={setVehicleNumber}
               value={vehicleNumber}
             />
+
             <Text style={styles.label}>Kms Driven</Text>
             <TextInput
               style={[
@@ -300,28 +352,6 @@ const SellYourTruck = () => {
               value={kmsDriven}
             />
 
-
-            <Text style={styles.label}>Brand</Text>
-            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
-              <RNPickerSelect
-                onValueChange={(value) => setBrand(value)}
-                items={brandData}
-                value={brand}
-              />
-            </View>
-            <View>
-
-            </View>
-
-            <Text style={styles.label}>Model</Text>
-            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
-
-              <RNPickerSelect
-                onValueChange={(value) => setModel(value)}
-                items={yearsData}
-                value={model}
-              />
-            </View>
             <Text style={styles.label}>Price</Text>
             <TextInput
               style={[styles.textInput, !priceValid && { borderColor: "red" }]}
@@ -330,6 +360,29 @@ const SellYourTruck = () => {
               value={price}
               keyboardType="number-pad"
             />
+
+            <Text style={styles.label}>Contact Number</Text>
+            <TextInput
+              style={[
+                styles.textInput,
+                !contactNumberValid && { borderColor: "red" },
+              ]}
+              keyboardType="number-pad"
+              placeholder="Type Your Number"
+              onChangeText={setContactNumber}
+              value={contactNumber}
+              maxLength={10}
+            />
+
+
+
+
+
+
+
+
+
+
 
             <Text style={styles.label}>Location</Text>
             <TextInput
@@ -340,6 +393,45 @@ const SellYourTruck = () => {
               placeholder="Location"
               value={location}
               onPress={() => setLocationModal(true)}
+            />
+
+            <Text style={styles.label}>Truck Body Type</Text>
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setTruckBodyType(value)}
+                items={bodyTypeData}
+                value={truckBodyType}
+                placeholder={{
+                  label: 'Select truck body type',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+
+            <Text style={styles.label}>No. of Tyres</Text>
+
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setNumberOfTyres(value)}
+                items={numberOfTyresData}
+                value={numberOfTyres}
+                placeholder={{
+                  label: 'Select number of tyres',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+            <Text style={styles.label}>Ton</Text>
+            <TextInput
+              style={[styles.textInput, !tonValid && { borderColor: "red" }]}
+              placeholder="Example : 2"
+              onChangeText={setTon}
+              value={ton}
+              keyboardType="number-pad"
             />
 
 

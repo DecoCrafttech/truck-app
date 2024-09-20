@@ -21,6 +21,10 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import RNPickerSelect from 'react-native-picker-select';
+import MultiSelectComponent from "../../components/MultiSelectComponent";
+import SectionedMultiSelect from "react-native-sectioned-multi-select";
+import { MaterialIcons as Icon } from '@expo/vector-icons';
+
 
 
 const AvailableTruck = ({ navigation }) => {
@@ -43,10 +47,13 @@ const AvailableTruck = ({ navigation }) => {
   const [getTruckData, setGetTruckData] = useState([]);
   const [isLoadings, setisLoadings] = useState(true);
 
+  const [selectedStates, setSelectedStates] = useState([]);
+  const [filteredStates, setFilteredStates] = useState([])
+  const [userToLocationStatesData, setUserToLocationStatesData] = useState({})
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAadhaarModal, setIsAadhaarModal] = useState(false)
 
-  const [userToLocationStatesData,setUserToLocationStatesData] = useState({})
 
   const [modalValues, setModalValues] = useState({
     companyName: "",
@@ -94,15 +101,13 @@ const AvailableTruck = ({ navigation }) => {
 
 
   useEffect(() => {
-      setUserToLocationStatesData(
-          userStatesFromProfile.map(state => ({
-            label : state,
-            value : state
-          }))
-      )
-  },[])
-
-
+    setUserToLocationStatesData(
+      userStatesFromProfile.map((state, index) => ({
+        id: index + 1,
+        name: state
+      }))
+    )
+  }, [])
 
 
   const navigateToSellYourTruck = async () => {
@@ -144,6 +149,7 @@ const AvailableTruck = ({ navigation }) => {
         const response = await axiosInstance.get("/all_truck_details");
         if (response.data.error_code === 0) {
           const transformedData = response.data.data.map((item) => ({
+            companyName : item.company_name,
             post: item.user_post,
             profileName: item.profile_name,
             title: item.company_name,
@@ -180,6 +186,7 @@ const AvailableTruck = ({ navigation }) => {
 
     getAllTruckDetails();
   }, [isLoading]);
+
 
   const filteredTrucks = getTruckData.filter(
     (truck) =>
@@ -345,7 +352,7 @@ const AvailableTruck = ({ navigation }) => {
       "vehicle_number": "",
       "company_name": "",
       "from_location": modalValues.fromLocation,
-      "to_location": modalValues.toLocation,
+      "to_location": filteredStates,
       "truck_name": "",
       "truck_body_type": modalValues.truckBodyType,
       "no_of_tyres": modalValues.noOfTyres,
@@ -437,15 +444,25 @@ const AvailableTruck = ({ navigation }) => {
 
 
 
-  // const userToLocationStatesData = [
-  //   userStatesFromProfile.map((state,index) => {
-  //     return(
-  //       <>
-  //         {}
-  //       </>
-  //     )
-  //   })
-  // ]
+  const handleSelectStates = async (selectedItemIds) => {
+    // Log previously selected states
+    const prevSelectedStateNames = selectedStates.map(id => {
+      const state = userToLocationStatesData.find(state => state.id === id);
+      return state ? state.name : null;
+    }).filter(name => name !== null);
+
+
+    // Update selected states
+    setSelectedStates(selectedItemIds);
+
+    // Log currently selected states
+    const selectedStateNames = selectedItemIds.map(id => {
+      const state = userToLocationStatesData.find(state => state.id === id);
+      return state ? state.name : null;
+    }).filter(name => name !== null);
+    setFilteredStates(selectedStateNames)
+  };
+
 
 
   return (
@@ -511,7 +528,7 @@ const AvailableTruck = ({ navigation }) => {
               }}
             /> */}
 
-            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+            {/* <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
                 onValueChange={(value) => setModalValues({ ...modalValues, toLocation: value })}
                 items={userToLocationStatesData}
@@ -520,6 +537,30 @@ const AvailableTruck = ({ navigation }) => {
                   label: 'To Location',
                   value: null,
                   color: 'grey',
+                }}
+              />
+            </View> */}
+
+            <View style={{ width: "auto",marginBottom:5 }}>
+              <SectionedMultiSelect
+                items={userToLocationStatesData}
+                IconRenderer={Icon}
+                uniqueKey="id"
+                searchPlaceholderText="Search state"
+                selectedText="selected"
+                selectText="To Location"
+                confirmText="Done"
+                onSelectedItemsChange={handleSelectStates}  // Call to update selected items
+                selectedItems={selectedStates}  // Initialize with current user states
+                styles={{
+                  backdrop: styles.multiSelectBackdrop,
+                  selectToggle: styles.multiSelectBox,
+                  chipContainer: styles.multiSelectChipContainer,
+                  chipText: styles.multiSelectChipText,
+                  selectToggleText: styles.selectToggleText,
+                  selectedItemText: styles.selectedItemText,
+                  selectText: styles.selectText,
+                  button: { backgroundColor: '#CE093A' },
                 }}
               />
             </View>
@@ -555,6 +596,7 @@ const AvailableTruck = ({ navigation }) => {
               value={modalValues.truckBodyType}
               onChangeText={(text) => handleInputChange("truckBodyType", text)}
             /> */}
+
             <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
                 onValueChange={(value) => setModalValues({ ...modalValues, truckName: value })}
@@ -604,8 +646,8 @@ const AvailableTruck = ({ navigation }) => {
                 setIsLoading(!isLoading)
                 toggleModal()
               }}>
-              <Text style={styles.applyButtonText}>Clear filter</Text>
-            </TouchableOpacity>
+              <Text style={styles.applyButtonText} onPress={() => setIsLoading(!isLoading)}>Clear filter</Text>
+              </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.applyButtonText}>Close</Text>
             </TouchableOpacity>
@@ -847,6 +889,40 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.gray,
   },
+  multiSelectBackdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.01)',
+  },
+  multiSelectBox: {
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: 'grey',
+    padding: 10,
+    paddingLeft: 15,
+    marginBottom: 4,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 12
+
+  },
+  selectToggleText: {
+    color: '#000',
+    fontSize: 14
+  },
+  selectText: {
+    color: 'red'
+  },
+  selectedItemText: {
+    color: COLORS.primary,
+  },
+  multiSelectChipContainer: {
+    borderWidth: 0,
+    backgroundColor: '#ddd',
+    borderRadius: 8,
+  },
+  multiSelectChipText: {
+    color: '#222',
+    fontSize: 12,
+  }
 });
 
 export default AvailableTruck;

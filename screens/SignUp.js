@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Button, Image, Alert } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +20,7 @@ import { FlatList } from 'react-native-web';
 import MultiSelectComponent from '../components/MultiSelectComponent';
 import { BackHandler } from 'react-native';
 import { COLORS } from '../constants';
+import { LoadNeedsContext } from '../hooks/LoadNeedsContext';
 
 
 
@@ -33,15 +34,20 @@ const SignUp = () => {
 
     const inputRef = useRef("")
 
+    const {
+        isSignedUp,
+        setIsSignedUp
+      } = useContext(LoadNeedsContext)
+
     const navigation = useNavigation()
 
     const [inputs, setInputs] = useState({
         name: "",
         dob: "",
         mobileNumber: "",
-        email : "",
+        email: "",
         state: "",
-        pincode : "",
+        pincode: "",
         operatingCity: "",
         password: "",
         confirmPassword: "",
@@ -49,8 +55,8 @@ const SignUp = () => {
     const [selectedCities, setSelectedCities] = useState([]);
     const [selectedStates, setSelectedStates] = useState([]);
 
-    const [operatingCities,setOperatingCities] = useState([])
-    const [operatingStates,setOperatingStates] = useState([])
+    const [operatingCities, setOperatingCities] = useState([])
+    const [operatingStates, setOperatingStates] = useState([])
 
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -72,7 +78,7 @@ const SignUp = () => {
             BackHandler.addEventListener('hardwareBackPress', handleBackPress)
 
             return () => {
-                BackHandler.removeEventListener('hardwareBackPress',handleBackPress)
+                BackHandler.removeEventListener('hardwareBackPress', handleBackPress)
             }
         })
     )
@@ -159,13 +165,13 @@ const SignUp = () => {
             inputs.dob === "" ||
             inputs.mobileNumber === "" ||
             inputs.email === "" ||
+            category === "" ||
             inputs.pincode === "" ||
-            operatingStates.length === 0 ||
             inputs.password === "" ||
             inputs.confirmPassword === "" ||
             isChecked === false
         ) {
-            Toast.warn('Please fill all the details')
+            alert('Please fill all the details')
             return
         } else {
 
@@ -183,12 +189,12 @@ const SignUp = () => {
             const regex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/;
 
             if (!inputs.password.match(regex)) {
-                Toast.warn('Password must be 8-20 characters long, include at least one number, and one special character (!@#$%^&*).');
+                alert('Password must be 8-20 characters long, include at least one number, and one special character (!@#$%^&*).');
                 return; // Exit the function if the password does not match the regex
             }
 
             if (inputs.password !== inputs.confirmPassword) {
-                Toast.warn('Confirm password should match the password.');
+                alert('Confirm password should match the password.');
                 return; // Exit the function if the passwords do not match
             }
 
@@ -198,7 +204,7 @@ const SignUp = () => {
                 date_of_birth: `${inputs.dob.toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-')}`,
                 // date_of_birth: "1996-11-14" ,
                 phone_number: inputs.mobileNumber,
-                email : inputs.email,
+                email: inputs.email,
                 category: category,
                 operating_city: "",
                 state: operatingStates,
@@ -213,13 +219,14 @@ const SignUp = () => {
                 const response = await axiosInstance.post("/registration", signupParams)
                 if (response.data.error_code === 0) {
                     if (response.data.message === "Phone Number already registered!") {
-                        Toast.warn(response.data.message)
+                        alert(response.data.message)
                         return
                     }
                     await AsyncStorage.setItem("userName", `${inputs.name}`)
                     await AsyncStorage.setItem("user_id", `${response.data.data[0].id}`)
                     await AsyncStorage.setItem("mobileNumber", `${inputs.mobileNumber}`)
-                    Toast.success(response.data.message)
+                    setIsSignedUp(true)
+                    // alert(response.data.message)
                     setCategory("")
                     setInputs({
                         name: "",
@@ -230,14 +237,14 @@ const SignUp = () => {
                         password: "",
                         confirmPassword: "",
                     })
-                   
+
                     sendOTP()
                     navigation.navigate("OTPVerification")
                 } else {
-                    Toast.error(response.data.message)
+                    alert(response.data.message)
                 }
 
-               
+
 
             } catch (err) {
                 console.log(err)
@@ -253,21 +260,21 @@ const SignUp = () => {
 
 
     const sendOTP = async (e) => {
-            const OTPParams = {
-                "phone_number": `${inputs.mobileNumber}`,
-            }
-            try {
-                const response = await axiosInstance.post("/send_signup_otp", OTPParams)
-                if (response.data.error_code === 0) {
-                    Toast.success(response.data.message)
-                } else {
-                    Toast.error(response.data.message)
-                }
-            } catch (err) {
-                console.log(err)
-            }
+        const OTPParams = {
+            "phone_number": `${inputs.mobileNumber}`,
         }
-    
+        try {
+            const response = await axiosInstance.post("/send_signup_otp", OTPParams)
+            if (response.data.error_code === 0) {
+                alert(response.data.message)
+            } else {
+                alert(response.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
 
 
     return (
@@ -289,8 +296,8 @@ const SignUp = () => {
                         <View style={styles.avatarContainer}>
                             <Image
                                 style={styles.avatar}
-                                source={require("../assets/images/app-logo.png")}
-                                />
+                                source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
+                            />
                         </View>
 
                         <View style={styles.pageHeadingContainer}>
@@ -356,7 +363,7 @@ const SignUp = () => {
                                         placeholder='Enter your mobile number'
                                         placeholderTextColor='grey'
                                         inputMode='numeric'
-                                        // maxLength={10}
+                                        maxLength={10}
                                         style={styles.mobileNumberInput}
                                         value={inputs.mobileNumber}
                                         onChangeText={(value) => handleChange('mobileNumber', value)}
@@ -432,7 +439,7 @@ const SignUp = () => {
                                 </View>
                                 <View style={styles.inputBox}>
                                     <TextInput
-                                    keyboardType='number-pad'
+                                        keyboardType='number-pad'
                                         placeholder='Enter your pincode'
                                         maxLength={6}
                                         placeholderTextColor='grey'
@@ -560,7 +567,7 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: "bold",
         marginVertical: 12,
-        marginHorizontal:20
+        marginHorizontal: 20
     },
     avatarContainer: {
         marginTop: 30,

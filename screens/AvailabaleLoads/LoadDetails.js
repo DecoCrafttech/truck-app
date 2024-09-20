@@ -10,6 +10,7 @@ const LoadDetails = ({ filteredTrucks, status, handleEdit, selectedValue }) => {
 
   const navigation = useNavigation()
 
+console.log("selectedValue",selectedValue)
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -33,24 +34,94 @@ const LoadDetails = ({ filteredTrucks, status, handleEdit, selectedValue }) => {
         ))
       ) : (
         <>
-          <View style={styles.noResultContainer}>
-            <View>
-              <Image
-                source={require("../../assets/images/Folder_empty.png")}
-                width={50}
-                height={50}
-                resizeMode="center"
-              />
-            </View>
-            <Text style={styles.noResultsText}>No records</Text>
-            <TouchableOpacity>
-              <Text
-                style={{ color: '#fff',width:"100%",padding:10,paddingHorizontal:20,borderRadius:5,textAlign:'center', fontWeight: 'bold',fontSize:16,backgroundColor:COLORS.primary}}
-                onPress={() => navigation.navigate('SellYourTruck')}
-              > Click here to post load</Text>
-            </TouchableOpacity>
+          {
+            selectedValue === "user_load_details" ?
+              <View style={styles.noResultContainer}>
+                <View>
+                  <Image
+                    source={require("../../assets/images/Folder_empty.png")}
+                    width={50}
+                    height={50}
+                    resizeMode="center"
+                  />
+                </View>
+                <Text style={styles.noResultsText}>No records</Text>
+                {/* <TouchableOpacity>
+                  <Text
+                    style={{ color: '#fff', width: "100%", padding: 10, paddingHorizontal: 20, borderRadius: 5, textAlign: 'center', fontWeight: 'bold', fontSize: 16, backgroundColor: COLORS.primary }}
+                    onPress={() => navigation.navigate('LoadNeeds')}
+                  > Click here to post load</Text>
+                </TouchableOpacity> */}
+              </View>
+              : null
+          }
 
-          </View>
+          {
+            selectedValue === "user_driver_details" ?
+              <View style={styles.noResultContainer}>
+                <View>
+                  <Image
+                    source={require("../../assets/images/Folder_empty.png")}
+                    width={50}
+                    height={50}
+                    resizeMode="center"
+                  />
+                </View>
+                <Text style={styles.noResultsText}>No records</Text>
+                {/* <TouchableOpacity>
+                  <Text
+                    style={{ color: '#fff', width: "100%", padding: 10, paddingHorizontal: 20, borderRadius: 5, textAlign: 'center', fontWeight: 'bold', fontSize: 16, backgroundColor: COLORS.primary }}
+                    onPress={() => navigation.navigate('DriverNeeds')}
+                  > Click here to post a driver</Text>
+                </TouchableOpacity> */}
+              </View>
+              : null
+          }
+
+          {
+            selectedValue === "user_truck_details" ?
+              <View style={styles.noResultContainer}>
+                <View>
+                  <Image
+                    source={require("../../assets/images/Folder_empty.png")}
+                    width={50}
+                    height={50}
+                    resizeMode="center"
+                  />
+                </View>
+                <Text style={styles.noResultsText}>No records</Text>
+                {/* <TouchableOpacity>
+                  <Text
+                    style={{ color: '#fff', width: "100%", padding: 10, paddingHorizontal: 20, borderRadius: 5, textAlign: 'center', fontWeight: 'bold', fontSize: 16, backgroundColor: COLORS.primary }}
+                    onPress={() => navigation.navigate('TruckDetail')}
+                  > Click here to post a truck</Text>
+                </TouchableOpacity> */}
+              </View>
+              : null
+          }
+
+          {
+            selectedValue === "user_buy_sell_details" ?
+              <View style={styles.noResultContainer}>
+                <View>
+                  <Image
+                    source={require("../../assets/images/Folder_empty.png")}
+                    width={50}
+                    height={50}
+                    resizeMode="center"
+                  />
+                </View>
+                <Text style={styles.noResultsText}>No records</Text>
+                <TouchableOpacity>
+                  <Text
+                    style={{ color: '#fff', width: "100%", padding: 10, paddingHorizontal: 20, borderRadius: 5, textAlign: 'center', fontWeight: 'bold', fontSize: 16, backgroundColor: COLORS.primary }}
+                    onPress={() => navigation.navigate('MarketPlace')}
+                  > Click here to post a driver</Text>
+                </TouchableOpacity>
+              </View>
+              : null
+          }
+
         </>
       )}
     </ScrollView>
@@ -60,7 +131,7 @@ const LoadDetails = ({ filteredTrucks, status, handleEdit, selectedValue }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    flex: 1
+    // flex: 1
   },
   noResultContainer: {
     marginTop: 50,
@@ -72,7 +143,7 @@ const styles = StyleSheet.create({
   noResultsText: {
     textAlign: "center",
     marginTop: -90,
-    marginBottom:30,
+    marginBottom: 30,
     color: "grey",
     fontSize: 16,
   },

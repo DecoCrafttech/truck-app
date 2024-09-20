@@ -290,6 +290,8 @@ const TruckNeeds = () => {
               placeholder="Example : 2"
               onChangeText={setTon}
               value={ton}
+              keyboardType="number-pad"
+
             />
 
             <Text style={styles.label}>Truck Name</Text>
@@ -355,15 +357,7 @@ const TruckNeeds = () => {
             </View>
 
             <Text style={styles.label}>No. of Tyres</Text>
-            {/* <TextInput
-              style={[
-                styles.textInput,
-                !numberOfTyresValid && { borderColor: "red" },
-              ]}
-              placeholder="Number of Tyres"
-              onChangeText={setNumberOfTyres}
-              value={numberOfTyres}
-            /> */}
+
             <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
                 onValueChange={(value) => setNumberOfTyres(value)}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { images } from "../../constants"
+import { COLORS, images } from "../../constants"
 import VehicleProfileDetails from "./VehicleProfileDetails";
 import HeaderWithoutNotifications from "../../components/HeaderWithoutNotifications";
 import ProfileTopContainer from "./ProfileTopContainer";
@@ -9,7 +9,7 @@ import ProfileTopContainer from "./ProfileTopContainer";
 const Profile = () => {
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 ,backgroundColor: COLORS.white }}>
       <View style={styles.container}>
         <HeaderWithoutNotifications title="Profile" />
 

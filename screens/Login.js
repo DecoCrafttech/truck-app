@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Button, Image, BackHandler, Alert } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,6 +11,7 @@ import { COLORS } from '../constants';
 import Container, { Toast } from 'toastify-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axiosInstance from '../services/axiosInstance';
+import { LoadNeedsContext } from '../hooks/LoadNeedsContext';
 
 
 
@@ -20,6 +21,11 @@ import axiosInstance from '../services/axiosInstance';
 const Login = () => {
 
     const inputRef = useRef("")
+
+    const {
+        isLoggedIn,
+        setIsLoggedIn
+      } = useContext(LoadNeedsContext)
 
     const navigation = useNavigation()
 
@@ -101,14 +107,15 @@ const Login = () => {
 
                 const response = await axios.post("https://truck.truckmessage.com/login", LogInParams)
                 if (response.data.error_code === 0) {
-                   
+
                     setInputs({
                         mobileNumber: "",
                         password: "",
                     })
                     Toast.success(response.data.message)
                     await AsyncStorage.setItem("userName", `${response.data.data[0].first_name}`)
-                    await AsyncStorage.setItem("user_id",`${response.data.data[0].id}`)
+                    await AsyncStorage.setItem("user_id", `${response.data.data[0].id}`)
+                    setIsLoggedIn(true);
                     navigation.navigate('Main')
                 } else {
                     Toast.error(response.data.message)
@@ -116,16 +123,12 @@ const Login = () => {
             } catch (err) {
                 console.log(err)
             }
-
-
         }
-
-
     }
 
     const handleResetPassword = async () => {
         const resetPasswordPasswordParams = {
-            "user_id": `${ await AsyncStorage.getItem("user_id")}`,
+            "user_id": `${await AsyncStorage.getItem("user_id")}`,
         }
 
         try {
@@ -142,7 +145,6 @@ const Login = () => {
             console.log(err)
         }
     }
-
 
 
     const [date, setDate] = useState(new Date());
@@ -186,7 +188,7 @@ const Login = () => {
                     <View style={styles.avatarContainer}>
                         <Image
                             style={styles.avatar}
-                            source={require("../assets/images/app-logo.png")}
+                            source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
                         />
                     </View>
 
@@ -209,6 +211,7 @@ const Login = () => {
                                 placeholder='Enter your mobile number'
                                 placeholderTextColor='grey'
                                 inputMode='numeric'
+                                maxLength={10}
                                 // maxLength={10}
                                 style={styles.mobileNumberInput}
                                 value={inputs.mobileNumber}
@@ -264,7 +267,7 @@ const Login = () => {
                         justifyContent: 'center'
                     }}>
                         <Text style={{ textAlign: 'center' }}>
-                        Forgot Password? {" "}
+                            Forgot Password? {" "}
                         </Text>
                         <TouchableOpacity>
                             <Text
@@ -326,7 +329,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginVertical: 12,
         marginBottom: 30,
-        textAlign:'left'
+        textAlign: 'left'
     },
     signupContainer: {
         marginHorizontal: 20,

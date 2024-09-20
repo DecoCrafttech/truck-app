@@ -18,6 +18,11 @@ export const LoadNeedsProvider = ({ children }) => {
   const [pageRefresh, setPageRefresh] = useState(false)
   const [userStatesFromProfile, setUserStatesFromProfile] = useState([])
 
+  const [isFirstSignup, setIsFirstSignup] = useState(false)
+  const [isSignedUp, setIsSignedUp] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+
 
 
   const toggleLoading = () => {
@@ -39,7 +44,13 @@ export const LoadNeedsProvider = ({ children }) => {
         pageRefresh,
         setPageRefresh,
         userStatesFromProfile,
-        setUserStatesFromProfile
+        setUserStatesFromProfile,
+        isFirstSignup,
+        setIsFirstSignup,
+        isLoggedIn,
+        setIsLoggedIn,
+        isSignedUp,
+        setIsSignedUp
       }}
     >
       {children}

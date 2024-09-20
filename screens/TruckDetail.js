@@ -37,7 +37,6 @@ const TruckDetail = ({ route }) => {
   });
 
 
-  console.log("fullProductDetails",fullProductDetails)
 
   useEffect(() => {
     const fetchFullProductDetails = async () => {
@@ -150,20 +149,28 @@ const TruckDetail = ({ route }) => {
           </View>
 
           <View style={styles.card}>
+
+          <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Brand name</Text>
+            </View>
+            <View style={styles.cardContent}>
+              <Text style={styles.description}>{fullProductDetails.brand}</Text>
+            </View>
+
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Owner Name</Text>
+            </View>
+            <View style={styles.cardContent}>
+              <Text style={styles.description}>
+                {fullProductDetails.owner_name}
+              </Text>
+            </View>
+            
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Model</Text>
             </View>
             <View style={styles.cardContent}>
               <Text style={styles.description}>{fullProductDetails.model}</Text>
-            </View>
-
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Kms Driven</Text>
-            </View>
-            <View style={styles.cardContent}>
-              <Text style={styles.description}>
-                {fullProductDetails.kms_driven}
-              </Text>
             </View>
 
             <View style={styles.cardHeader}>
@@ -176,13 +183,53 @@ const TruckDetail = ({ route }) => {
             </View>
 
             <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Owner Name</Text>
+              <Text style={styles.cardTitle}>Kms Driven</Text>
             </View>
             <View style={styles.cardContent}>
               <Text style={styles.description}>
-                {fullProductDetails.owner_name}
+                {fullProductDetails.kms_driven}
               </Text>
             </View>
+
+
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Price</Text>
+            </View>
+            <View style={styles.cardContent}>
+              <Text style={styles.description}>
+                {fullProductDetails.price}
+              </Text>
+            </View>
+
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>No of tyres</Text>
+            </View>
+            <View style={styles.cardContent}>
+              <Text style={styles.description}>
+                {fullProductDetails.no_of_tyres}
+              </Text>
+            </View>
+
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Tonnage</Text>
+            </View>
+            <View style={styles.cardContent}>
+              <Text style={styles.description}>
+                {fullProductDetails.tonnage}
+              </Text>
+            </View>
+           
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Truck body type</Text>
+            </View>
+            <View style={styles.cardContent}>
+              <Text style={styles.description}>
+                {fullProductDetails.truck_body_type}
+              </Text>
+            </View>
+
+
+           
 
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Location</Text>
@@ -340,7 +387,7 @@ const styles = StyleSheet.create({
   locationContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 5,
+    marginBottom: 8,
     justifyContent: "flex-start",
     marginLeft:12
   },

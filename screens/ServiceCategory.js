@@ -6,27 +6,49 @@ import { useNavigation } from '@react-navigation/native';
 export default ServiceCategory = () => {
   const navigation = useNavigation();
 
-  const data = [
-    { id: 1, title: "Fastag", image: { source: icons.fastag }, screen: "Fastag" },
-    { id: 2, title: "Insurance", image: { source: icons.insurance }, screen: "Insurance" },
-    { id: 3, title: "Toll Calculator", image: { source: icons.toll }, screen: "TollCalculator" },
-    { id: 4, title: "Mileage Calculator", image: { source: icons.mileage }, screen: "MileageCalculator" },
-    // { id: 5, title: "Fuel Price", image: { source: icons.fuel }, screen: "FuelPrice" },
-    { id: 6, title: "Expense Calculator", image: { source: icons.vaughan }, screen: "VaughanInfo" },
-    { id: 7, title: "Buy & Sell", image: { source: icons.buy }, screen: "MarketPlace" },
-    { id: 8, title: "Load Available", image: { source: icons.load }, screen: "AvailableLoads" },
-    { id: 9, title: "Driver Needs", image: { source: icons.driver }, screen: "AvailableDrivers" },
-    { id: 10, title: "Truck Availabe", image: { source: icons.truck }, screen: "AvailableTrucks" },
-  ];
+  
+const images = [
+  { id: '1', uri: 'https://ddyz8ollngqwo.cloudfront.net/load.png', screen: "AvailableLoads" },
+  { id: '2', uri: 'https://ddyz8ollngqwo.cloudfront.net/truck.png',screen: "AvailableTrucks"  },
+  { id: '3', uri: 'https://ddyz8ollngqwo.cloudfront.net/driver.png', screen: "AvailableDrivers" },
+  { id: '4', uri: 'https://ddyz8ollngqwo.cloudfront.net/buy&sell.png', screen: "MarketPlace" },
 
+];
+
+  const data = [
+    { id: 1, title: "Load Available", image: { source: icons.load }, screen: "AvailableLoads" },
+    { id: 2, title: "Truck Availabe", image: { source: icons.truck }, screen: "AvailableTrucks" },
+    { id: 3, title: "Driver Needs", image: { source: icons.driver }, screen: "AvailableDrivers" },
+    { id: 4, title: "Buy & Sell", image: { source: icons.buy }, screen: "MarketPlace" },
+    { id: 5, title: "Expense Calculator", image: { source: icons.vaughan }, screen: "VaughanInfo" },
+    { id: 6, title: "Toll Calculator", image: { source: icons.toll }, screen: "TollCalculator" },
+    { id: 7, title: "Mileage Calculator", image: { source: icons.mileage }, screen: "MileageCalculator" },
+    { id: 8, title: "Fastag", image: { source: icons.fastag }, screen: "Fastag" },
+    { id: 9, title: "Insurance", image: { source: icons.insurance }, screen: "Insurance" },
+  ];
   const [options, setOptions] = useState(data);
 
   const handlePress = (screen) => {
     navigation.navigate(screen);
   };
+  
 
   return (
     <View style={styles.container}>
+      <View style={{marginBottom:20}}>
+      <FlatList
+        data={images}
+        horizontal
+        automaticallyAdjustsScrollIndicatorInsets
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity  onPress={() => handlePress(item.screen)}>
+            <Image source={{ uri: item.uri }} style={styles.image} />
+          </TouchableOpacity>
+        )}
+        showsHorizontalScrollIndicator={false}
+      />
+      </View>
       <FlatList
         style={styles.list}
         contentContainerStyle={styles.listContainer}
@@ -55,11 +77,20 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     backgroundColor: '#F1F2FF',
   },
-  list: {
-    flex: 1,
+  carouselContainer : {
+    flex:1
+  },
+  image: {
+    width: 350,
+    height: 150,
+    marginRight: 10,
+    borderRadius: 8,
   },
   listContainer: {
-    alignItems: 'center',
+    // flex: 1,
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // marginTop:"-30%"
   },
   card: {
     backgroundColor: '#F6F8FF',
@@ -70,7 +101,7 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 15,
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: '#303030',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3.5,
@@ -84,7 +115,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   title: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#0d6efd',

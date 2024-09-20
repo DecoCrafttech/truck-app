@@ -122,10 +122,7 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
 
 
   const handleEditPress = (item) => {
-    console.log("item", item)
-
-    
-
+ 
     setEditItem(item);
     setEditedData({
       images: item.images,
@@ -183,8 +180,6 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
       setImages((prevImages) => [...prevImages, ...newImages]);
     }
   };
-
-  console.log("allData", allData)
 
 
   const pickImage = async () => {
@@ -350,9 +345,6 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
       </View>
     </View>
   );
-
-
-  console.log("editedData.images", editedData.images)
 
 
 

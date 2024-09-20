@@ -53,6 +53,10 @@ const MarketPlace = ({ navigation }) => {
     model: false,
     location: false,
   });
+
+  const [truckBodyType, setTruckBodyType] = useState("");
+  const [numberOfTyres, setNumberOfTyres] = useState("");
+  const [ton, setTon] = useState("");
   const [aadhaar, setAadhaar] = useState("")
   const [aadhaarError, setAadhaarError] = useState("")
   const [showOTPInputBox, setShowOTPInputBox] = useState(false)
@@ -359,6 +363,30 @@ const MarketPlace = ({ navigation }) => {
 
 
 
+  const bodyTypeData = [
+    { label: 'Open body', value: 'open_body' },
+    { label: 'Container', value: 'container' },
+    { label: 'Trailer', value: 'trailer' },
+    { label: 'Tanker', value: 'tanker' },
+    { label: 'Tipper', value: 'tipper' },
+    { label: 'LCV', value: 'lcv' },
+  ];
+
+  const numberOfTyresData = [
+    { label: '4', value: '4' },
+    { label: '6', value: '6' },
+    { label: '8', value: '8' },
+    { label: '10', value: '10' },
+    { label: '12', value: '12' },
+    { label: '14', value: '14' },
+    { label: '16', value: '16' },
+    { label: '18', value: '18' },
+    { label: '20', value: '20' },
+    { label: '22', value: '22' },
+  ];
+
+
+
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 45 }, (_, index) => {
     const year = currentYear - index;
@@ -412,9 +440,9 @@ const MarketPlace = ({ navigation }) => {
           <View style={styles.modalContent}>
             <View style={styles.filterHeadingContainer}>
               <Text style={styles.modalTitle}>Filter Options</Text>
-              <Text style={styles.closeIcon}>
+              {/* <Text style={styles.closeIcon}>
                 <AntDesign name="close" size={18} color="black" />
-              </Text>
+              </Text> */}
             </View>
             <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
@@ -466,6 +494,45 @@ const MarketPlace = ({ navigation }) => {
                 }}
               />
             </View>
+
+
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setTruckBodyType(value)}
+                items={bodyTypeData}
+                value={truckBodyType}
+                placeholder={{
+                  label: 'Select truck body type',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+
+
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setNumberOfTyres(value)}
+                items={numberOfTyresData}
+                value={numberOfTyres}
+                placeholder={{
+                  label: 'Select number of tyres',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+            <TextInput
+              style={[styles.textInput]}
+              placeholder="Example : 2"
+              onChangeText={setTon}
+              value={ton}
+              keyboardType="number-pad"
+            />
+
+
             <TextInput
               style={[styles.input, errorFields.location && styles.inputError, { fontSize: 16, borderColor: COLORS.gray, borderWidth: 1, paddingLeft: 17, borderRadius: 5, height: 55, marginBottom: 10 }]}
               placeholder="Search location"
@@ -484,8 +551,8 @@ const MarketPlace = ({ navigation }) => {
             <TouchableOpacity
               style={styles.applyButton}
               onPress={() => handleClearFilter()}>
-              <Text style={styles.applyButtonText}>Clear filter</Text>
-            </TouchableOpacity>
+              <Text style={styles.applyButtonText} onPress={() => setIsLoading(!isLoading)}>Clear filter</Text>
+              </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.applyButtonText}>Close</Text>
             </TouchableOpacity>
@@ -688,6 +755,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     end: 20,
     top: 15
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: COLORS.gray,
+    borderRadius: 5,
+    padding: 15,
+    marginBottom: 10,
   },
   
 });

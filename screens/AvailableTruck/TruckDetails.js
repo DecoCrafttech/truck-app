@@ -11,6 +11,7 @@ const TruckDetails = ({ navigation, filteredTrucks }) => {
             key={index}
             post={truck.post}
             profileName={truck.profileName}
+            companyName={truck.companyName}
             title={truck.title}
             fromLocation={truck.fromLocation}
             toLocation={truck.toLocation}

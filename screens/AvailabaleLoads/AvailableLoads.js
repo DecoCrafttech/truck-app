@@ -106,6 +106,7 @@ const AvailableLoads = ({ navigation }) => {
   };
 
   const handleChatNavigate = () => {
+
     navigation.navigate("Chat")
   }
 
@@ -116,6 +117,7 @@ const AvailableLoads = ({ navigation }) => {
 
         if (response.data.error_code === 0) {
           const transformedData = response.data.data.map((item) => ({
+            companyName : item.company_name,
             post: item.user_post,
             profileName: item.profile_name,
             title: item.company_name,
@@ -132,6 +134,9 @@ const AvailableLoads = ({ navigation }) => {
             description: item.description,
             onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
             onButton2Press: () => {
+
+              console.log("item",item)
+
               setMessageReceiver(item)
               handleChatNavigate()
             }
@@ -332,6 +337,8 @@ const AvailableLoads = ({ navigation }) => {
 
 
       const response = await axiosInstance.post("https://truck.truckmessage.com/user_load_details_filter", filterParams)
+
+
 
       if (response.data.error_code === 0) {
         const transformedData = response.data.data.map((item) => ({
@@ -534,7 +541,7 @@ const AvailableLoads = ({ navigation }) => {
                  setIsLoading(!isLoading)
                  toggleModal()
               }}>
-              <Text style={styles.applyButtonText}>Clear filter</Text>
+              <Text style={styles.applyButtonText} onPress={() => setIsLoading(!isLoading)}>Clear filter</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.applyButtonText}>Close</Text>
