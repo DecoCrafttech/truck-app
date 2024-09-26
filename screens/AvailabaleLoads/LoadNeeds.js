@@ -149,7 +149,7 @@ const LoadNeeds = () => {
     }
 
 
-    setFromLocation(`${city} , ${state}`)
+    setFromLocation(`${city}, ${state}`)
     setFromLocationModal(false)
 
     // You can use the extracted details as needed
@@ -176,7 +176,7 @@ const LoadNeeds = () => {
     }
 
 
-    setToLocation(`${city} , ${state}`)
+    setToLocation(`${city}, ${state}`)
     setToLocationModal(false)
 
     // You can use the extracted details as needed

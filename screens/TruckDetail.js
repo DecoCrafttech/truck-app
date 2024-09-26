@@ -28,7 +28,8 @@ const TruckDetail = ({ route }) => {
 
   const {
     messageReceiver,
-    setMessageReceiver
+    setMessageReceiver,
+    
   } = useContext(LoadNeedsContext)
   const navigation = useNavigation("")
 
@@ -36,6 +37,7 @@ const TruckDetail = ({ route }) => {
     images: [],
   });
 
+  const [formattedTime, setFormattedTime] = useState("")
 
 
   useEffect(() => {
@@ -51,6 +53,28 @@ const TruckDetail = ({ route }) => {
 
         if (response.data.error_code === 0) {
           setFullProductDetails(response.data.data[0]);
+
+          if (response.data.data[0].updt) {
+            const dateObject = new Date(response.data.data[0].updt);
+
+            // Format the date as "23 Sep 2024"
+            const formattedDate = dateObject.toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            });
+
+            // Format the time as "04:13 PM"
+            const formattedTime = dateObject.toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true
+            });
+
+            const finalResult = `${formattedDate} ${formattedTime}`;
+
+            setFormattedTime(finalResult)
+          }
         }
       } catch (error) {
         console.error('Error fetching product details:', error);
@@ -104,8 +128,35 @@ const TruckDetail = ({ route }) => {
   const handleChatNavigate = () => {
     setMessageReceiver(fullProductDetails)
     navigation.navigate("Chat")
-    
   }
+
+
+  // useEffect(() => {
+
+  //   if(fullProductDetails.updt){
+  //     const dateObject = new Date(fullProductDetails.updt);
+
+  //     // Format the date as "23 Sep 2024"
+  //     const formattedDate = dateObject.toLocaleDateString('en-GB', {
+  //       day: '2-digit',
+  //       month: 'short',
+  //       year: 'numeric'
+  //     });
+
+  //     // Format the time as "04:13 PM"
+  //     const formattedTime = dateObject.toLocaleTimeString('en-US', {
+  //       hour: '2-digit',
+  //       minute: '2-digit',
+  //       hour12: true
+  //     });
+
+  //     const finalResult = `${formattedDate} ${formattedTime}`;
+
+  //     setFormattedTime(finalResult)
+  //   }
+
+  // }, [])
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -139,7 +190,7 @@ const TruckDetail = ({ route }) => {
             </View>
             <View style={styles.locationContainer}>
               <AntDesign name="calendar" size={20} color={COLORS.gray} />
-              <Text style={styles.location}>{fullProductDetails.updt}</Text>
+              <Text style={styles.location}>{formattedTime}</Text>
             </View>
 
             <View>
@@ -150,7 +201,7 @@ const TruckDetail = ({ route }) => {
 
           <View style={styles.card}>
 
-          <View style={styles.cardHeader}>
+            <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Brand name</Text>
             </View>
             <View style={styles.cardContent}>
@@ -165,7 +216,7 @@ const TruckDetail = ({ route }) => {
                 {fullProductDetails.owner_name}
               </Text>
             </View>
-            
+
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Model</Text>
             </View>
@@ -218,7 +269,7 @@ const TruckDetail = ({ route }) => {
                 {fullProductDetails.tonnage}
               </Text>
             </View>
-           
+
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Truck body type</Text>
             </View>
@@ -229,7 +280,7 @@ const TruckDetail = ({ route }) => {
             </View>
 
 
-           
+
 
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Location</Text>
@@ -389,7 +440,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
     justifyContent: "flex-start",
-    marginLeft:12
+    marginLeft: 12
   },
   location: {
     fontSize: 16,

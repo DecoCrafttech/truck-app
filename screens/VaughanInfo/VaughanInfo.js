@@ -220,7 +220,7 @@ const VaughanInfo = ({ navigation }) => {
 
 
     setModalValues((prevState) => ({
-      ...prevState, fromLocation: (`${city} , ${state}`)
+      ...prevState, fromLocation: (`${city}, ${state}`)
     }))
     setFromLocationModal(false)
     // You can use the extracted details as needed
@@ -247,7 +247,7 @@ const VaughanInfo = ({ navigation }) => {
 
 
     setModalValues((prevState) => ({
-      ...prevState, toLocation: (`${city} , ${state}`)
+      ...prevState, toLocation: (`${city}, ${state}`)
     }))
     setToLocationModal(false)
     // You can use the extracted details as needed

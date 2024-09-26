@@ -24,8 +24,9 @@ const Login = () => {
 
     const {
         isLoggedIn,
-        setIsLoggedIn
-      } = useContext(LoadNeedsContext)
+        setIsLoggedIn,
+        userStatesFromProfile
+    } = useContext(LoadNeedsContext)
 
     const navigation = useNavigation()
 
@@ -69,7 +70,6 @@ const Login = () => {
     }
 
 
-
     const handleChange = (name, value) => {
         setInputs((prevState) => ({
             ...prevState, [name]: value
@@ -85,12 +85,11 @@ const Login = () => {
 
 
     const handleLogInClick = async (e) => {
-
         if (
             inputs.mobileNumber === "" ||
             inputs.password === ""
         ) {
-            Toast.warn('Please fill all the details')
+            Toast.error('Please fill all the details')
             return
         } else {
             const LogInParams = {
@@ -102,10 +101,9 @@ const Login = () => {
 
                 await AsyncStorage.setItem("mobileNumber", `${inputs.mobileNumber}`)
 
-
                 // const response = await axiosInstance.post("/send_signup_otp", LogInParams)
 
-                const response = await axios.post("https://truck.truckmessage.com/login", LogInParams)
+                const response = await axiosInstance.post("/login", LogInParams)
                 if (response.data.error_code === 0) {
 
                     setInputs({
@@ -166,15 +164,19 @@ const Login = () => {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: '#fff' }]}>
             <Container
-                position="footer"
+                position="top"
                 duration={3000}
-                animationIn="slideInUp"
-                animationOut="slideOutDown"
-                height={60}
+                animationIn="slideInDown"
+                height="auto"
                 width="100%"
-                style={{ textAlign: 'center' }}
-                textStyle={{ backgroundColor: '', fontSize: 14, }}
+                textStyle={{
+                    fontSize: 15,
+                    flexWrap: 'wrap', // Ensure text wraps
+                    maxWidth: '90%', // Ensure text does not overflow
+                    overflow: 'hidden',
+                }} // Ensure text wraps
             />
+
             <View >
                 {/* <StatusBar hidden /> */}
                 {/* <View style={styles.pageHeadingContainer}>
@@ -188,7 +190,7 @@ const Login = () => {
                     <View style={styles.avatarContainer}>
                         <Image
                             style={styles.avatar}
-                            source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
+                            source={{ uri: "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png" }}
                         />
                     </View>
 

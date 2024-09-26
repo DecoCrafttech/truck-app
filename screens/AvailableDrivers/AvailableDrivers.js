@@ -24,6 +24,8 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import RNPickerSelect from 'react-native-picker-select';
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import { MaterialIcons as Icon } from '@expo/vector-icons';
+import { Alert } from "react-native";
+import SendMessageModal from "../SendMessageModal";
 
 
 
@@ -78,6 +80,8 @@ const AvailableDrivers = ({ navigation }) => {
 
   const [fromLocationModal, setFromLocationModal] = useState(false)
   const [toLocationModal, setToLocationModal] = useState(false)
+
+  const [sendMessageModal, setSendMessageModal] = useState(false)
 
 
 
@@ -145,6 +149,7 @@ const AvailableDrivers = ({ navigation }) => {
         if (response.data.error_code === 0) {
           const transformedData = response.data.data.map((item) => ({
             companyName: item.company_name,
+            updatedTime: item.updt,
             post: item.user_post,
             profileName: item.profile_name,
             title: item.driver_name,
@@ -160,7 +165,7 @@ const AvailableDrivers = ({ navigation }) => {
             onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
             onButton2Press: () => {
               setMessageReceiver(item)
-              handleChatNavigate()
+              setSendMessageModal(true)
             }
           }));
 
@@ -185,11 +190,20 @@ const AvailableDrivers = ({ navigation }) => {
     (truck) =>
       truck.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       truck.fromLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      truck.toLocation.toLowerCase().includes(searchQuery.toLowerCase())
+      truck.toLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[0].text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[1].text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[2].text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[3].text.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
+  };
+
+  const handleClearFilter = () => {
+
+    setIsLoading(!isLoading)
     // Reset modal values and error fields when modal opens/closes
     setModalValues({
       driverName: "",
@@ -200,6 +214,8 @@ const AvailableDrivers = ({ navigation }) => {
       truckBodyType: "",
       truckName: "",
     });
+    setSelectedStates([])
+
     setErrorFields({
       driverName: false,
       fromLocation: false,
@@ -209,8 +225,12 @@ const AvailableDrivers = ({ navigation }) => {
       truckBodyType: false,
       truckName: false,
     });
-  };
 
+    setIsModalVisible(!isModalVisible);
+
+
+
+  }
 
   const handleInputChange = (field, value) => {
     setModalValues({ ...modalValues, [field]: value });
@@ -233,7 +253,7 @@ const AvailableDrivers = ({ navigation }) => {
           setShowOTPInputBox(true)
           setTimeLeft(60)
         } else {
-          Toast.error(response.data.message)
+          Alert.alert(response.data.message)
         }
       } catch (err) {
         console.log(err)
@@ -248,9 +268,11 @@ const AvailableDrivers = ({ navigation }) => {
       }
       const response = await axiosInstance.post("/aadhaar_generate_otp", resendParams)
       if (response.data.error_code === 0) {
+        Alert.alert("OTP Resent successfully")
+        setTimeLeft(60)
         AsyncStorage.setItem("client_id", response.data.data[0].client_id)
       } else {
-        Toast.error(response.data.message)
+        Alert.alert(response.data.message)
       }
     } catch (err) {
       console.log(err)
@@ -279,7 +301,7 @@ const AvailableDrivers = ({ navigation }) => {
         navigation.navigate("DriverNeeds");
 
       } else {
-        Toast.error(response.data.message)
+        Alert.alert(response.data.message)
         return
       }
 
@@ -309,7 +331,7 @@ const AvailableDrivers = ({ navigation }) => {
 
 
     setModalValues((prevState) => ({
-      ...prevState, fromLocation: (`${city} , ${state}`)
+      ...prevState, fromLocation: (`${city}, ${state}`)
     }))
     setFromLocationModal(false)
     // You can use the extracted details as needed
@@ -336,7 +358,7 @@ const AvailableDrivers = ({ navigation }) => {
 
 
     setModalValues((prevState) => ({
-      ...prevState, toLocation: (`${city} , ${state}`)
+      ...prevState, toLocation: (`${city}, ${state}`)
     }))
     setToLocationModal(false)
     // You can use the extracted details as needed
@@ -378,7 +400,8 @@ const AvailableDrivers = ({ navigation }) => {
       const response = await axiosInstance.post("/user_driver_details_filter", filterParams)
       if (response.data.error_code === 0) {
         const transformedData = response.data.data.map((item) => ({
-          companyName : item.company_name,
+          companyName: item.company_name,
+          updatedTime: item.updt,
           truckName: item.truck_name,
           post: item.user_post,
           profileName: item.profile_name,
@@ -395,7 +418,7 @@ const AvailableDrivers = ({ navigation }) => {
           onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
           onButton2Press: () => {
             setMessageReceiver(item)
-            handleChatNavigate()
+            setSendMessageModal(true)
           }
         }));
         setDriversData(transformedData);
@@ -481,6 +504,23 @@ const AvailableDrivers = ({ navigation }) => {
       return state ? state.name : null;
     }).filter(name => name !== null);
     setFilteredStates(selectedStateNames)
+  };
+
+  const handleClose = () => {
+    setShowOTPInputBox(false)
+    setIsAadhaarModal(false)
+  }
+
+
+
+
+  const handleYes = () => {
+    setSendMessageModal(false);
+    navigation.navigate("Chat")
+  };
+
+  const handleCancel = () => {
+    setSendMessageModal(false);
   };
 
 
@@ -598,7 +638,7 @@ const AvailableDrivers = ({ navigation }) => {
               <RNPickerSelect
                 onValueChange={(value) => setModalValues({ ...modalValues, noOfTyres: value })}
                 items={numberOfTyresData}
-                value={modalValues.numberOfTyres}
+                value={modalValues.noOfTyres}
                 placeholder={{
                   label: 'Select number of tyres',
                   value: null,
@@ -612,12 +652,9 @@ const AvailableDrivers = ({ navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.applyButton}
-              onPress={() => {
-                setIsLoading(!isLoading)
-                toggleModal()
-              }}>
-              <Text style={styles.applyButtonText} onPress={() => setIsLoading(!isLoading)}>Clear filter</Text>
-              </TouchableOpacity>
+              onPress={() => handleClearFilter()}>
+              <Text style={styles.applyButtonText} >Clear filter</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.applyButtonText}>Close</Text>
             </TouchableOpacity>
@@ -656,7 +693,7 @@ const AvailableDrivers = ({ navigation }) => {
                   <AadhaarOTPVerification
                   />
                   <View style={{ alignItems: 'center', marginVertical: 20 }}>
-                    <Text>Don't receive the code ? </Text>
+                    <Text>Didn't receive the code ? </Text>
                     <TouchableOpacity disabled={timeLeft === null ? false : true}>
                       <Text
                         style={{ color: timeLeft === null ? "#4285F4" : '#ccc', fontWeight: 'bold', textDecorationLine: 'underline', marginTop: 10 }}
@@ -686,7 +723,7 @@ const AvailableDrivers = ({ navigation }) => {
                   <Text style={styles.applyButtonText}>Submit</Text>
                 </TouchableOpacity>
             }
-            <TouchableOpacity style={styles.closeButton} onPress={() => setIsAadhaarModal(false)}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => handleClose()}>
               <Text style={styles.applyButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -770,6 +807,17 @@ const AvailableDrivers = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+      </Modal>
+
+
+      {/* Send Message Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={sendMessageModal}
+        onRequestClose={() => setSendMessageModal(false)}
+      >
+        <SendMessageModal handleYes={handleYes} handleCancel={handleCancel} />
       </Modal>
 
     </SafeAreaView>

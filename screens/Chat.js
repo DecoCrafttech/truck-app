@@ -35,45 +35,108 @@ const Chat = () => {
   const [chatMessageLoading, setChatMessageLoading] = useState(false)
 
 
+  console.log("messageReceiver",messageReceiver)
 
 
   useEffect(() => {
 
-    
+
     const fetchChatMessages = async () => {
       try {
         // setChatMessageLoading(true)
-        const userId = await AsyncStorage.getItem("user_id");
-        const response = await axios.post(
-          "https://truck.truckmessage.com/get_user_chat_message_list",
-          {
-            user_id: userId,
+
+
+        let requiredParams;
+        if (messageReceiver.driver_id) {
+          requiredParams = {
+            user_id: await AsyncStorage.getItem("user_id"),
+            person_id: messageReceiver.person_id ? messageReceiver?.person_id : messageReceiver?.user_id,
+            ref_flag: "Driver",
+            ref_id : messageReceiver.driver_id
+          }
+        }
+        else if (messageReceiver.load_id) {
+          requiredParams = {
+            user_id: await AsyncStorage.getItem("user_id"),
+            person_id: messageReceiver.person_id ? messageReceiver?.person_id : messageReceiver?.user_id,
+            ref_flag: "Load",
+            ref_id : messageReceiver.load_id
+
+          }
+        } else if (messageReceiver.truck_id) {
+          requiredParams = {
+            user_id: await AsyncStorage.getItem("user_id"),
+            person_id: messageReceiver.person_id ? messageReceiver?.person_id : messageReceiver?.user_id,
+            ref_flag: "Truck",
+            ref_id : messageReceiver.truck_id
+          }
+        }
+        else if (messageReceiver.buy_sell_id) {
+          requiredParams = {
+            user_id: await AsyncStorage.getItem("user_id"),
+            person_id: messageReceiver.person_id ? messageReceiver?.person_id : messageReceiver?.user_id,
+            ref_flag: "Buy and sell",
+            ref_id : messageReceiver.buy_sell_id
+          }
+        }
+        else {
+          requiredParams = {
+            user_id: await AsyncStorage.getItem("user_id"),
             person_id: messageReceiver.person_id ? messageReceiver?.person_id : messageReceiver?.user_id,
           }
+        }
+
+
+        const userId = await AsyncStorage.getItem("user_id");
+        const response = await axios.post(
+          "https://truck.truckmessage.com/get_user_chat_message_list", requiredParams
         );
 
-        // setTimeout(() => {
-        //   setChatMessageLoading(false)
-        // },1000)
+   
+
+        const transformedMessages = response.data.data.map((msg, index) => {
+          // Check if msg.message exists and is a string before splitting
+          if (msg.message && typeof msg.message === "string") {
+            return {
+              _id: index,
+              text: msg.message.split(",").join("\n"),
+              createdAt: new Date(),
+              user: {
+                _id: msg.chat_id === parseInt(userId) ? 1 : 2,
+                name:
+                  msg.chat_id === parseInt(userId)
+                    ? "You"
+                    : messageReceiver?.profile_name || "Unknown",
+                avatar:
+                  msg.chat_id === parseInt(userId)
+                    ? currentUser?.avatar || null
+                    : messageReceiver?.avatar || null,
+              },
+            };
+          } else {
+            // If msg.message is undefined or invalid, handle it here (return default message or skip)
+            return {
+              _id: index,
+              text: "Invalid message",
+              createdAt: new Date(),
+              user: {
+                _id: msg.chat_id === parseInt(userId) ? 1 : 2,
+                name:
+                  msg.chat_id === parseInt(userId)
+                    ? "You"
+                    : messageReceiver?.profile_name || "Unknown",
+                avatar:
+                  msg.chat_id === parseInt(userId)
+                    ? currentUser?.avatar || null
+                    : messageReceiver?.avatar || null,
+              },
+            };
+          }
+        });
 
 
 
-        const transformedMessages = response.data.data.map((msg, index) => ({
-          _id: index,
-          text: msg.message,
-          createdAt: new Date(msg.updt),
-          user: {
-            _id: msg.chat_id === parseInt(userId) ? 1 : 2,
-            name:
-              msg.chat_id === parseInt(userId)
-                ? "You"
-                : messageReceiver?.profile_name || "Unknown",
-            avatar:
-              msg.chat_id === parseInt(userId)
-                ? currentUser?.avatar || null
-                : messageReceiver?.avatar || null,
-          },
-        }));
+
 
         setMessages(transformedMessages);
       } catch (err) {
@@ -98,7 +161,7 @@ const Chat = () => {
 
       await axios.post("https://truck.truckmessage.com/user_chat_message", {
         user_id: userId,
-        person_id: messageReceiver.person_id ? messageReceiver?.person_id : messageReceiver?.user_id ,
+        person_id: messageReceiver.person_id ? messageReceiver?.person_id : messageReceiver?.user_id,
         message: inputMessage,
       });
 
@@ -109,7 +172,6 @@ const Chat = () => {
         user: { _id: 1 },
       };
 
-      console.log("inputMessageSent",inputMessage)
       setPageRefresh(!pageRefresh)
       setMessages((prevMessages) => GiftedChat.append(prevMessages, [newMessage]));
       setInputMessage("");

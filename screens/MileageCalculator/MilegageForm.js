@@ -138,11 +138,11 @@ const MileageForm = () => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handlePostAdd}>
-          <Text style={styles.buttonText}>Calculate</Text>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.resetButton} onPress={resetForm}>
           <Text style={styles.buttonText}>Reset</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handlePostAdd}>
+          <Text style={styles.buttonText}>Calculate</Text>
         </TouchableOpacity>
       </View>
 

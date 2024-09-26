@@ -10,7 +10,6 @@ const LoadDetails = ({ filteredTrucks, status, handleEdit, selectedValue }) => {
 
   const navigation = useNavigation()
 
-console.log("selectedValue",selectedValue)
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -30,10 +29,12 @@ console.log("selectedValue",selectedValue)
             onButton1Press={truck.onButton1Press} // Ensure handleEdit is invoked correctly
             onButton2Press={truck.onButton2Press}
             status={status}
+            updatedTime={truck.updatedTime}
           />
         ))
       ) : (
         <>
+        {/* If My Posts empty */}
           {
             selectedValue === "user_load_details" ?
               <View style={styles.noResultContainer}>
@@ -121,6 +122,33 @@ console.log("selectedValue",selectedValue)
               </View>
               : null
           }
+
+
+          {/* If Four cards empty */}
+          {
+            !selectedValue && filteredTrucks.length === 0 ?
+              <View style={styles.noResultContainer}>
+                <View>
+                  <Image
+                    source={require("../../assets/images/Folder_empty.png")}
+                    width={50}
+                    height={50}
+                    resizeMode="center"
+                  />
+                </View>
+                <Text style={styles.noResultsText}>No records</Text>
+                <TouchableOpacity>
+                  <Text
+                    style={{ color: '#fff', width: "100%", padding: 10, paddingHorizontal: 20, borderRadius: 5, textAlign: 'center', fontWeight: 'bold', fontSize: 16, backgroundColor: COLORS.primary }}
+                    onPress={() => navigation.navigate('TruckNeeds')}
+                  > Click here to post a truck</Text>
+                </TouchableOpacity>
+              </View>
+              :
+              null
+          }
+
+          
 
         </>
       )}

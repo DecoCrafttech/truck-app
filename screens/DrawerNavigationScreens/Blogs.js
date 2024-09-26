@@ -84,7 +84,7 @@ const Blogs = () => {
   return (
     <SafeAreaView style={styles.container}>
       <HeaderWithoutNotifications title="Blogs" />
-      <View style={styles.content}>
+      {/* <View style={styles.content}>
         <DropDownPicker
           open={open}
           value={selectedValue}
@@ -112,6 +112,9 @@ const Blogs = () => {
           keyExtractor={(post) => post.id.toString()}
           renderItem={({ item }) => <PostCard post={item} />}
         />
+      </View> */}
+      <View style={styles.container2}>
+          <Text>Coming soon</Text>
       </View>
     </SafeAreaView>
   );
@@ -121,6 +124,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
+  },
+  container2: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    justifyContent : 'center',
+    alignItems:'center'
   },
   content: {
     flex: 1,

@@ -37,7 +37,7 @@ const SignUp = () => {
     const {
         isSignedUp,
         setIsSignedUp
-      } = useContext(LoadNeedsContext)
+    } = useContext(LoadNeedsContext)
 
     const navigation = useNavigation()
 
@@ -168,33 +168,38 @@ const SignUp = () => {
             category === "" ||
             inputs.pincode === "" ||
             inputs.password === "" ||
-            inputs.confirmPassword === "" ||
-            isChecked === false
+            inputs.confirmPassword === ""
+
         ) {
-            alert('Please fill all the details')
+            Toast.error('Please fill all the details')
             return
-        } else {
+        } else if (isChecked === false) {
+            Toast.error('Please accept the terms and conditions')
+            return
+        }
+
+        else {
 
             // const regex = "^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$"
 
             // if ((inputs.password).match(regex)) {
-            //     Toast.warn('enter correct password')
+            //     Toast.error('enter correct password')
             // }
 
             // if (inputs.password !== inputs.confirmPassword) {
-            //     Toast.warn('Confirm password should be matched with password')
+            //     Toast.error('Confirm password should be matched with password')
             //     return
             // }
 
             const regex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/;
 
             if (!inputs.password.match(regex)) {
-                alert('Password must be 8-20 characters long, include at least one number, and one special character (!@#$%^&*).');
+                Toast.error('Password must be 8-20 characters long, include at least one number, and one special character (!@#$%^&*).');
                 return; // Exit the function if the password does not match the regex
             }
 
             if (inputs.password !== inputs.confirmPassword) {
-                alert('Confirm password should match the password.');
+                Toast.error('Confirm password should match the password.');
                 return; // Exit the function if the passwords do not match
             }
 
@@ -281,12 +286,16 @@ const SignUp = () => {
         <SafeAreaProvider>
             <SafeAreaView>
                 <Container
-                    position="footer"
+                    position="top"
                     duration={3000}
-                    animationIn="slideInUp"
-                    animationOut="slideOutDown"
-                    height={60}
-                    textStyle={{ backgroundColor: '', fontSize: 12 }}
+                    animationIn="slideInDown"
+                    height="auto"
+                    width="100%"
+                    textStyle={{ 
+                        fontSize: 15,  
+                        flexWrap: 'wrap', // Ensure text wraps
+                        maxWidth: '90%', // Ensure text does not overflow
+                        overflow: 'hidden', }} // Ensure text wraps
                 />
 
                 <ScrollView style={{ backgroundColor: '#fff' }}>
@@ -296,7 +305,7 @@ const SignUp = () => {
                         <View style={styles.avatarContainer}>
                             <Image
                                 style={styles.avatar}
-                                source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
+                                source={{ uri: "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png" }}
                             />
                         </View>
 

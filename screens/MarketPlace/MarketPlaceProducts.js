@@ -35,10 +35,11 @@ const ProductCategoryList = ({ navigation, searchQuery, filteredProducts, onPres
 
 
 
-    <TouchableOpacity >
+    <View >
       <View style={[styles.categoryItem]}>
         {item.images && item.images.length > 0 ? (
-          <View style={{backgroundColor:'#f1f2ff',borderWidth:6,borderColor:'#fff',borderRadius:8,paddingHorizontal:10,paddingBottom:10}}>
+          <View style={{borderRadius:8,paddingHorizontal:10,padding:10}}>
+           <Text style={styles.profile_name}>{item.profile_name}</Text>
             <View style={[styles.ratingsContainer]}>
               <View style={styles.starsContainer}>
                 {[...Array(5)].map((_, index) => (
@@ -95,7 +96,7 @@ const ProductCategoryList = ({ navigation, searchQuery, filteredProducts, onPres
           </TouchableOpacity>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
 
@@ -108,7 +109,23 @@ const ProductCategoryList = ({ navigation, searchQuery, filteredProducts, onPres
       color="#0000ff"
     />
   ) : filteredProducts.length === 0 ? (
-    <Text style={styles.noProductsText}>No truck details found</Text>
+    <View style={styles.noResultContainer}>
+          <View>
+            <Image
+              source={require("../../assets/images/Folder_empty.png")}
+              width={50}
+              height={50}
+              resizeMode="center"
+            />
+          </View>
+          <Text style={styles.noResultsText}>No records</Text>
+          <TouchableOpacity>
+            <Text
+              style={{ color: '#fff', width: "100%", padding: 10, paddingHorizontal: 20, borderRadius: 5, textAlign: 'center', fontWeight: 'bold', fontSize: 16, backgroundColor: COLORS.primary }}
+              onPress={() => navigation.navigate('SellYourTruck')}
+            > Click here to post</Text>
+          </TouchableOpacity>
+        </View>
   ) : (
     <View style={{ flex: 1 }}>
       <FlatList
@@ -134,11 +151,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   categoryItem: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    // padding: 10,
-    // paddingTop: 30,
-    marginBottom: 10,
+    backgroundColor: COLORS.white,
+    padding: 10,
+    marginVertical: 10,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
   },
   categoryImage: {
     width: "100%",
@@ -213,6 +233,28 @@ const styles = StyleSheet.create({
     fontWeight:'600'
     // Additional styling for the "Hi" text if needed
   },
+  noResultContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // flex:1,
+
+  },
+  noResultsText: {
+    textAlign: "center",
+    marginTop: -90,
+    marginBottom: 30,
+    color: "grey",
+    fontSize: 16,
+  },
+  profile_name : {
+    fontSize:20,
+    fontWeight : "bold",
+    textAlign:'center',
+    backgroundColor : "#f1f2ff",
+    paddingVertical:10,
+    width:"100%"
+  }
 
 });
 

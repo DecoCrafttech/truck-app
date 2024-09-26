@@ -27,7 +27,8 @@ const DrawerNavigation = () => {
     isLoggedIn,
     setIsLoggedIn,
     isSignedUp,
-    setIsSignedUp
+    setIsSignedUp,
+    setUserStatesFromProfile
   } = useContext(LoadNeedsContext)
 
   const [userName,setUserName] = useState("")
@@ -61,6 +62,7 @@ const DrawerNavigation = () => {
               await AsyncStorage.removeItem("userName")
               await AsyncStorage.removeItem("mobileNumber")
               navigation.navigate("Login")
+              setUserStatesFromProfile([])
           }
           (async () => logoutFunction())()
           }
@@ -168,7 +170,7 @@ const DrawerNavigation = () => {
         }}
         component={Refer}
       />
-       <Drawer.Screen
+       {/* <Drawer.Screen
         name="DrawerLanguage"
         options={{
           drawerLabel: "Language",
@@ -179,7 +181,7 @@ const DrawerNavigation = () => {
           ),
         }}
         component={Language}
-      />
+      /> */}
       <Drawer.Screen
         name="DrawerAboutUs"
         options={{

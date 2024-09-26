@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -30,6 +30,8 @@ const DriverNeeds = () => {
 
   const [spinner, setSpinner] = useState(false);
 
+  const textInputRef = useRef(null); // Create a reference for the TextInput
+
 
   const [driverName, setDriverName] = useState("");
   const [vehicleNumber, setVehicleNumber] = useState("");
@@ -45,6 +47,10 @@ const DriverNeeds = () => {
   const [fromLocationModal, setFromLocationModal] = useState(false)
   const [toLocationModal, setToLocationModal] = useState(false)
 
+  const [vehicleListData, setVehicleListData] = useState([])
+  const [vehicleFromDropdown, setVehicleFromDropdown] = useState("")
+  const [searchText, setSearchText] = useState('');  // To track the search text
+
   // State variables to track input field validity
   const [driverNameValid, setDriverNameValid] = useState(true);
   const [vehicleNumberValid, setVehicleNumberValid] = useState(true);
@@ -57,12 +63,47 @@ const DriverNeeds = () => {
   const [numberOfTyresValid, setNumberOfTyresValid] = useState(true);
   const [descriptionValid, setDescriptionValid] = useState(true);
 
+
+
+  useEffect(() => {
+
+    const getVehicleList = async () => {
+
+      const vehicleListParams = {
+        user_id: `${await AsyncStorage.getItem("user_id")}`
+      }
+
+
+      try {
+
+
+        const response = await axiosInstance.post("/get_user_vehicle_list", vehicleListParams);
+        // console.log(response.data.data[0].vehicle_list)
+        if (response.data.error_code === 0) {
+          setVehicleListData(
+            response.data.data[0].vehicle_list.map((value, index) => ({
+              label: value,
+              value: value
+            }))
+          )
+        }
+
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    (async () => getVehicleList())()
+
+  }, [])
+
+
+
   const handlePostAdd = async () => {
     setSpinner(true); // Show spinner while making API call
 
     if (
       driverName.trim() === "" ||
-      vehicleNumber.trim() === "" ||
       companyName.trim() === "" ||
       contactNumber.trim() === "" ||
       fromLocation.trim() === "" ||
@@ -89,7 +130,7 @@ const DriverNeeds = () => {
 
     const postData = {
       driver_name: driverName,
-      vehicle_number: vehicleNumber,
+      vehicle_number: vehicleNumber !== "" ? vehicleNumber : vehicleFromDropdown,
       company_name: companyName,
       contact_no: contactNumber,
       from: fromLocation,
@@ -161,7 +202,7 @@ const DriverNeeds = () => {
       });
     }
 
-    setFromLocation(`${city} , ${state}`)
+    setFromLocation(`${city}, ${state}`)
     setFromLocationModal(false)
 
     // You can use the extracted details as needed
@@ -187,7 +228,7 @@ const DriverNeeds = () => {
       });
     }
 
-    setToLocation(`${city} , ${state}`)
+    setToLocation(`${city}, ${state}`)
     setToLocationModal(false)
 
     // You can use the extracted details as needed
@@ -224,16 +265,43 @@ const DriverNeeds = () => {
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <View style={styles.textInputContainer}>
 
-            <Text style={styles.label}>Vehicle Number</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={styles.label}>Vehicle Number</Text>
+              <Text style={{ textAlign: 'right', textDecorationLine: 'underline', color: 'blue' }} onPress={() => navigation.navigate("Profile")}>Add Truck</Text>
+            </View>
             <TextInput
               style={[
                 styles.textInput,
-                !vehicleNumberValid && { borderColor: "red" },
               ]}
               placeholder="Enter your vehicle number"
-              onChangeText={setVehicleNumber}
+              onChangeText={setVehicleNumber} // Simplified
+
               value={vehicleNumber}
+              onFocus={() => {
+                setVehicleFromDropdown(''); // Clear dropdown value on focus
+                textInputRef.current.focus()
+              }}
+              ref={textInputRef}
             />
+            <Text style={{ textAlign: 'center', marginBottom: 8 }}>OR</Text>
+            <View style={{ borderColor: "grey", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => {
+                  setVehicleFromDropdown(value); // Set dropdown value
+                  setVehicleNumber(''); // Clear TextInput if desired, otherwise comment this out
+                  textInputRef.current.blur(); // Remove focus from TextInput
+                }}
+                items={vehicleListData}
+                value={vehicleFromDropdown}
+                placeholder={{
+                  label: 'Select vehicle number from profile',
+                  value: null,
+                  color: 'grey',
+                }}
+
+
+              />
+            </View>
 
             <Text style={styles.label}>Company Name</Text>
             <TextInput
@@ -266,6 +334,7 @@ const DriverNeeds = () => {
               placeholder="Enter your contact number"
               onChangeText={setContactNumber}
               value={contactNumber}
+              keyboardType="number-pad"
             />
             <Text style={styles.label}>From</Text>
             <TextInput

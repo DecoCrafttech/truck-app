@@ -16,6 +16,10 @@ import AadhaarOTPVerification from "../AadhaarOTPVerification";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { useNavigation } from "@react-navigation/native";
 import RNPickerSelect from 'react-native-picker-select';
+import SectionedMultiSelect from "react-native-sectioned-multi-select";
+import { MaterialIcons as Icon } from '@expo/vector-icons';
+import SendMessageModal from "../SendMessageModal";
+
 
 
 const AvailableLoads = ({ navigation }) => {
@@ -29,8 +33,8 @@ const AvailableLoads = ({ navigation }) => {
     setIsLoading,
     aadhaarOTP,
     setAadhaarOTP,
-    setMessageReceiver
-
+    setMessageReceiver,
+    userStatesFromProfile,
   } = useContext(LoadNeedsContext);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,7 +68,22 @@ const AvailableLoads = ({ navigation }) => {
   const [fromLocationModal, setFromLocationModal] = useState(false)
   const [toLocationModal, setToLocationModal] = useState(false)
 
+  const [selectedStates, setSelectedStates] = useState([]);
+  const [filteredStates, setFilteredStates] = useState([])
+  const [userToLocationStatesData, setUserToLocationStatesData] = useState({})
 
+  const [sendMessageModal, setSendMessageModal] = useState(false)
+
+
+
+  useEffect(() => {
+    setUserToLocationStatesData(
+      userStatesFromProfile.map((state, index) => ({
+        id: index + 1,
+        name: state
+      }))
+    )
+  }, [])
 
   useEffect(() => {
     if (timeLeft === 0) {
@@ -105,19 +124,18 @@ const AvailableLoads = ({ navigation }) => {
     setSearchQuery(query);
   };
 
-  const handleChatNavigate = () => {
 
-    navigation.navigate("Chat")
-  }
 
   useEffect(() => {
     const getAllLoads = async () => {
       try {
         const response = await axiosInstance.get("/all_load_details");
-
+        console.log("loadresponse", response.data.data[3])
         if (response.data.error_code === 0) {
+          console.log("userStatesFromProfileLoadpage", userStatesFromProfile)
           const transformedData = response.data.data.map((item) => ({
-            companyName : item.company_name,
+            companyName: item.company_name,
+            updatedTime: item.updt,
             post: item.user_post,
             profileName: item.profile_name,
             title: item.company_name,
@@ -135,10 +153,8 @@ const AvailableLoads = ({ navigation }) => {
             onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
             onButton2Press: () => {
 
-              console.log("item",item)
-
               setMessageReceiver(item)
-              handleChatNavigate()
+              setSendMessageModal(true)
             }
           }));
 
@@ -164,13 +180,21 @@ const AvailableLoads = ({ navigation }) => {
       truck.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       truck.profileName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       truck.fromLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      truck.toLocation.toLowerCase().includes(searchQuery.toLowerCase())
+      truck.toLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[0].text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[1].text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[2].text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[3].text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[4].text.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
-    // Reset modal values and error fields when modal opens/closes
+  };
+
+  const handleClearFilter = () => {
+    setIsLoading(!isLoading)
     setModalValues({
       companyName: "",
       fromLocation: "",
@@ -180,6 +204,8 @@ const AvailableLoads = ({ navigation }) => {
       tons: "",
       truckBodyType: ""
     });
+    setSelectedStates([])
+
     setErrorFields({
       companyName: false,
       fromLocation: false,
@@ -189,7 +215,9 @@ const AvailableLoads = ({ navigation }) => {
       tons: false,
       truckBodyType: false
     });
-  };
+    setIsModalVisible(!isModalVisible);
+
+  }
 
   const handleInputChange = (field, value) => {
     setModalValues({ ...modalValues, [field]: value });
@@ -208,11 +236,12 @@ const AvailableLoads = ({ navigation }) => {
         }
         const response = await axiosInstance.post("/aadhaar_generate_otp", generateOTPParams)
         if (response.data.error_code === 0) {
+          Alert.alert("OTP sent successfully")
           AsyncStorage.setItem("client_id", response.data.data[0].client_id)
           setShowOTPInputBox(true)
           setTimeLeft(60)
         } else {
-          Toast.error(response.data.message)
+          Alert.alert(response.data.message)
         }
       } catch (err) {
         console.log(err)
@@ -227,9 +256,11 @@ const AvailableLoads = ({ navigation }) => {
       }
       const response = await axiosInstance.post("/aadhaar_generate_otp", resendParams)
       if (response.data.error_code === 0) {
+        Alert.alert("OTP Resent successfully")
+        setTimeLeft(60)
         AsyncStorage.setItem("client_id", response.data.data[0].client_id)
       } else {
-        Toast.error(response.data.message)
+        Alert.alert(response.data.message)
       }
     } catch (err) {
       console.log(err)
@@ -257,7 +288,7 @@ const AvailableLoads = ({ navigation }) => {
         AsyncStorage.removeItem("client_id")
         navigation.navigate("LoadNeeds");
       } else {
-        Toast.error(response.data.message)
+        Alert.alert(response.data.message)
         return
       }
 
@@ -287,9 +318,10 @@ const AvailableLoads = ({ navigation }) => {
     }
 
 
-    setModalValues((prevState) => ({
-      ...prevState, fromLocation: (`${city} , ${state}`)
-    }))
+
+    setModalValues({
+      ...modalValues, fromLocation: (`${city}, ${state}`)
+    })
     setFromLocationModal(false)
     // You can use the extracted details as needed
   };
@@ -314,34 +346,61 @@ const AvailableLoads = ({ navigation }) => {
     }
 
 
-    setModalValues((prevState) => ({
-      ...prevState, toLocation: (`${city} , ${state}`)
-    }))
+    setModalValues({
+      ...modalValues, toLocation: (`${city}, ${state}`)
+    })
     setToLocationModal(false)
     // You can use the extracted details as needed
   };
 
 
+
+  const handleSelectStates = async (selectedItemIds) => {
+    // Log previously selected states
+    const prevSelectedStateNames = selectedStates.map(id => {
+      const state = userToLocationStatesData.find(state => state.id === id);
+      return state ? state.name : null;
+    }).filter(name => name !== null);
+
+
+    // Update selected states
+    setSelectedStates(selectedItemIds);
+
+    // Log currently selected states
+    const selectedStateNames = selectedItemIds.map(id => {
+      const state = userToLocationStatesData.find(state => state.id === id);
+      return state ? state.name : null;
+    }).filter(name => name !== null);
+    setFilteredStates(selectedStateNames)
+  };
+
+
   const applyFilter = async () => {
 
+    console.log("modalValues", modalValues)
+
     const filterParams = {
-      "company_name": modalValues.companyName,
+      "company_name": "",
       "from_location": modalValues.fromLocation,
-      "to_location": modalValues.toLocation,
       "material": modalValues.material,
+      "no_of_tyres": modalValues.noOfTyres,
+      "to_location": filteredStates,
       "tone": modalValues.tons,
       "truck_body_type": modalValues.truckBodyType,
-      "no_of_tyres": modalValues.noOfTyres
+      "user_id": ""
+
     }
     try {
 
+      console.log("filterParams", filterParams)
 
-      const response = await axiosInstance.post("https://truck.truckmessage.com/user_load_details_filter", filterParams)
-
-
+      const response = await axiosInstance.post("/user_load_details_filter", filterParams)
 
       if (response.data.error_code === 0) {
+        console.log(response.data)
         const transformedData = response.data.data.map((item) => ({
+          companyName: item.company_name,
+          updatedTime: item.updt,
           post: item.user_post,
           profileName: item.profile_name,
           title: item.company_name,
@@ -358,7 +417,7 @@ const AvailableLoads = ({ navigation }) => {
           onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
           onButton2Press: () => {
             setMessageReceiver(item)
-            handleChatNavigate()
+            setSendMessageModal(true)
           }
         }));
 
@@ -378,6 +437,11 @@ const AvailableLoads = ({ navigation }) => {
       console.log(err)
     }
   };
+
+  const handleClose = () => {
+    setShowOTPInputBox(false)
+    setIsAadhaarModal(false)
+  }
 
   if (isLoadings) {
     return (
@@ -411,16 +475,32 @@ const AvailableLoads = ({ navigation }) => {
   ];
 
 
+  const handleYes = () => {
+    setSendMessageModal(false);
+    navigation.navigate("Chat")
+  };
+
+  const handleCancel = () => {
+    setSendMessageModal(false);
+  };
+
+
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#e8f4ff" }}>
 
       <Container
-        position="footer"
+        position="top"
         duration={3000}
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        height={60}
-        textStyle={{ backgroundColor: '', fontSize: 12 }}
+        animationIn="slideInDown"
+        height="auto"
+        width="100%"
+        textStyle={{
+          fontSize: 15,
+          flexWrap: 'wrap', // Ensure text wraps
+          maxWidth: '90%', // Ensure text does not overflow
+          overflow: 'hidden',
+        }} // Ensure text wraps
       />
       <View style={{ flex: 1, backgroundColor: COLORS.white }}>
         <HeaderWithOutBS title="Available Loads" />
@@ -466,25 +546,32 @@ const AvailableLoads = ({ navigation }) => {
                 }));
               }}
             />
-            <TextInput
-              style={[styles.input, errorFields.toLocation && styles.inputError]}
-              placeholder="To Location"
-              value={modalValues.toLocation}
-              // onChangeText={(text) => handleInputChange('toLocation', text)}
-              onPress={() => {
-                setToLocationModal(true);
-                setModalValues(prevValues => ({
-                  ...prevValues,
-                  toLocation: ""
-                }));
-              }}
-            />
-            {/* <TextInput
-              style={[styles.input, errorFields.truckBodyType && styles.inputError]}
-              placeholder="Truck Body Type"
-              value={modalValues.truckBodyType}
-              onChangeText={(text) => handleInputChange('truckBodyType', text)}
-            /> */}
+
+
+            <View style={{ width: "auto", marginBottom: 5 }}>
+              <SectionedMultiSelect
+                items={userToLocationStatesData}
+                IconRenderer={Icon}
+                uniqueKey="id"
+                searchPlaceholderText="Search state"
+                selectedText="selected"
+                selectText="To Location"
+                confirmText="Done"
+                onSelectedItemsChange={handleSelectStates}  // Call to update selected items
+                selectedItems={selectedStates}  // Initialize with current user states
+                styles={{
+                  backdrop: styles.multiSelectBackdrop,
+                  selectToggle: styles.multiSelectBox,
+                  chipContainer: styles.multiSelectChipContainer,
+                  chipText: styles.multiSelectChipText,
+                  selectToggleText: styles.selectToggleText,
+                  selectedItemText: styles.selectedItemText,
+                  selectText: styles.selectText,
+                  button: { backgroundColor: '#CE093A' },
+                }}
+              />
+            </View>
+
 
             <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
@@ -498,13 +585,6 @@ const AvailableLoads = ({ navigation }) => {
                 }}
               />
             </View>
-            {/* <TextInput
-              style={[styles.input, errorFields.noOfTyres && styles.inputError]}
-              placeholder="Number of Tyres"
-              keyboardType="number-pad"
-              value={modalValues.noOfTyres}
-              onChangeText={(text) => handleInputChange('noOfTyres', text)}
-            /> */}
             <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
                 onValueChange={(value) => setModalValues({ ...modalValues, noOfTyres: value })}
@@ -537,11 +617,8 @@ const AvailableLoads = ({ navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.applyButton}
-              onPress={() => {
-                 setIsLoading(!isLoading)
-                 toggleModal()
-              }}>
-              <Text style={styles.applyButtonText} onPress={() => setIsLoading(!isLoading)}>Clear filter</Text>
+              onPress={() => handleClearFilter()}>
+              <Text style={styles.applyButtonText}>Clear filter</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.applyButtonText}>Close</Text>
@@ -581,7 +658,7 @@ const AvailableLoads = ({ navigation }) => {
                   <AadhaarOTPVerification
                   />
                   <View style={{ alignItems: 'center', marginVertical: 20 }}>
-                    <Text>Don't receive the code ? </Text>
+                    <Text>Didn't receive the code ? </Text>
                     <TouchableOpacity disabled={timeLeft === null ? false : true}>
                       <Text
                         style={{ color: timeLeft === null ? "#4285F4" : '#ccc', fontWeight: 'bold', textDecorationLine: 'underline', marginTop: 10 }}
@@ -611,7 +688,7 @@ const AvailableLoads = ({ navigation }) => {
                   <Text style={styles.applyButtonText}>Submit</Text>
                 </TouchableOpacity>
             }
-            <TouchableOpacity style={styles.closeButton} onPress={() => setIsAadhaarModal(false)}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => handleClose()}>
               <Text style={styles.applyButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -699,6 +776,16 @@ const AvailableLoads = ({ navigation }) => {
       </Modal>
 
 
+
+      {/* Send Message Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={sendMessageModal}
+        onRequestClose={() => setSendMessageModal(false)}
+      >
+        <SendMessageModal handleYes={handleYes} handleCancel={handleCancel} />
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -733,6 +820,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+    textAlign: "center",
+  },
+  modalText: {
+    fontSize: 15,
+    marginTop: 10,
     textAlign: "center",
   },
   input: {
@@ -787,6 +879,71 @@ const styles = StyleSheet.create({
   locationTextInput: {
     borderWidth: 1,
     borderColor: COLORS.gray,
+  },
+  multiSelectBackdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.01)',
+  },
+  multiSelectBox: {
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: 'grey',
+    padding: 10,
+    paddingLeft: 15,
+    marginBottom: 4,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 12
+
+  },
+  selectToggleText: {
+    color: '#000',
+    fontSize: 14
+  },
+  selectText: {
+    color: 'red'
+  },
+  selectedItemText: {
+    color: COLORS.primary,
+  },
+  multiSelectChipContainer: {
+    borderWidth: 0,
+    backgroundColor: '#ddd',
+    borderRadius: 8,
+  },
+  multiSelectChipText: {
+    color: '#222',
+    fontSize: 12,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
+    alignItems: 'center',
+    // width:"100%",
+    // flexWrap :"wrap",
+    marginHorizontal: 20
+
+  },
+  saveButton: {
+    backgroundColor: "#0066cc",
+    width: "50%",
+  },
+  cancelButton: {
+    backgroundColor: "#999",
+    width: "50%",
+
+  },
+  button: {
+    backgroundColor: "#0066cc",
+    borderRadius: 5,
+    padding: 10,
+    marginHorizontal: 20,
+    marginTop: 10,
+  },
+  buttonText: {
+    fontSize: 16,
+    color: "#fff",
+    textAlign: "center",
   },
 });
 

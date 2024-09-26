@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Text,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants";
@@ -45,6 +46,7 @@ const MarketPlace = ({ navigation }) => {
     kmsDriven: "",
     model: "",
     location: "",
+    ton: ""
   });
   const [errorFields, setErrorFields] = useState({
     brand: false,
@@ -52,11 +54,11 @@ const MarketPlace = ({ navigation }) => {
     kmsDriven: false,
     model: false,
     location: false,
+    ton: false
   });
 
   const [truckBodyType, setTruckBodyType] = useState("");
   const [numberOfTyres, setNumberOfTyres] = useState("");
-  const [ton, setTon] = useState("");
   const [aadhaar, setAadhaar] = useState("")
   const [aadhaarError, setAadhaarError] = useState("")
   const [showOTPInputBox, setShowOTPInputBox] = useState(false)
@@ -127,7 +129,8 @@ const MarketPlace = ({ navigation }) => {
   };
 
   const filteredProducts = marketPlaceProducts.filter((product) =>
-    product.brand.toLowerCase().includes(searchQuery.toLowerCase())
+    product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
 
@@ -138,21 +141,24 @@ const MarketPlace = ({ navigation }) => {
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
 
-    // setModalValues({
-    //   brand: "",
-    //   price: "",
-    //   kmsDriven: "",
-    //   model: "",
-    //   location: "",
-    // });
-    // setErrorFields({
-    //   brand: false,
-    //   model: false,
-    //   location: false,
-    //   price : false,
-    //   kmsDriven: false,
+    // if(clearFilter){
+    //   setModalValues({
+    //     brand: "",
+    //     price: "",
+    //     kmsDriven: "",
+    //     model: "",
+    //     location: "",
+    //     ton : ""
+    //   });
+    //   setTruckBodyType("")
+    //   setNumberOfTyres("")
+    //   console.log("hi1")
+    // }else{
+    //   setIsModalVisible(!isModalVisible);
+    //   console.log("hello1")
+    // }
 
-    // });
+
   };
 
   const handleInputChange = (field, value) => {
@@ -176,7 +182,7 @@ const MarketPlace = ({ navigation }) => {
           setShowOTPInputBox(true)
           setTimeLeft(60)
         } else {
-          Toast.error(response.data.message)
+          Alert.alert(response.data.message)
         }
       } catch (err) {
         console.log(err)
@@ -191,14 +197,17 @@ const MarketPlace = ({ navigation }) => {
       }
       const response = await axiosInstance.post("/aadhaar_generate_otp", resendParams)
       if (response.data.error_code === 0) {
+        Alert.alert("OTP Resent successfully")
+        setTimeLeft(60)
         AsyncStorage.setItem("client_id", response.data.data[0].client_id)
       } else {
-        Toast.error(response.data.message)
+        Alert.alert(response.data.message)
       }
     } catch (err) {
       console.log(err)
     }
   }
+
 
   const handleVerifyAadhaarOTP = async () => {
     const verifyParams = {
@@ -220,7 +229,7 @@ const MarketPlace = ({ navigation }) => {
         AsyncStorage.removeItem("client_id")
         navigation.navigate("SellYourTruck");
       } else {
-        Toast.error(response.data.message)
+        Alert.alert(response.data.message)
         return
       }
 
@@ -231,23 +240,26 @@ const MarketPlace = ({ navigation }) => {
 
   const applyFilter = async () => {
 
-
     const filterParams = {
       "user_id": "",
       "owner_name": "",
       "vehicle_number": "",
       "contact_no": "",
-      "kms_driven": "",
+      "kms_driven": modalValues.kmsDriven,
       "brand": modalValues.brand !== "" ? [`${modalValues.brand}`] : [],
       "model": modalValues.model !== "" ? [`${modalValues.model}`] : [],
       "location": modalValues.location,
-      "price": modalValues.price !== "" ? modalValues.price : ""
+      "price": modalValues.price !== "" ? modalValues.price : "",
+      "tonnage": modalValues.ton
       // "price": `${modalValues.price}`
     }
 
 
 
     try {
+
+      console.log("filterParams",filterParams)
+
       const response = await axiosInstance.post("/user_buy_sell_filter", filterParams)
       if (response.data.error_code === 0) {
         setMarketPlaceProducts(response.data.data)
@@ -287,63 +299,60 @@ const MarketPlace = ({ navigation }) => {
 
 
     setModalValues({
-      location: (`${city} , ${state}`)
+      ...modalValues, location: (`${city}, ${state}`)
     })
     setLocationModal(false)
   };
 
+
+
   const handleClearFilter = () => {
     setIsLoading(!isLoading);
-    toggleModal()
     setModalValues({
       brand: "",
       price: "",
       kmsDriven: "",
       model: "",
       location: "",
+      ton: ""
     });
-    setErrorFields({
-      brand: false,
-      model: false,
-      location: false,
-      price: false,
-      kmsDriven: false,
-
-    });
+    setTruckBodyType("")
+    setNumberOfTyres("")
+    toggleModal()
   }
 
   const brandData = [
-       { label: 'Ashok Leyland', value: 'ashok_leyland' },
-    { label: 'Tata', value: 'tata' },
-    { label: 'Mahindra', value: 'mahindra' },
-    { label: 'Eicher', value: 'eicher' },
-    { label: 'Daimler India', value: 'daimler_india' },
-    { label: 'Bharat Benz', value: 'bharat_benz' },
-    { label: 'Maruthi Suzuki', value: 'maruthi_suzuki' },
-    { label: 'SML Lsuzu', value: 'sml_isuzu' },
-    { label: 'Force', value: 'force' },
-    { label: 'AMW', value: 'amw' },
-    { label: 'Man', value: 'man' },
-    { label: 'Volvo', value: 'volvo' },
-    { label: 'Scania', value: 'scania' },
-    { label: 'Others', value: 'others' },
+    { label: 'Ashok Leyland', value: 'Ashok Leyland' },
+    { label: 'Tata', value: 'Tata' },
+    { label: 'Mahindra', value: 'Mahindra' },
+    { label: 'Eicher', value: 'Eicher' },
+    { label: 'Daimler India', value: 'Daimler India' },
+    { label: 'Bharat Benz', value: 'Bharat Benz' },
+    { label: 'Maruthi Suzuki', value: 'Maruthi Suzuki' },
+    { label: 'SML Lsuzu', value: 'SML Lsuzu' },
+    { label: 'Force', value: 'Force' },
+    { label: 'AMW', value: 'AMW' },
+    { label: 'Man', value: 'Man' },
+    { label: 'Volvo', value: 'Volvo' },
+    { label: 'Scania', value: 'Scania' },
+    { label: 'Others', value: 'Others' },
   ]
 
   const kmsData = [
-    { label: '0 - 10,000 kms', value: '(0 - 10000) kms' },
-    { label: '10,001 - 30,000 kms', value: '(10001 - 30000) kms' },
-    { label: '30,001 - 50,000 kms', value: '(30001 - 50000) kms' },
-    { label: '50,001 - 70,000 kms', value: '(50001 - 70000) kms' },
-    { label: '70,001 - 100,000 kms', value: '(70001 - 100000) kms' },
-    { label: '100,001 - 150,000 kms', value: '(100001 - 150000) kms' },
-    { label: '150,001 - 200,000 kms', value: '(150001 - 200000) kms' },
-    { label: '200,001 - 300,000 kms', value: '(200001 - 300000) kms' },
-    { label: '300,001 - 500,000 kms', value: '(300001 - 500000) kms' },
-    { label: '500,001 - 700,000 kms', value: '(500001 - 700000) kms' },
-    { label: '700,001 - 1,000,000 kms', value: '(700001 - 1000000) kms' },
-    { label: '1,000,001 - 1,500,000 kms', value: '(1000001 - 1500000) kms' },
-    { label: '1,500,001 - 2,000,000 kms', value: '(1500001 - 2000000) kms' },
-    { label: '2,000,001+ kms', value: '(2000001+) kms' }
+    { label: '0 - 10,000 kms', value: '(0 - 10,000) kms' },
+    { label: '10,001 - 30,000 kms', value: '(10,001 - 30,000) kms' },
+    { label: '30,001 - 50,000 kms', value: '(30,001 - 50,000) kms' },
+    { label: '50,001 - 70,000 kms', value: '(50,001 - 70,000) kms' },
+    { label: '70,001 - 100,000 kms', value: '(70,001 - 100,000) kms' },
+    { label: '100,001 - 150,000 kms', value: '(100,001 - 150,000) kms' },
+    { label: '150,001 - 200,000 kms', value: '(150,001 - 200,000) kms' },
+    { label: '200,001 - 300,000 kms', value: '(200,001 - 300,000) kms' },
+    { label: '300,001 - 500,000 kms', value: '(300,001 - 500,000) kms' },
+    { label: '500,001 - 700,000 kms', value: '(500,001 - 700,000) kms' },
+    { label: '700,001 - 1,000,000 kms', value: '(700,001 - 1,000,000) kms' },
+    { label: '1,000,001 - 1,500,000 kms', value: '(1,000,001 - 1,500,000) kms' },
+    { label: '1,500,001 - 2,000,000 kms', value: '(1,500,001 - 2,000,000) kms' },
+    { label: '2,000,001+ kms', value: '(2,000,001+) kms' }
   ];
 
 
@@ -364,12 +373,13 @@ const MarketPlace = ({ navigation }) => {
 
 
   const bodyTypeData = [
-    { label: 'Open body', value: 'open_body' },
-    { label: 'Container', value: 'container' },
-    { label: 'Trailer', value: 'trailer' },
-    { label: 'Tanker', value: 'tanker' },
-    { label: 'Tipper', value: 'tipper' },
-    { label: 'LCV', value: 'lcv' },
+    { label: 'Open body', value: 'Open body' },
+    { label: 'Container', value: 'Container' },
+    { label: 'Trailer', value: 'Trailer' },
+    { label: 'Tanker', value: 'Tanker' },
+    { label: 'Tipper', value: 'Tipper' },
+    { label: 'LCV', value: 'LCV' },
+    { label: 'Bus', value: 'Bus' },
   ];
 
   const numberOfTyresData = [
@@ -399,7 +409,21 @@ const MarketPlace = ({ navigation }) => {
   const yearsData = years
 
 
+  const tonsData = [
+    { label: "1 Ton - 2.5 Ton", value: "1 Ton - 2.5 Ton" },
+    { label: "2.5 Ton - 5 Ton", value: "2.5 Ton - 5 Ton" },
+    { label: "5 Ton - 10 Ton", value: "5 Ton - 10 Ton" },
+    { label: "10 Ton - 20 Ton", value: "10 Ton - 20 Ton" },
+    { label: "20 Ton - 40 Ton", value: "20 Ton - 40 Ton" },
+    { label: "Above 40 Ton", value: "Above 40 Ton" },
+  ]
 
+
+
+  const handleClose = () => {
+    setShowOTPInputBox(false)
+    setIsAadhaarModal(false)
+  }
 
 
   return (
@@ -524,13 +548,18 @@ const MarketPlace = ({ navigation }) => {
               />
             </View>
 
-            <TextInput
-              style={[styles.textInput]}
-              placeholder="Example : 2"
-              onChangeText={setTon}
-              value={ton}
-              keyboardType="number-pad"
-            />
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({ ...modalValues, ton: value })}
+                items={tonsData}
+                value={modalValues.ton}
+                placeholder={{
+                  label: 'Select ton',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
 
 
             <TextInput
@@ -541,7 +570,6 @@ const MarketPlace = ({ navigation }) => {
               // onChangeText={(text) => handleInputChange("location", text)}
               onPress={() => {
                 setLocationModal(true);
-                setModalValues({ location: "" })
               }}
             />
 
@@ -551,8 +579,8 @@ const MarketPlace = ({ navigation }) => {
             <TouchableOpacity
               style={styles.applyButton}
               onPress={() => handleClearFilter()}>
-              <Text style={styles.applyButtonText} onPress={() => setIsLoading(!isLoading)}>Clear filter</Text>
-              </TouchableOpacity>
+              <Text style={styles.applyButtonText} >Clear filter</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.applyButtonText}>Close</Text>
             </TouchableOpacity>
@@ -591,7 +619,7 @@ const MarketPlace = ({ navigation }) => {
                   <AadhaarOTPVerification
                   />
                   <View style={{ alignItems: 'center', marginVertical: 20 }}>
-                    <Text>Don't receive the code ? </Text>
+                    <Text>Didn't receive the code ? </Text>
                     <TouchableOpacity disabled={timeLeft === null ? false : true}>
                       <Text
                         style={{ color: timeLeft === null ? "#4285F4" : '#ccc', fontWeight: 'bold', textDecorationLine: 'underline', marginTop: 10 }}
@@ -621,7 +649,7 @@ const MarketPlace = ({ navigation }) => {
                   <Text style={styles.applyButtonText}>Submit</Text>
                 </TouchableOpacity>
             }
-            <TouchableOpacity style={styles.closeButton} onPress={() => setIsAadhaarModal(false)}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => handleClose()}>
               <Text style={styles.applyButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -763,7 +791,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
   },
-  
+
 });
 
 export default MarketPlace;

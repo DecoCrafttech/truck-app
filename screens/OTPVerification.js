@@ -58,6 +58,7 @@ const OTPVerification = () => {
 
             await axios.post("https://truck.truckmessage.com/validate_otp", verifyParams)
                 .then((response) => {
+
                     if (response.data.error_code === 1) {
                         // AsyncStorage.setItem("user_id",`${response.data.data[0].user_id}`)
                         Toast.success(response.data.message)
@@ -84,18 +85,22 @@ const OTPVerification = () => {
     return (
         <ScrollView >
             <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white, justifyContent: 'center', alignItems: 'center' }}>
-                <Container
-                    position="footer"
+            <Container
+                    position="top"
                     duration={3000}
-                    animationIn="slideInUp"
-                    animationOut="slideOutDown"
-                    Height="100%"
-                    textStyle={{ backgroundColor: '', fontSize: 12 }}
+                    animationIn="slideInDown"
+                    height="auto"
+                    width="100%"
+                    textStyle={{ 
+                        fontSize: 15,  
+                        flexWrap: 'wrap', // Ensure text wraps
+                        maxWidth: '90%', // Ensure text does not overflow
+                        overflow: 'hidden', }} // Ensure text wraps
                 />
                 <View style={{ flex: 1, backgroundColor: COLORS.white, padding: 16, alignItems: 'center' }}>
                     {/* <StatusBar hidden /> */}
                     <Image
-                        source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
+                        source={{ uri: "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png" }}
                         resizeMode='contain'
                         style={{
                             width: SIZES.width * 0.4,
@@ -133,7 +138,7 @@ const OTPVerification = () => {
                         />
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
-                        <Text>Don't receive the code ?</Text>
+                        <Text>Didn't receive the code ?</Text>
                         <TouchableOpacity>
                             <Text
                                 style={{ color: '#4285F4', fontWeight: 'bold', textDecorationLine: 'underline' }}

@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { COLORS } from "../constants";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Icon1 from 'react-native-vector-icons/FontAwesome';
+import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 const TruckCard = ({
@@ -17,9 +18,35 @@ const TruckCard = ({
   profileName,
   post,
   companyName,
-  selectedValue
+  selectedValue,
+  updatedTime
 
 }) => {
+
+  const [formattedTime, setFormattedTime] = useState("")
+
+  useEffect(() => {
+
+    const dateObject = new Date(`${updatedTime}`);
+
+    // Format the date as "23 Sep 2024"
+    const formattedDate = dateObject.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    // Format the time as "04:13 PM"
+    const formattedTime = dateObject.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+
+    const finalResult = `${formattedDate} ${formattedTime}`;
+
+    setFormattedTime(finalResult)
+  }, [])
 
 
 
@@ -76,8 +103,8 @@ const TruckCard = ({
                 <Text style={styles.label}>{companyName}</Text>
               </View>
             </>
-          
-            
+
+
         }
 
 
@@ -90,11 +117,19 @@ const TruckCard = ({
         <Icon name="place" size={24} color={COLORS.iconDrop} />
         <Text style={styles.location}>{toLocation}</Text>
       </View>
+      <View style={styles.locationContainer}>
+        <Icon name="calendar-month" size={24} color={COLORS.secondary} />
+        <Text style={styles.location}>{formattedTime}</Text>
+      </View>
 
       <View style={styles.labelsContainer}>
-        {labels.slice(0, 4).map((label, index) => (
+        {labels.slice(0, 6).map((label, index) => (
           <View key={index} style={styles.labelRow}>
-            <Icon name={label.icon} size={20} color={COLORS.black} />
+            {label.icon !== "weight" ?
+              <Icon name={label.icon} size={20} color={COLORS.black} />
+              :
+              <Icon2 name={label.icon} size={20} color={COLORS.black} />}
+
             <Text style={styles.label}>{label.text}</Text>
           </View>
         ))}

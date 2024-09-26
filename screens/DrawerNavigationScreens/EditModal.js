@@ -131,7 +131,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
 
 
-      setLocation(`${city} , ${state}`)
+      setLocation(`${city}, ${state}`)
       setLocationModal(false)
       // You can use the extracted details as needed
     };
@@ -157,7 +157,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
 
 
-      setEditedDetails({ ...editedDetails, fromLocation: (`${city} , ${state}`) })
+      setEditedDetails({ ...editedDetails, fromLocation: (`${city}, ${state}`) })
       setFromLocationModal(false)
       // You can use the extracted details as needed
     };
@@ -183,9 +183,9 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
 
       // setModalValues((prevState) => ({
-      //   ...prevState, toLocation: (`${city} , ${state}`)
+      //   ...prevState, toLocation: (`${city}, ${state}`)
       // }))
-      setEditedDetails({ ...editedDetails, toLocation: (`${city} , ${state}`) })
+      setEditedDetails({ ...editedDetails, toLocation: (`${city}, ${state}`) })
 
       setToLocationModal(false)
       // You can use the extracted details as needed
@@ -216,52 +216,52 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
 
     const brandData = [
-      { label: 'Ashok Leyland', value: 'ashokLeyland' },
-      { label: 'Tata', value: 'tata' },
-      { label: 'Mahindra', value: 'mahindra' },
-      { label: 'Eicher', value: 'eicher' },
-      { label: 'Daimler India', value: 'daimlerIndia' },
-      { label: 'Bharat Benz', value: 'bharatBenz' },
-      { label: 'Maruthi Suzuki', value: 'maruthiSuzuki' },
-      { label: 'SML Lsuzu', value: 'smlLsuzu' },
-      { label: 'Force', value: 'force' },
-      { label: 'AMW', value: 'amw' },
-      { label: 'Man', value: 'man' },
-      { label: 'Volvo', value: 'volvo' },
-      { label: 'Scania', value: 'scania' },
-      { label: 'Others', value: 'others' },
+      { label: 'Ashok Leyland', value: 'Ashok Leyland' },
+      { label: 'Tata', value: 'Tata' },
+      { label: 'Mahindra', value: 'Mahindra' },
+      { label: 'Eicher', value: 'Eicher' },
+      { label: 'Daimler India', value: 'Daimler India' },
+      { label: 'Bharat Benz', value: 'Bharat Benz' },
+      { label: 'Maruthi Suzuki', value: 'Maruthi Suzuki' },
+      { label: 'SML Lsuzu', value: 'SML Lsuzu' },
+      { label: 'Force', value: 'Force' },
+      { label: 'AMW', value: 'AMW' },
+      { label: 'Man', value: 'Man' },
+      { label: 'Volvo', value: 'Volvo' },
+      { label: 'Scania', value: 'Scania' },
+      { label: 'Others', value: 'Others' },
     ]
 
     const kmsData = [
-      { label: '0 - 10,000 kms', value: '0_10000_kms' },
-      { label: '10,001 - 30,000 kms', value: '10001_30000_kms' },
-      { label: '30,001 - 50,000 kms', value: '30001_50000_kms' },
-      { label: '50,001 - 70,000 kms', value: '50001_70000_kms' },
-      { label: '70,001 - 100,000 kms', value: '70001_100000_kms' },
-      { label: '100,001 - 150,000 kms', value: '100001_150000_kms' },
-      { label: '150,001 - 200,000 kms', value: '150001_200000_kms' },
-      { label: '200,001 - 300,000 kms', value: '200001_300000_kms' },
-      { label: '300,001 - 500,000 kms', value: '300001_500000_kms' },
-      { label: '500,001 - 700,000 kms', value: '500001_700000_kms' },
-      { label: '700,001 - 1,000,000 kms', value: '700001_1000000_kms' },
-      { label: '1,000,001 - 1,500,000 kms', value: '1000001_1500000_kms' },
-      { label: '1,500,001 - 2,000,000 kms', value: '1500001_2000000_kms' },
-      { label: '2,000,001+ kms', value: '2000001_plus_kms' },
+      { label: '0 - 10,000 kms', value: '(0 - 10,000) kms' },
+      { label: '10,001 - 30,000 kms', value: '(10,001 - 30,000) kms' },
+      { label: '30,001 - 50,000 kms', value: '(30,001 - 50,000) kms' },
+      { label: '50,001 - 70,000 kms', value: '(50,001 - 70,000) kms' },
+      { label: '70,001 - 100,000 kms', value: '(70,001 - 100,000) kms' },
+      { label: '100,001 - 150,000 kms', value: '(100,001 - 150,000) kms' },
+      { label: '150,001 - 200,000 kms', value: '(150,001 - 200,000) kms' },
+      { label: '200,001 - 300,000 kms', value: '(200,001 - 300,000) kms' },
+      { label: '300,001 - 500,000 kms', value: '(300,001 - 500,000) kms' },
+      { label: '500,001 - 700,000 kms', value: '(500,001 - 700,000) kms' },
+      { label: '700,001 - 1,000,000 kms', value: '(700,001 - 1,000,000) kms' },
+      { label: '1,000,001 - 1,500,000 kms', value: '(1,000,001 - 1,500,000) kms' },
+      { label: '1,500,001 - 2,000,000 kms', value: '(1,500,001 - 2,000,000) kms' },
+      { label: '2,000,001+ kms', value: '(2,000,001+) kms' }
     ];
 
 
     const priceData = [
-      { label: '0 - 5,00,000 lakhs', value: '0_5_lakhs' },
-      { label: '5,00,001 - 10,00,000 lakhs', value: '5_10_lakhs' },
-      { label: '10,00,001 - 20,00,000 lakhs', value: '10_20_lakhs' },
-      { label: '20,00,001 - 30,00,000 lakhs', value: '20_30_lakhs' },
-      { label: '30,00,001 - 40,00,000 lakhs', value: '30_40_lakhs' },
-      { label: '40,00,001 - 50,00,000 lakhs', value: '40_50_lakhs' },
-      { label: '50,00,001 - 60,00,000 lakhs', value: '50_60_lakhs' },
-      { label: '60,00,001 - 70,00,000 lakhs', value: '60_70_lakhs' },
-      { label: '70,00,001 - 80,00,000 lakhs', value: '70_80_lakhs' },
-      { label: '80,00,001 - 90,00,000 lakhs', value: '80_90_lakhs' },
-      { label: '90,00,001 and above lakhs', value: '90_above_lakhs' },
+      { label: '0 - 5,00,000 lakhs', value: '(0 - 5,00,000) lakhs' },
+      { label: '5,00,001 - 10,00,000 lakhs', value: '(5,00,001 - 10,00,000) lakhs' },
+      { label: '10,00,001 - 20,00,000 lakhs', value: '(10,00,001 - 20,00,000) lakhs' },
+      { label: '20,00,001 - 30,00,000 lakhs', value: '(20,00,001 - 30,00,000) lakhs' },
+      { label: '30,00,001 - 40,00,000 lakhs', value: '(30,00,001 - 40,00,000) lakhs' },
+      { label: '40,00,001 - 50,00,000 lakhs', value: '(40,00,001 - 50,00,000) lakhs' },
+      { label: '50,00,001 - 60,00,000 lakhs', value: '(50,00,001 - 60,00,000) lakhs' },
+      { label: '60,00,001 - 70,00,000 lakhs', value: '(60,00,001 - 70,00,000) lakhs' },
+      { label: '70,00,001 - 80,00,000 lakhs', value: '(70,00,001 - 80,00,000) lakhs' },
+      { label: '80,00,001 - 90,00,000 lakhs', value: '(80,00,001 - 90,00,000) lakhs' },
+      { label: '90,00,001 and above lakhs', value: '(90,00,001 and above) lakhs' }
     ];
 
 

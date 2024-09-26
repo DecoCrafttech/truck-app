@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -19,6 +19,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import RNPickerSelect from 'react-native-picker-select';
 import { useNavigation } from "@react-navigation/native";
+import { Dropdown } from 'react-native-element-dropdown';
+
 
 
 const TruckNeeds = () => {
@@ -29,6 +31,9 @@ const TruckNeeds = () => {
   const { isLoading, setIsLoading } = useContext(LoadNeedsContext);
 
   const [spinner, setSpinner] = useState(false);
+
+  const textInputRef = useRef(null); // Create a reference for the TextInput
+
 
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -58,11 +63,71 @@ const TruckNeeds = () => {
   const [fromLocationModal, setFromLocationModal] = useState(false)
   const [toLocationModal, setToLocationModal] = useState(false)
 
+  const [vehicleListData, setVehicleListData] = useState([])
+  const [vehicleFromDropdown, setVehicleFromDropdown] = useState("")
+  const [searchText, setSearchText] = useState('');  // To track the search text
+
+
+
+  const categoryData = [
+    { label: 'Lorry owners', category: 'Lorry owners' },
+    { label: 'Logistics', category: 'Logistics' },
+    { label: 'Lorry contractors', category: 'Lorry contractors' },
+    { label: 'Load booking agent', category: 'Load booking agent' },
+    { label: 'Driver', category: 'Driver' },
+    { label: 'Lorry Buy & Sell dealers / Owners', category: 'Lorry Buy &Sell dealers / Owners' },
+  ];
+
+
+  // useEffect(() => {
+  //   setUserToLocationStatesData(
+  //     userStatesFromProfile.map((state, index) => ({
+  //       id: index + 1,
+  //       name: state
+  //     }))
+  //   )
+  // }, [])
+
+
+
+  useEffect(() => {
+
+    const getVehicleList = async () => {
+
+      const vehicleListParams = {
+        user_id: `${await AsyncStorage.getItem("user_id")}`
+      }
+
+
+      try {
+
+
+        const response = await axiosInstance.post("/get_user_vehicle_list", vehicleListParams);
+        // console.log(response.data.data[0].vehicle_list)
+        if (response.data.error_code === 0) {
+          setVehicleListData(
+            response.data.data[0].vehicle_list.map((value, index) => ({
+              label: value,
+              value: value
+            }))
+          )
+        }
+
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    (async () => getVehicleList())()
+
+  }, [])
+
+
+
   const handlePostAdd = async () => {
     setSpinner(true);
     // Validate input fields
     if (
-      vehicleNumber.trim() === "" ||
       companyName.trim() === "" ||
       contactNumber.trim() === "" ||
       transportName.trim() === "" ||
@@ -97,7 +162,7 @@ const TruckNeeds = () => {
       description: description,
       from: fromLocation,
       to: toLocation,
-      vehicle_number: vehicleNumber,
+      vehicle_number: vehicleNumber !== "" ? vehicleNumber : vehicleFromDropdown,
       name_of_the_transport: transportName,
       no_of_tyres: numberOfTyres,
       tone: ton,
@@ -162,7 +227,7 @@ const TruckNeeds = () => {
     }
 
 
-    setFromLocation(`${city} , ${state}`)
+    setFromLocation(`${city}, ${state}`)
     setFromLocationModal(false)
 
     // You can use the extracted details as needed
@@ -187,16 +252,13 @@ const TruckNeeds = () => {
         }
       });
     }
-
-
-    setToLocation(`${city} , ${state}`)
+    setToLocation(`${city}, ${state}`)
     setToLocationModal(false)
-
     // You can use the extracted details as needed
   };
 
   const brandData = [
-       { label: 'Ashok Leyland', value: 'ashok_leyland' },
+    { label: 'Ashok Leyland', value: 'ashok_leyland' },
     { label: 'Tata', value: 'tata' },
     { label: 'Mahindra', value: 'mahindra' },
     { label: 'Eicher', value: 'eicher' },
@@ -241,16 +303,71 @@ const TruckNeeds = () => {
 
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <View style={styles.textInputContainer}>
-            <Text style={styles.label}>Vehicle Number</Text>
+
+
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={styles.label}>Vehicle Number</Text>
+              <Text style={{ textAlign: 'right', textDecorationLine: 'underline', color: 'blue' }} onPress={() => navigation.navigate("Profile")}>Add Truck</Text>
+            </View>
+            {/* <View style={styles.mobileNumberInputBox}>
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                iconStyle={styles.iconStyle}
+                itemTextStyle={styles.itemTextStyle}
+                itemContainerStyle={styles.itemContainerStyle}
+                data={vehicleList}
+                maxHeight={300}
+                labelField="label"
+                valueField="category"
+                placeholder="Select or type new item"
+                search
+                searchPlaceholder="Search or type to add..."
+                value={vehicle}
+                onChange={handleSelect}
+                onChangeText={setSearchText}
+                onBlur={handleNewItem}
+              />
+            </View> */}
+
+
+
             <TextInput
               style={[
                 styles.textInput,
-                !vehicleNumberValid && { borderColor: "red" },
               ]}
               placeholder="Enter your vehicle number"
-              onChangeText={setVehicleNumber}
+              onChangeText={setVehicleNumber} // Simplified
+
               value={vehicleNumber}
+              onFocus={() => {
+                setVehicleFromDropdown(''); // Clear dropdown value on focus
+                textInputRef.current.focus()
+              }}
+              ref={textInputRef}
             />
+            <Text style={{ textAlign: 'center', marginBottom: 8 }}>OR</Text>
+            <View style={{ borderColor: "grey", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => {
+                  setVehicleFromDropdown(value); // Set dropdown value
+                  setVehicleNumber(''); // Clear TextInput if desired, otherwise comment this out
+                  textInputRef.current.blur(); // Remove focus from TextInput
+                }}
+                items={vehicleListData}
+                value={vehicleFromDropdown}
+                placeholder={{
+                  label: 'Select vehicle number from profile',
+                  value: null,
+                  color: 'grey',
+                }}
+
+
+              />
+            </View>
             <Text style={styles.label}>Owner Name</Text>
             <TextInput
               style={[
@@ -561,6 +678,57 @@ const styles = StyleSheet.create({
   applyButtonText: {
     color: "white",
     textAlign: "center",
+    fontWeight: "bold",
+  },
+  dropdown: {
+    fontSize: 14,
+    width: "100%",
+    borderBottomColor: 'gray',
+    paddingLeft: 12,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  mobileNumberInputBox: {
+    width: "100%",
+    height: 48,
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    borderColor: 'grey',
+    borderWidth: 1,
+    flexDirection: 'row'
+  },
+  placeholderStyle: {
+    fontSize: 14,
+    color: 'grey'
+  },
+  selectedTextStyle: {
+    fontSize: 14,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+    marginRight: 15,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 14,
+  },
+  itemContainerStyle: {
+
+  },
+  itemTextStyle: {
+    fontSize: 14,
+  },
+  addButton: {
+    backgroundColor: "#007AFF",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
     fontWeight: "bold",
   },
 });

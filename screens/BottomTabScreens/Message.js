@@ -38,7 +38,6 @@ const Message = () => {
         user_id : await AsyncStorage.getItem("user_id")
       }
       const response = await axios.post('https://truck.truckmessage.com/get_user_chat_list', userIdParams);
-      console.log("message",response.data.data)
    
       setAllPersons(response.data.data)
       setFilteredUsers(response.data.data)
@@ -54,7 +53,6 @@ const Message = () => {
   },[pageRefresh])
 
   const handleSearch = (text) => {
-    console.log(text)
     setSearch(text)
     const filteredResult = allPersons.filter((value) => {
       return value.profile_name.toLowerCase().includes(text.toLowerCase())
@@ -71,7 +69,7 @@ const Message = () => {
 
   const renderItem = ({ item, index }) => {
     return (
-      <View style={{backgroundColor:'red'}}>
+      <View >
         <TouchableOpacity
           key={index}
           onPress={() => handleNavigateToChat(item)}

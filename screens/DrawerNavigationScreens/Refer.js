@@ -332,6 +332,7 @@ const Refer = () => {
               companyName: item.company_name,
               contactNumber: item.contact_number,
               truckBodyType: item.truck_body_type,
+              updatedTime : item.updt,
               title: item.company_name,
               fromLocation: item.from_location,
               toLocation: item.to_location,
@@ -356,6 +357,7 @@ const Refer = () => {
               title: item.driver_name,
               fromLocation: item.from_location,
               toLocation: item.to_location,
+              updatedTime : item.updt,
               labels: [
                 { icon: "directions-bus", text: item.vehicle_number },
                 { icon: "attractions", text: item.no_of_tyres },
@@ -373,7 +375,7 @@ const Refer = () => {
           case "user_truck_details":
             setAllLoadData([]);
             const transformedAllTruckData = response.data.data.map((item) => ({
-        
+              updatedTime : item.updt,
               companyName: item.company_name,
               title: item.company_name,
               fromLocation: item.from_location,
@@ -395,6 +397,7 @@ const Refer = () => {
             break;
 
           case "user_buy_sell_details":
+            console.log("marketplaceData", response.data)
             setAllLoadData(response.data.data);
             break;
           default:

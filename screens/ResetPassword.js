@@ -146,16 +146,18 @@ const ResetPassword = () => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: '#fff' }]}>
-            <Container
-                position="footer"
-                duration={3000}
-                animationIn="slideInUp"
-                animationOut="slideOutDown"
-                height={60}
-                width="100%"
-                style={{ textAlign: 'center' }}
-                textStyle={{ backgroundColor: '', fontSize: 14, }}
-            />
+             <Container
+                    position="top"
+                    duration={3000}
+                    animationIn="slideInDown"
+                    height="auto"
+                    width="100%"
+                    textStyle={{ 
+                        fontSize: 15,  
+                        flexWrap: 'wrap', // Ensure text wraps
+                        maxWidth: '90%', // Ensure text does not overflow
+                        overflow: 'hidden', }} // Ensure text wraps
+                />
             <View >
                 {/* <StatusBar hidden /> */}
                 {/* <View style={styles.pageHeadingContainer}>

@@ -105,7 +105,7 @@ const VehicleProfileDetails = () => {
     try {
       const response = await axios.post("https://truck.truckmessage.com/add_user_vehicle_details", addTruckParams)
       if (response.data.error_code === 0) {
-        Toast.success(response.data.message)
+        Toast.success("Posted successfully")
 
 
         // Reset state and close modal
@@ -188,12 +188,17 @@ const VehicleProfileDetails = () => {
   return (
     <>
       <Container
-        position="footer"
+        position="top"
         duration={3000}
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        height={60}
-        textStyle={{ backgroundColor: '', fontSize: 12 }}
+        animationIn="slideInDown"
+        height="auto"
+        width="100%"
+        textStyle={{
+          fontSize: 15,
+          flexWrap: 'wrap', // Ensure text wraps
+          maxWidth: '90%', // Ensure text does not overflow
+          overflow: 'hidden',
+        }} // Ensure text wraps
       />
       {
         pageLoaded === false ?
@@ -211,17 +216,17 @@ const VehicleProfileDetails = () => {
               </View>
               {
                 users.length === 0 ?
-                <View style={styles.noResultContainer}>
-                <View>
-                  <Image
-                    source={require("../../assets/images/Folder_empty.png")}
-                    width={50}
-                    height={50}
-                    resizeMode="center"
-                  />
-                </View>
-                <Text style={styles.noResultsText}>No records</Text>
-              </View>
+                  <View style={styles.noResultContainer}>
+                    <View>
+                      <Image
+                        source={require("../../assets/images/Folder_empty.png")}
+                        width={50}
+                        height={50}
+                        resizeMode="center"
+                      />
+                    </View>
+                    <Text style={styles.noResultsText}>No records</Text>
+                  </View>
                   :
                   <>
                     {users.map((user, index) => (
@@ -442,7 +447,7 @@ const styles = StyleSheet.create({
   noResultsText: {
     textAlign: "center",
     marginTop: -90,
-    marginBottom:30,
+    marginBottom: 30,
     color: "grey",
     fontSize: 16,
   },

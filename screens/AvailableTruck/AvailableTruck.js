@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   Text,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants";
@@ -24,6 +25,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import MultiSelectComponent from "../../components/MultiSelectComponent";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import { MaterialIcons as Icon } from '@expo/vector-icons';
+import SendMessageModal from "../SendMessageModal";
 
 
 
@@ -53,6 +55,8 @@ const AvailableTruck = ({ navigation }) => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAadhaarModal, setIsAadhaarModal] = useState(false)
+
+  const [sendMessageModal, setSendMessageModal] = useState(false)
 
 
   const [modalValues, setModalValues] = useState({
@@ -149,24 +153,28 @@ const AvailableTruck = ({ navigation }) => {
         const response = await axiosInstance.get("/all_truck_details");
         if (response.data.error_code === 0) {
           const transformedData = response.data.data.map((item) => ({
-            companyName : item.company_name,
+            companyName: item.company_name,
+            updatedTime: item.updt,
             post: item.user_post,
             profileName: item.profile_name,
             title: item.company_name,
             fromLocation: item.from_location,
             toLocation: item.to_location,
             labels: [
-              { icon: "table-view", text: item.truck_name },
-              { icon: "directions-bus", text: item.vehicle_number },
-              { icon: "attractions", text: item.no_of_tyres },
+              { icon: "weight", text: item.tone },
               { icon: "local-shipping", text: item.truck_body_type },
+              { icon: "attractions", text: item.no_of_tyres },
+              { icon: "directions-bus", text: item.truck_brand_name },
+              { icon: "table-view", text: item.vehicle_number },
+              { icon: "fire-truck", text: item.name_of_the_transport },
               { icon: "verified", text: "RC verified" },
             ],
             description: item.description,
             onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
             onButton2Press: () => {
+
               setMessageReceiver(item)
-              handleChatNavigate()
+              setSendMessageModal(true)
             }
           }));
 
@@ -192,11 +200,20 @@ const AvailableTruck = ({ navigation }) => {
     (truck) =>
       truck.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       truck.fromLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      truck.toLocation.toLowerCase().includes(searchQuery.toLowerCase())
+      truck.toLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[0].text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[1].text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[2].text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[3].text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      truck.labels[4].text.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
+  };
+
+
+  const handleClearFilter = () => {
     setModalValues({
       companyName: "",
       fromLocation: "",
@@ -206,6 +223,8 @@ const AvailableTruck = ({ navigation }) => {
       tons: "",
       truckBodyType: "",
     });
+    setSelectedStates([])
+
     setErrorFields({
       companyName: false,
       fromLocation: false,
@@ -215,7 +234,10 @@ const AvailableTruck = ({ navigation }) => {
       tons: false,
       truckBodyType: false,
     });
-  };
+    setIsLoading(!isLoading)
+    setIsModalVisible(!isModalVisible);
+
+  }
 
   const handleInputChange = (field, value) => {
     setModalValues({ ...modalValues, [field]: value });
@@ -238,7 +260,7 @@ const AvailableTruck = ({ navigation }) => {
           setShowOTPInputBox(true)
           setTimeLeft(60)
         } else {
-          Toast.error(response.data.message)
+          Alert.alert(response.data.message)
         }
       } catch (err) {
         console.log(err)
@@ -253,9 +275,11 @@ const AvailableTruck = ({ navigation }) => {
       }
       const response = await axiosInstance.post("/aadhaar_generate_otp", resendParams)
       if (response.data.error_code === 0) {
+        Alert.alert("OTP Resent successfully")
+        setTimeLeft(60)
         AsyncStorage.setItem("client_id", response.data.data[0].client_id)
       } else {
-        Toast.error(response.data.message)
+        Alert.alert(response.data.message)
       }
     } catch (err) {
       console.log(err)
@@ -283,7 +307,7 @@ const AvailableTruck = ({ navigation }) => {
         AsyncStorage.removeItem("client_id")
         navigation.navigate("TruckNeeds");
       } else {
-        Toast.error(response.data.message)
+        Alert.alert(response.data.message)
         return
       }
 
@@ -313,7 +337,7 @@ const AvailableTruck = ({ navigation }) => {
 
 
     setModalValues((prevState) => ({
-      ...prevState, fromLocation: (`${city} , ${state}`)
+      ...prevState, fromLocation: (`${city}, ${state}`)
     }))
     setFromLocationModal(false)
     // You can use the extracted details as needed
@@ -340,7 +364,7 @@ const AvailableTruck = ({ navigation }) => {
 
 
     setModalValues((prevState) => ({
-      ...prevState, toLocation: (`${city} , ${state}`)
+      ...prevState, toLocation: (`${city}, ${state}`)
     }))
     setToLocationModal(false)
     // You can use the extracted details as needed
@@ -353,33 +377,40 @@ const AvailableTruck = ({ navigation }) => {
       "company_name": "",
       "from_location": modalValues.fromLocation,
       "to_location": filteredStates,
-      "truck_name": "",
+      "truck_name": modalValues.truckName,
       "truck_body_type": modalValues.truckBodyType,
       "no_of_tyres": modalValues.noOfTyres,
       "tone": modalValues.tons
     }
 
     try {
+
+
       const response = await axiosInstance.post("/user_truck_details_filter", filterParams)
       if (response.data.error_code === 0) {
         const transformedData = response.data.data.map((item) => ({
+          companyName: item.company_name,
+          updatedTime: item.updt,
           post: item.user_post,
           profileName: item.profile_name,
           title: item.company_name,
           fromLocation: item.from_location,
           toLocation: item.to_location,
           labels: [
-            { icon: "table-view", text: item.truck_name },
-            { icon: "directions-bus", text: item.vehicle_number },
-            { icon: "attractions", text: item.no_of_tyres },
+            { icon: "weight", text: item.tone },
             { icon: "local-shipping", text: item.truck_body_type },
+            { icon: "attractions", text: item.no_of_tyres },
+            { icon: "directions-bus", text: item.truck_brand_name },
+            { icon: "table-view", text: item.vehicle_number },
+            { icon: "fire-truck", text: item.name_of_the_transport },
             { icon: "verified", text: "RC verified" },
           ],
           description: item.description,
           onButton1Press: () => Linking.openURL(`tel:${item.contact_no}`),
           onButton2Press: () => {
+
             setMessageReceiver(item)
-            handleChatNavigate()
+            setSendMessageModal(true)
           }
         }));
         setGetTruckData(transformedData);
@@ -404,20 +435,20 @@ const AvailableTruck = ({ navigation }) => {
   }
 
   const brandData = [
-    { label: 'Ashok Leyland', value: 'ashok_leyland' },
-    { label: 'Tata', value: 'tata' },
-    { label: 'Mahindra', value: 'mahindra' },
-    { label: 'Eicher', value: 'eicher' },
-    { label: 'Daimler India', value: 'daimler_india' },
-    { label: 'Bharat Benz', value: 'bharat_benz' },
-    { label: 'Maruthi Suzuki', value: 'maruthi_suzuki' },
-    { label: 'SML Lsuzu', value: 'sml_isuzu' },
-    { label: 'Force', value: 'force' },
-    { label: 'AMW', value: 'amw' },
-    { label: 'Man', value: 'man' },
-    { label: 'Volvo', value: 'volvo' },
-    { label: 'Scania', value: 'scania' },
-    { label: 'Others', value: 'others' },
+    { label: 'Ashok Leyland', value: 'Ashok Leyland' },
+    { label: 'Tata', value: 'Tata' },
+    { label: 'Mahindra', value: 'Mahindra' },
+    { label: 'Eicher', value: 'Eicher' },
+    { label: 'Daimler India', value: 'Daimler India' },
+    { label: 'Bharat Benz', value: 'Bharat Benz' },
+    { label: 'Maruthi Suzuki', value: 'Maruthi Suzuki' },
+    { label: 'SML Lsuzu', value: 'SML Lsuzu' },
+    { label: 'Force', value: 'Force' },
+    { label: 'AMW', value: 'AMW' },
+    { label: 'Man', value: 'Man' },
+    { label: 'Volvo', value: 'Volvo' },
+    { label: 'Scania', value: 'Scania' },
+    { label: 'Others', value: 'Others' },
   ]
 
   const bodyTypeData = [
@@ -444,6 +475,7 @@ const AvailableTruck = ({ navigation }) => {
 
 
 
+
   const handleSelectStates = async (selectedItemIds) => {
     // Log previously selected states
     const prevSelectedStateNames = selectedStates.map(id => {
@@ -461,6 +493,22 @@ const AvailableTruck = ({ navigation }) => {
       return state ? state.name : null;
     }).filter(name => name !== null);
     setFilteredStates(selectedStateNames)
+  };
+
+
+  const handleClose = () => {
+    setShowOTPInputBox(false)
+    setIsAadhaarModal(false)
+  }
+
+
+  const handleYes = () => {
+    setSendMessageModal(false);
+    navigation.navigate("Chat")
+  };
+
+  const handleCancel = () => {
+    setSendMessageModal(false);
   };
 
 
@@ -541,7 +589,7 @@ const AvailableTruck = ({ navigation }) => {
               />
             </View> */}
 
-            <View style={{ width: "auto",marginBottom:5 }}>
+            <View style={{ width: "auto", marginBottom: 5 }}>
               <SectionedMultiSelect
                 items={userToLocationStatesData}
                 IconRenderer={Icon}
@@ -565,21 +613,6 @@ const AvailableTruck = ({ navigation }) => {
               />
             </View>
 
-
-
-            <TextInput
-              style={[styles.input, errorFields.material && styles.inputError]}
-              placeholder="Material"
-              value={modalValues.material}
-              onChangeText={(text) => handleInputChange("material", text)}
-            />
-            {/* <TextInput
-              style={[styles.input, errorFields.noOfTyres && styles.inputError]}
-              placeholder="Number of Tyres"
-              keyboardType="number-pad"
-              value={modalValues.noOfTyres}
-              onChangeText={(text) => handleInputChange("noOfTyres", text)}
-            />
             <TextInput
               style={[styles.input, errorFields.tons && styles.inputError]}
               placeholder="Tons"
@@ -587,6 +620,23 @@ const AvailableTruck = ({ navigation }) => {
               value={modalValues.tons}
               onChangeText={(text) => handleInputChange("tons", text)}
             />
+
+
+
+            {/* <TextInput
+              style={[styles.input, errorFields.material && styles.inputError]}
+              placeholder="Material"
+              value={modalValues.material}
+              onChangeText={(text) => handleInputChange("material", text)}
+            /> */}
+            {/* <TextInput
+              style={[styles.input, errorFields.noOfTyres && styles.inputError]}
+              placeholder="Number of Tyres"
+              keyboardType="number-pad"
+              value={modalValues.noOfTyres}
+              onChangeText={(text) => handleInputChange("noOfTyres", text)}
+            />
+           
             <TextInput
               style={[
                 styles.input,
@@ -628,7 +678,7 @@ const AvailableTruck = ({ navigation }) => {
               <RNPickerSelect
                 onValueChange={(value) => setModalValues({ ...modalValues, noOfTyres: value })}
                 items={numberOfTyresData}
-                value={modalValues.numberOfTyres}
+                value={modalValues.noOfTyres}
                 placeholder={{
                   label: 'Select number of tyres',
                   value: null,
@@ -637,17 +687,16 @@ const AvailableTruck = ({ navigation }) => {
               />
             </View>
 
+
+
             <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
               <Text style={styles.applyButtonText}>Apply Filter</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.applyButton}
-              onPress={() => {
-                setIsLoading(!isLoading)
-                toggleModal()
-              }}>
-              <Text style={styles.applyButtonText} onPress={() => setIsLoading(!isLoading)}>Clear filter</Text>
-              </TouchableOpacity>
+              onPress={() => handleClearFilter()} >
+              <Text style={styles.applyButtonText} >Clear filter</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.applyButtonText}>Close</Text>
             </TouchableOpacity>
@@ -686,7 +735,7 @@ const AvailableTruck = ({ navigation }) => {
                   <AadhaarOTPVerification
                   />
                   <View style={{ alignItems: 'center', marginVertical: 20 }}>
-                    <Text>Don't receive the code ? </Text>
+                    <Text>Didn't receive the code ? </Text>
                     <TouchableOpacity disabled={timeLeft === null ? false : true}>
                       <Text
                         style={{ color: timeLeft === null ? "#4285F4" : '#ccc', fontWeight: 'bold', textDecorationLine: 'underline', marginTop: 10 }}
@@ -716,7 +765,7 @@ const AvailableTruck = ({ navigation }) => {
                   <Text style={styles.applyButtonText}>Submit</Text>
                 </TouchableOpacity>
             }
-            <TouchableOpacity style={styles.closeButton} onPress={() => setIsAadhaarModal(false)}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => handleClose()}>
               <Text style={styles.applyButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -799,6 +848,16 @@ const AvailableTruck = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+      </Modal>
+
+      {/* Send Message Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={sendMessageModal}
+        onRequestClose={() => setSendMessageModal(false)}
+      >
+        <SendMessageModal handleYes={handleYes} handleCancel={handleCancel} />
       </Modal>
 
     </SafeAreaView>

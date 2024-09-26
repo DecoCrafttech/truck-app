@@ -3,6 +3,8 @@ import { View, Image, Text, Button, Modal, TextInput, TouchableOpacity, Platform
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import Feather from '@expo/vector-icons/Feather';
+import AntDesign from '@expo/vector-icons/AntDesign';
+
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -86,6 +88,7 @@ const ProfileTopContainer = () => {
     const [show, setShow] = useState(false);
 
 
+
     const categoryData = [
         { label: 'Lorry owners', value: 'lorry_owners' },
         { label: 'Logistics', value: 'logistics' },
@@ -96,6 +99,7 @@ const ProfileTopContainer = () => {
     ]
 
 
+    
     useEffect(() => {
         const getProfilePage = async () => {
             const getUserProfileParams = {
@@ -112,7 +116,6 @@ const ProfileTopContainer = () => {
                 setDob(response.data.data[1].date_of_birth)
                 setUserCities(response.data.data[1].operating_city)
                 setProfileImage(response.data.data[1].profile_image_name)
-
             } else {
                 console.log(response.data.message)
             }
@@ -121,15 +124,17 @@ const ProfileTopContainer = () => {
     }, [pageRefresh])
 
 
+
+    
     const getStates = async () => {
         try {
             const updateProfileParams = {
                 "user_id": `${await AsyncStorage.getItem("user_id")}`,
             }
-
+          
             const res = await axiosInstance.post("/get_user_state_list", updateProfileParams)
-
             if (res.data.error_code === 0) {
+                console.log("res.data.data[0].state_list",res.data.data[0].state_list)
                 setUserStates(res.data.data[0].state_list)
                 setUserStatesFromProfile(res.data.data[0].state_list)
             } else {
@@ -142,9 +147,11 @@ const ProfileTopContainer = () => {
 
 
 
+
     useEffect(() => {
         (async () => getStates())()
     }, [])
+
 
 
 
@@ -216,7 +223,7 @@ const ProfileTopContainer = () => {
             if (response.data.error_code === 0) {
                 setProfileImage(response.data.data[0].profile_image_name)
                 setUpdateImageModal(false)
-                Alert.alert('Upload Success', 'Image uploaded successfully!');
+                Toast.success('Image uploaded successfully!');
                 setImagePicked(false)
 
             } else {
@@ -224,7 +231,7 @@ const ProfileTopContainer = () => {
             }
 
         } catch (error) {
-            Alert.alert('Upload Failed', 'Image upload failed. Please try again.');
+            Toast.error('Image upload failed. Please try again.');
             console.error('Error uploading image:', error);
         }
     };
@@ -291,12 +298,10 @@ const ProfileTopContainer = () => {
 
     const handleStatesSubmit = async () => {
         try {
-
             const addStatesParams = {
                 "user_id": `${await AsyncStorage.getItem("user_id")}`,
                 "state_name": operatingStates
             }
-
             const res = await axiosInstance.post("/user_state_entry", addStatesParams)
 
             if (res.data.error_code === 0) {
@@ -304,7 +309,6 @@ const ProfileTopContainer = () => {
                 refRBSheetStates.current.close()
                 setOperatingStates([])
                 setSelectedStates([])
-
                 getStates()
             } else {
                 console.log(res.data.message)
@@ -368,25 +372,34 @@ const ProfileTopContainer = () => {
         }
     }
 
+
     const updateStatesFunction = async () => {
-        try {
-            const updateStatesParams = {
-                "user_id": `${await AsyncStorage.getItem("user_id")}`,
-                "state_name": updateSelectedStates
-            }
 
-            const res = await axiosInstance.post("/user_state_entry", updateStatesParams)
+        if (updateSelectedStates.length === 0) {
+            alert("Please select atleast one state")
+            return
+        } else {
+            try {
+                const updateStatesParams = {
+                    "user_id": `${await AsyncStorage.getItem("user_id")}`,
+                    "state_name": updateSelectedStates
+                }
 
-            if (res.data.error_code === 0) {
-                setPageRefresh(!pageRefresh)
-                setEditStatesClick(false)
-                getStates()
-            } else {
-                console.log(res.data.message)
+                const res = await axiosInstance.post("/user_state_entry", updateStatesParams)
+
+                if (res.data.error_code === 0) {
+                    setPageRefresh(!pageRefresh)
+                    setEditStatesClick(false)
+                    getStates()
+                } else {
+                    console.log(res.data.message)
+                }
+            } catch (err) {
+                console.log(err)
             }
-        } catch (err) {
-            console.log(err)
         }
+
+
 
     }
 
@@ -445,6 +458,7 @@ const ProfileTopContainer = () => {
                     onPress={() => {
                         setEditStatesClick(false);
                         refRBSheetViewStates.current.open()
+                        getStates()
                     }} >
                     <Text style={[styles.buttonText, { textAlign: 'center' }]}>View states</Text>
                 </TouchableOpacity>
@@ -570,14 +584,14 @@ const ProfileTopContainer = () => {
 
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
-                                style={[styles.button, styles.saveButton, { width: "50%" }]}
+                                style={[styles.button, styles.saveButton]}
                                 onPress={() => isImagePicked === true ? updateProfileImageAPI(updatedProfileImage) : alert("Please choose image first")}>
-                                <Text style={[styles.buttonText, { textAlign: 'center', }]}>Save</Text>
+                                <Text style={[styles.buttonText, { textAlign: 'center' }]}>Save</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.button, styles.cancelButton]}
                                 onPress={handleUpdateImageModalCancel}>
-                                <Text style={styles.buttonText}>Cancel</Text>
+                                <Text style={[styles.buttonText, { textAlign: 'center' }]}>Cancel</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -734,7 +748,7 @@ const ProfileTopContainer = () => {
                     openDuration={250}
                     closeOnDragDown={true}
                     closeOnPressBack={true}
-                    closeOnPressMask={false}
+                    closeOnPressMask={true}
                     customStyles={{
                         wrapper: {
                             backgroundColor: "rgba(0,0,0,0.5)",
@@ -802,7 +816,13 @@ const ProfileTopContainer = () => {
                                     </Text>
                                     <Text
                                         onPress={() => handleEditStates()}
-                                    >Edit
+                                    >
+                                        <Feather style={[styles.modalImageEditIcon, { position: 'absolute', bottom: 0, left: "65%" }]}
+                                            name="edit"
+                                            size={20}
+                                            color="#000"
+                                        />
+
                                     </Text>
 
                                 </View>
@@ -903,6 +923,10 @@ const styles = {
         position: 'absolute',
         right: "0%",
         bottom: "0%",
+        backgroundColor:'white',
+        borderRadius:10,
+        padding:5,
+        
     },
     info: {
         marginLeft: 20,
@@ -1061,15 +1085,22 @@ const styles = {
     },
     buttonContainer: {
         flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "center",
         marginTop: 20,
+        alignItems: 'center',
+        // width:"100%",
+        // flexWrap :"wrap",
+        marginHorizontal: 20
+
     },
     saveButton: {
         backgroundColor: "#0066cc",
-        width: '25%'
+        width: "50%",
     },
     cancelButton: {
         backgroundColor: "#999",
+        width: "50%",
+
     },
     addButton: {
         backgroundColor: COLORS.primary,
