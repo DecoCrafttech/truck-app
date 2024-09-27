@@ -61,7 +61,7 @@ const Home = () => {
 
 
   useEffect(() => {
-    getStates()
+
     setStateFun()
   }, [])
 
@@ -71,22 +71,9 @@ const Home = () => {
 
 
 
-  const getStates = async () => {
-    try {
-      const updateProfileParams = {
-        "user_id": `${await AsyncStorage.getItem("user_id")}`,
-      }
-
-      const res = await axiosInstance.post("/get_user_state_list", updateProfileParams)
-      if (res.data.error_code === 0) {
-        setUserStatesFromProfile(res.data.data[0].state_list)
-      } else {
-        console.log(res.data.message)
-      }
-    } catch (err) {
-      console.log(err)
-    }
-  }
+  useEffect(() => {
+    console.log("userStatesFromProfileHome", userStatesFromProfile)
+  }, [userStatesFromProfile])
 
 
 
@@ -206,15 +193,15 @@ const Home = () => {
                         />
                       </View> */}
                       <TouchableOpacity
-                     
+
                         onPress=""
                         style={[
                           styles.userContainer,
-                       
+
                         ]}
                       >
                         <View style={styles.userImageContainer}>
-                          
+
                           <Image
                             source={require("../../assets/images/apple.png")}
                             resizeMode='contain'
@@ -225,7 +212,7 @@ const Home = () => {
                         <View style={{
                           flexDirection: 'row',
                           width: SIZES.width - 104,
-                         
+
                         }}>
                           <View style={styles.userInfoContainer}>
                             <Text style={styles.fullName}>FullNameFullName</Text>
@@ -239,12 +226,12 @@ const Home = () => {
                             alignItems: 'center',
                           }}>
                             <Text style={styles.lastMessageTime}>Time</Text>
-                           
+
                           </View>
                         </View>
                       </TouchableOpacity>
 
-                    
+
                     </ScrollView>
                   </View>
                 </RBSheet>
@@ -348,9 +335,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginHorizontal: 'auto',
     paddingHorizontal: 20,
-      backgroundColor:'#efefef',
-      borderRadius:10
-   
+    backgroundColor: '#efefef',
+    borderRadius: 10
+
   },
   oddBackground: {
     backgroundColor: COLORS.white
@@ -378,14 +365,14 @@ const styles = StyleSheet.create({
   },
   userInfoContainer: {
     flexDirection: 'column',
-    maxWidth:"80%",
+    maxWidth: "80%",
   },
   fullName: {
     fontSize: 14,
     fontWeight: 'bold',
     color: COLORS.black,
     marginBottom: 4,
- 
+
   },
   lastMessage: {
     fontSize: 14,

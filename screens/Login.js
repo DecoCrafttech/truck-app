@@ -25,7 +25,8 @@ const Login = () => {
     const {
         isLoggedIn,
         setIsLoggedIn,
-        userStatesFromProfile
+        userStatesFromProfile,
+        setUserStatesFromProfile
     } = useContext(LoadNeedsContext)
 
     const navigation = useNavigation()
@@ -83,6 +84,26 @@ const Login = () => {
 
 
 
+  const getStates = async () => {
+    try {
+      const updateProfileParams = {
+        "user_id": `${await AsyncStorage.getItem("user_id")}`,
+      }
+
+      const res = await axiosInstance.post("/get_user_state_list", updateProfileParams)
+      if (res.data.error_code === 0) {
+        setUserStatesFromProfile(res.data.data[0].state_list)
+      } else {
+        console.log(res.data.message)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+
+
+
 
     const handleLogInClick = async (e) => {
         if (
@@ -114,7 +135,10 @@ const Login = () => {
                     await AsyncStorage.setItem("userName", `${response.data.data[0].first_name}`)
                     await AsyncStorage.setItem("user_id", `${response.data.data[0].id}`)
                     setIsLoggedIn(true);
+                    (async () => getStates())()
+
                     navigation.navigate('Main')
+
                 } else {
                     Toast.error(response.data.message)
                 }
