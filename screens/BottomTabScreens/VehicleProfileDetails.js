@@ -21,7 +21,7 @@ const VehicleProfileDetails = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [isInputValid, setIsInputValid] = useState(true);
-  const [pageLoaded, setPageLoaded] = useState(false)
+  const [pageLoading, setPageLoading] = useState(false)
   const [pageRefresh, setPageRefresh] = useState(false)
 
 
@@ -52,7 +52,7 @@ const VehicleProfileDetails = () => {
       if (response.data.error_code === 0) {
         setUsers(response.data.data[0].vehicle_data)
         setTimeout(() => {
-          setPageLoaded(true)
+          setPageLoading(true)
         }, 1000);
       } else {
         console.log(response.data.message)
@@ -201,7 +201,7 @@ const VehicleProfileDetails = () => {
         }} // Ensure text wraps
       />
       {
-        pageLoaded === false ?
+        pageLoading === false ?
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <ActivityIndicator size='large' color={COLORS.primary} />
           </View>

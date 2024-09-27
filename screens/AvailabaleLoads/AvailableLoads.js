@@ -73,6 +73,8 @@ const AvailableLoads = ({ navigation }) => {
   const [userToLocationStatesData, setUserToLocationStatesData] = useState({})
 
   const [sendMessageModal, setSendMessageModal] = useState(false)
+  const [pageLoading, setPageLoading] = useState(false)
+
 
 
 
@@ -129,10 +131,10 @@ const AvailableLoads = ({ navigation }) => {
   useEffect(() => {
     const getAllLoads = async () => {
       try {
+        setPageLoading(true)
+
         const response = await axiosInstance.get("/all_load_details");
-        console.log("loadresponse", response.data.data[3])
         if (response.data.error_code === 0) {
-          console.log("userStatesFromProfileLoadpage", userStatesFromProfile)
           const transformedData = response.data.data.map((item) => ({
             companyName: item.company_name,
             updatedTime: item.updt,
@@ -159,16 +161,24 @@ const AvailableLoads = ({ navigation }) => {
           }));
 
           setAllLoadData(transformedData);
+          setPageLoading(false)
+
         } else {
           console.error(
             "Error fetching all loads:",
             response.data.error_message
           );
+          setPageLoading(false)
+
         }
       } catch (error) {
         console.error("Error fetching all loads:", error);
+        setPageLoading(false)
+
       } finally {
         setisLoadings(false);
+        setPageLoading(false)
+
       }
     };
 
@@ -377,7 +387,6 @@ const AvailableLoads = ({ navigation }) => {
 
   const applyFilter = async () => {
 
-    console.log("modalValues", modalValues)
 
     const filterParams = {
       "company_name": "",
@@ -391,13 +400,12 @@ const AvailableLoads = ({ navigation }) => {
 
     }
     try {
-
-      console.log("filterParams", filterParams)
+      toggleModal(); // Close modal after applying filter
+      setPageLoading(true)
 
       const response = await axiosInstance.post("/user_load_details_filter", filterParams)
 
       if (response.data.error_code === 0) {
-        console.log(response.data)
         const transformedData = response.data.data.map((item) => ({
           companyName: item.company_name,
           updatedTime: item.updt,
@@ -420,21 +428,21 @@ const AvailableLoads = ({ navigation }) => {
             setSendMessageModal(true)
           }
         }));
-
         setAllLoadData(transformedData);
+        setPageLoading(false)
 
-        // setIsLoading(!isLoading)
-        toggleModal(); // Close modal after applying filter
       } else {
         console.error(
           "Error fetching all loads:",
           response.data.error_message
         );
+        setPageLoading(false)
       }
-
 
     } catch (err) {
       console.log(err)
+      setPageLoading(false)
+
     }
   };
 
@@ -519,7 +527,14 @@ const AvailableLoads = ({ navigation }) => {
           />
         </View>
         <SearchFilter onSearch={handleSearch} />
-        <LoadDetails navigation={navigation} filteredTrucks={filteredTrucks} />
+        {
+          pageLoading == false ? 
+          <LoadDetails navigation={navigation} filteredTrucks={filteredTrucks} />
+          :
+          <View style={styles.ActivityIndicatorContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+        }
       </View>
 
       {/* Filter Modal */}
@@ -606,7 +621,7 @@ const AvailableLoads = ({ navigation }) => {
 
             <TextInput
               style={[styles.input, errorFields.tons && styles.inputError]}
-              placeholder="Tons"
+              placeholder="Example: 2 tones"
               keyboardType="number-pad"
               value={modalValues.tons}
               onChangeText={(text) => handleInputChange('tons', text)}
@@ -803,6 +818,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginTop: 10,
   },
+  ActivityIndicatorContainer : {
+    flex : 1,
+    justifyContent:'center',
+  }, 
   modalContainer: {
     flex: 1,
     justifyContent: "center",

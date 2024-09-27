@@ -86,6 +86,8 @@ const AvailableTruck = ({ navigation }) => {
 
   const [fromLocationModal, setFromLocationModal] = useState(false)
   const [toLocationModal, setToLocationModal] = useState(false)
+  const [pageLoading, setPageLoading] = useState(false)
+
 
   useEffect(() => {
     if (timeLeft === 0) {
@@ -150,6 +152,8 @@ const AvailableTruck = ({ navigation }) => {
   useEffect(() => {
     const getAllTruckDetails = async () => {
       try {
+        setPageLoading(true)
+
         const response = await axiosInstance.get("/all_truck_details");
         if (response.data.error_code === 0) {
           const transformedData = response.data.data.map((item) => ({
@@ -179,16 +183,24 @@ const AvailableTruck = ({ navigation }) => {
           }));
 
           setGetTruckData(transformedData);
+          setPageLoading(false)
+
         } else {
           console.error(
             "Error fetching all loads:",
             response.data.error_message
           );
+          setPageLoading(false)
+
         }
       } catch (error) {
         console.error("Error fetching all loads:", error);
+        setPageLoading(false)
+
       } finally {
         setisLoadings(false); // Set loading to false after fetch completes
+        setPageLoading(false)
+
       }
     };
 
@@ -384,6 +396,8 @@ const AvailableTruck = ({ navigation }) => {
     }
 
     try {
+      toggleModal(); // Close modal after applying filter
+      setPageLoading(true)
 
 
       const response = await axiosInstance.post("/user_truck_details_filter", filterParams)
@@ -414,15 +428,19 @@ const AvailableTruck = ({ navigation }) => {
           }
         }));
         setGetTruckData(transformedData);
-        toggleModal(); // Close modal after applying filter
+        setPageLoading(false)
       } else {
         console.error(
           "Error fetching all loads:",
           response.data.error_message
         );
+        setPageLoading(false)
+
       }
     } catch (err) {
       console.log(err)
+      setPageLoading(false)
+
     }
   };
 
@@ -532,7 +550,14 @@ const AvailableTruck = ({ navigation }) => {
           />
         </View>
         <SearchFilter onSearch={handleSearch} />
-        <TruckDetails navigation={navigation} filteredTrucks={filteredTrucks} />
+        {
+          pageLoading === false ?
+            <TruckDetails navigation={navigation} filteredTrucks={filteredTrucks} />
+            :
+            <View style={styles.ActivityIndicatorContainer}>
+              <ActivityIndicator size="large" color={COLORS.primary} />
+            </View>
+        }
       </View>
       <Modal
         animationType="slide"
@@ -613,13 +638,55 @@ const AvailableTruck = ({ navigation }) => {
               />
             </View>
 
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({ ...modalValues, truckName: value })}
+                items={brandData}
+                value={modalValues.truckName}
+                placeholder={{
+                  label: 'Select brand name',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({ ...modalValues, truckBodyType: value })}
+                items={bodyTypeData}
+                value={modalValues.truckBodyType}
+                placeholder={{
+                  label: 'Select truck body type',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({ ...modalValues, noOfTyres: value })}
+                items={numberOfTyresData}
+                value={modalValues.noOfTyres}
+                placeholder={{
+                  label: 'Select number of tyres',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
             <TextInput
               style={[styles.input, errorFields.tons && styles.inputError]}
-              placeholder="Tons"
+              placeholder="Example: 2 tones"
               keyboardType="number-pad"
               value={modalValues.tons}
               onChangeText={(text) => handleInputChange("tons", text)}
             />
+
+
 
 
 
@@ -647,45 +714,11 @@ const AvailableTruck = ({ navigation }) => {
               onChangeText={(text) => handleInputChange("truckBodyType", text)}
             /> */}
 
-            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
-              <RNPickerSelect
-                onValueChange={(value) => setModalValues({ ...modalValues, truckName: value })}
-                items={brandData}
-                value={modalValues.truckName}
-                placeholder={{
-                  label: 'Select truck name',
-                  value: null,
-                  color: 'grey',
-                }}
-              />
-            </View>
-
-            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
-              <RNPickerSelect
-                onValueChange={(value) => setModalValues({ ...modalValues, truckBodyType: value })}
-                items={bodyTypeData}
-                value={modalValues.truckBodyType}
-                placeholder={{
-                  label: 'Select truck body type',
-                  value: null,
-                  color: 'grey',
-                }}
-              />
-            </View>
 
 
-            <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
-              <RNPickerSelect
-                onValueChange={(value) => setModalValues({ ...modalValues, noOfTyres: value })}
-                items={numberOfTyresData}
-                value={modalValues.noOfTyres}
-                placeholder={{
-                  label: 'Select number of tyres',
-                  value: null,
-                  color: 'grey',
-                }}
-              />
-            </View>
+
+
+
 
 
 
@@ -870,6 +903,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 15,
     marginTop: 10,
+  },
+  ActivityIndicatorContainer: {
+    flex: 1,
+    justifyContent: 'center',
   },
   centeredContainer: {
     flex: 1,

@@ -37,7 +37,6 @@ const VaughanInfo = ({ navigation }) => {
         const response = await axiosInstance.post("/user_load_trip_details", {
           user_id: await AsyncStorage.getItem("user_id"),
         });
-        console.log(response.data);
         if (response.data.error_code === 0) {
           setExpenses(response.data.data);
         }

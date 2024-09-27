@@ -32,6 +32,7 @@ const Refer = () => {
   const [feedbackModalVisible, setFeedbackModalVisible] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [editedDetails, setEditedDetails] = useState(null);
+  const [buyAndSellRefresh, setBuyAndSellRefresh] = useState(false)
 
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
@@ -309,6 +310,11 @@ const Refer = () => {
     fetchData("user_load_details"); // Trigger fetchData when selectedValue changes
   }, []);
 
+  // useEffect(() => {
+  //   setSelectedValue("user_buy_sell_details")
+  //   fetchData("user_buy_sell_details"); // Trigger fetchData when selectedValue changes
+  // }, [buyAndSellRefresh]);
+
 
   const fetchData = async (selectedValue) => {
     setLoading(true);
@@ -397,7 +403,6 @@ const Refer = () => {
             break;
 
           case "user_buy_sell_details":
-            console.log("marketplaceData", response.data)
             setAllLoadData(response.data.data);
             break;
           default:
@@ -442,7 +447,7 @@ const Refer = () => {
               <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
           ) : selectedValue === "user_buy_sell_details" ? (
-            <MarketPlace allData={allLoadData} editedDetails={editedDetails} />
+            <MarketPlace allData={allLoadData} editedDetails={editedDetails} fetchData={fetchData}   />
           ) : (
             <LoadDetails
               filteredTrucks={allLoadData}

@@ -78,7 +78,6 @@ const DriverNeeds = () => {
 
 
         const response = await axiosInstance.post("/get_user_vehicle_list", vehicleListParams);
-        // console.log(response.data.data[0].vehicle_list)
         if (response.data.error_code === 0) {
           setVehicleListData(
             response.data.data[0].vehicle_list.map((value, index) => ({

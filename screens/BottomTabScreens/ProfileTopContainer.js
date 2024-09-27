@@ -69,7 +69,7 @@ const ProfileTopContainer = () => {
 
 
 
-    const [pageLoaded, setPageLoaded] = useState(false)
+    const [pageLoading, setPageLoading] = useState(false)
     const [pageRefresh, setPageRefresh] = useState(false)
     // update states
     const [updatedName, setUpdatedName] = useState("");
@@ -108,7 +108,7 @@ const ProfileTopContainer = () => {
             const response = await axios.post("https://truck.truckmessage.com/get_user_profile", getUserProfileParams)
             if (response.data.error_code === 0) {
                 setTimeout(() => {
-                    setPageLoaded(true)
+                    setPageLoading(true)
                 }, 2000);
                 setName(response.data.data[1].name)
                 setMobile(response.data.data[1].phone_number)
@@ -134,7 +134,6 @@ const ProfileTopContainer = () => {
           
             const res = await axiosInstance.post("/get_user_state_list", updateProfileParams)
             if (res.data.error_code === 0) {
-                console.log("res.data.data[0].state_list",res.data.data[0].state_list)
                 setUserStates(res.data.data[0].state_list)
                 setUserStatesFromProfile(res.data.data[0].state_list)
             } else {
@@ -410,7 +409,7 @@ const ProfileTopContainer = () => {
 
             <View style={styles.header}>
                 {
-                    pageLoaded ?
+                    pageLoading ?
                         <>
                             <TouchableOpacity style={styles.editIcon} onPress={() => handleEditPress()}>
                                 <Feather name="edit" size={24} color="black" />

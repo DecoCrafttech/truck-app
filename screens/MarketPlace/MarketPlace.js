@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Text,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants";
@@ -65,21 +66,30 @@ const MarketPlace = ({ navigation }) => {
   const [timeLeft, setTimeLeft] = useState(null);
 
   const [locationModal, setLocationModal] = useState(false)
+  const [pageLoading, setPageLoading] = useState(false)
 
 
   useEffect(() => {
     const getMarketPlaceProducts = async () => {
       try {
+        setPageLoading(true)
         const response = await axiosInstance.get("/all_buy_sell_details");
         if (response.data.error_code === 0) {
           setMarketPlaceProducts(response.data.data);
+          setPageLoading(false)
         } else {
           console.log(response.data.message);
+          setPageLoading(false)
+
         }
       } catch (error) {
         console.log(error);
+        setPageLoading(false)
+
       } finally {
         setLoading(false);
+        setPageLoading(false)
+
       }
     };
 
@@ -257,23 +267,29 @@ const MarketPlace = ({ navigation }) => {
 
 
     try {
+      toggleModal(); // Close modal after applying filter
+      setPageLoading(true)
 
-      console.log("filterParams",filterParams)
 
       const response = await axiosInstance.post("/user_buy_sell_filter", filterParams)
       if (response.data.error_code === 0) {
         setMarketPlaceProducts(response.data.data)
-        toggleModal(); // Close modal after applying filter
+        setPageLoading(false)
+
 
       } else {
         console.error(
           "Error fetching all loads:",
           response.data.error_message
         );
+        setPageLoading(false)
+
       }
 
     } catch (err) {
       console.log(err)
+      setPageLoading(false)
+
     }
 
   };
@@ -445,13 +461,20 @@ const MarketPlace = ({ navigation }) => {
           />
         </View>
         <SearchFilter onSearch={handleSearch} />
-        <MarketPlaceProducts
-          navigation={navigation}
-          searchQuery={searchQuery}
-          onPressCategory={onPressCategory}
-          filteredProducts={filteredProducts.reverse()}
-          loading={loading}
-        />
+        {
+          pageLoading === false ?
+            <MarketPlaceProducts
+              navigation={navigation}
+              searchQuery={searchQuery}
+              onPressCategory={onPressCategory}
+              filteredProducts={filteredProducts.reverse()}
+              loading={loading}
+            />
+            :
+            <View style={styles.ActivityIndicatorContainer}>
+              <ActivityIndicator size="large" color={COLORS.primary} />
+            </View>
+        }
       </View>
 
       <Modal
@@ -468,13 +491,15 @@ const MarketPlace = ({ navigation }) => {
                 <AntDesign name="close" size={18} color="black" />
               </Text> */}
             </View>
+
+
             <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
-                onValueChange={(value) => setModalValues({ ...modalValues, kmsDriven: value })}
-                items={kmsData}
-                value={modalValues.kmsDriven}
+                onValueChange={(value) => setModalValues({ ...modalValues, model: value })}
+                items={yearsData}
+                value={modalValues.model}
                 placeholder={{
-                  label: 'KMS Driven',
+                  label: 'Model',
                   value: null,
                   color: 'grey',
                 }}
@@ -494,18 +519,47 @@ const MarketPlace = ({ navigation }) => {
               />
             </View>
 
+            <TextInput
+              style={[styles.input, errorFields.location && styles.inputError, { fontSize: 16, borderColor: COLORS.gray, borderWidth: 1, paddingLeft: 17, borderRadius: 5, height: 55, marginBottom: 10 }]}
+              placeholder="Search location"
+              placeholderTextColor="#c2c2c2"
+              value={modalValues.location}
+              // onChangeText={(text) => handleInputChange("location", text)}
+              onPress={() => {
+                setLocationModal(true);
+              }}
+            />
+
             <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
-                onValueChange={(value) => setModalValues({ ...modalValues, model: value })}
-                items={yearsData}
-                value={modalValues.model}
+                onValueChange={(value) => setModalValues({ ...modalValues, ton: value })}
+                items={tonsData}
+                value={modalValues.ton}
                 placeholder={{
-                  label: 'Model',
+                  label: 'Select ton',
                   value: null,
                   color: 'grey',
                 }}
               />
             </View>
+
+
+            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+              <RNPickerSelect
+                onValueChange={(value) => setModalValues({ ...modalValues, kmsDriven: value })}
+                items={kmsData}
+                value={modalValues.kmsDriven}
+                placeholder={{
+                  label: 'KMS Driven',
+                  value: null,
+                  color: 'grey',
+                }}
+              />
+            </View>
+
+
+
+
 
             <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
@@ -548,30 +602,9 @@ const MarketPlace = ({ navigation }) => {
               />
             </View>
 
-            <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
-              <RNPickerSelect
-                onValueChange={(value) => setModalValues({ ...modalValues, ton: value })}
-                items={tonsData}
-                value={modalValues.ton}
-                placeholder={{
-                  label: 'Select ton',
-                  value: null,
-                  color: 'grey',
-                }}
-              />
-            </View>
 
 
-            <TextInput
-              style={[styles.input, errorFields.location && styles.inputError, { fontSize: 16, borderColor: COLORS.gray, borderWidth: 1, paddingLeft: 17, borderRadius: 5, height: 55, marginBottom: 10 }]}
-              placeholder="Search location"
-              placeholderTextColor="#c2c2c2"
-              value={modalValues.location}
-              // onChangeText={(text) => handleInputChange("location", text)}
-              onPress={() => {
-                setLocationModal(true);
-              }}
-            />
+
 
             <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
               <Text style={styles.applyButtonText}>Apply filter</Text>
@@ -707,6 +740,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
 
   },
+  ActivityIndicatorContainer : {
+    flex : 1,
+    justifyContent:'center',
+  },  
   modalContainer: {
     flex: 1,
     justifyContent: "center",

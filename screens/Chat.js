@@ -35,7 +35,6 @@ const Chat = () => {
   const [chatMessageLoading, setChatMessageLoading] = useState(false)
 
 
-  console.log("messageReceiver",messageReceiver)
 
 
   useEffect(() => {
@@ -150,7 +149,7 @@ const Chat = () => {
     // if (messageReceiver && currentUser) {
 
     // }
-  }, [messageReceiver, currentUser]);
+  }, [messageReceiver, currentUser, chatMessagesRefresh]);
 
   const handleInputText = (text) => setInputMessage(text);
 

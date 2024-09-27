@@ -123,6 +123,10 @@ const SellYourTruck = () => {
     });
 
     try {
+
+
+      console.log("formdata",formData)
+
       const response = await axiosInstance.post("/truck_buy_sell", formData, {
         headers: {
           'Content-Type': 'multipart/form-data',

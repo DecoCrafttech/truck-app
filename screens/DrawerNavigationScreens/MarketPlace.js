@@ -18,11 +18,12 @@ import axiosInstance from "../../services/axiosInstance";
 import RNPickerSelect from 'react-native-picker-select';
 import Feather from '@expo/vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
 
-const MarketPlace = ({ navigation, allData, editedDetails }) => {
+const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setBuyAndSellRefresh,fetchData }) => {
   const [editItem, setEditItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [pageRefresh, setPageRefresh] = useState(false)
@@ -39,6 +40,8 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
     images: [],
     userId: "",
     brand: "",
+    bodyType: "",
+    noOfTyres : "",
     buySellId: "",
     contact_no: "",
     description: "",
@@ -104,6 +107,15 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
     { label: '90,00,001 and above lakhs', value: '(90,00,001 and above) lakhs' }
   ];
 
+  const bodyTypeData = [
+    { label: 'Open body', value: 'open_body' },
+    { label: 'Container', value: 'container' },
+    { label: 'Trailer', value: 'trailer' },
+    { label: 'Tanker', value: 'tanker' },
+    { label: 'Tipper', value: 'tipper' },
+    { label: 'LCV', value: 'lcv' },
+  ];
+
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 40 }, (_, index) => {
@@ -122,13 +134,18 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
 
 
 
-  const handleEditPress = (item) => {
+  const handleEditPress =async(item) => {
     setEditItem(item);
     setEditedData({
+      id : item.buy_sell_id,
+      userId: await AsyncStorage.getItem("user_id"),
+      buySellId : item.buy_sell_id,
       images: item.images,
       vehicleNumber: item.vehicle_number,
       brand: item.brand,
       model: item.model,
+      bodyType: item.truck_body_type,
+      noOfTyres  : item.no_of_tyres,
       kms_driven: item.kms_driven,
       location: item.location,
       owner_name: item.owner_name,
@@ -233,6 +250,7 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
 
   };
 
+
   const saveChanges = async () => {
 
     // const requiredParams = {
@@ -252,11 +270,22 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
 
 
     const formData = new FormData();
-    formData.append('truck_image1', {
-      uri: Platform.OS === 'ios' ? updateImage.replace('file://', '') : updateImage,
-      type: 'image/jpeg', // Adjust if you are dealing with different image types
-      name: 'truck_image1',
+
+    // Append images to FormData
+    editedData.images.forEach((image, index) => {
+      formData.append(`truck_image${index + 1}`, {
+        uri: image.uri,
+        type: 'image/jpeg', // Adjust accordingly if different image types
+        name: `truck_image_${index + 1}.jpg`, // Use a unique name for the image
+      });
     });
+
+    // formData.append('truck_image1', {
+    //   uri: Platform.OS === 'ios' ? updateImage.replace('file://', '') : updateImage,
+    //   type: 'image/jpeg', // Adjust if you are dealing with different image types
+    //   name: 'truck_image1',
+    // });
+
     formData.append("user_id", editedData.userId)
     formData.append("brand", editedData.brand)
     formData.append("buy_sell_id", editedData.buySellId)
@@ -270,8 +299,9 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
     formData.append("price", editedData.price)
     formData.append("tonnage", editedData.ton)
     formData.append("vehicle_number", editedData.vehicleNumber)
-
-    try {
+    formData.append("truck_body_type", editedData.bodyType)
+    formData.append("no_of_tyres", editedData.noOfTyres)
+    try {   
       const response = await axiosInstance.post("/truck_buy_sell", formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -280,9 +310,9 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
       console.log(response.data)
       setPageRefresh(!pageRefresh)
 
-      // Implement save changes logic here
-      alert("Saving changes...");
       setModalVisible(false);
+      fetchData("user_buy_sell_details")
+
     } catch (error) {
       console.log(error)
     }
@@ -303,6 +333,10 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
             <View style={styles.tableRow}>
               <Text style={styles.tableLabel}>Model:</Text>
               <Text style={styles.tableValue}>{item.model}</Text>
+            </View>
+            <View style={styles.tableRow}>
+              <Text style={styles.tableLabel}>Body type:</Text>
+              <Text style={styles.tableValue}>{item.truck_body_type}</Text>
             </View>
             <View style={styles.tableRow}>
               <Text style={styles.tableLabel}>Kms Driven:</Text>
@@ -426,6 +460,7 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
               </View>
 
 
+
               {/* <TextInput
               style={styles.input}
               placeholder="Model"
@@ -439,6 +474,19 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
                   value={editedData.model}
                   placeholder={{
                     label: 'Select model',
+                    color: 'grey',
+                  }}
+                />
+              </View>
+
+
+              <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
+                <RNPickerSelect
+                  onValueChange={(value) => setEditedData({ ...editedData, bodyType: value })}
+                  items={bodyTypeData}
+                  value={editedData.bodyType}
+                  placeholder={{
+                    label: 'Select body type',
                     color: 'grey',
                   }}
                 />
@@ -530,7 +578,6 @@ const MarketPlace = ({ navigation, allData, editedDetails }) => {
                     return (
                       <View key={index}>
                         <Image
-
                           source={{ uri: `${image}` }}
                           style={styles.image}
                           width={80}
