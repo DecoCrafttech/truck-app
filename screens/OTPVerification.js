@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, Button, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Button, ScrollView, Alert } from 'react-native';
 import React, { useContext, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, FONTS, images, SIZES } from '../constants/index.js';
@@ -27,6 +27,7 @@ const OTPVerification = () => {
 
 
     const resendClick = async () => {
+        Alert.alert("OTP status","OTP sent successfully")
         const resendParams = {
             phone_number: await AsyncStorage.getItem("mobileNumber")
         }
@@ -34,9 +35,7 @@ const OTPVerification = () => {
             await axios.post("https://truck.truckmessage.com/send_signup_otp", resendParams)
                 .then((response) => {
                     if (response.data.error_code === 0) {
-
-
-                        Toast.success(response.data.message)
+                       console.log(response.data.message)
                     } else {
                         Toast.error(response.data.message)
                     }
@@ -83,35 +82,32 @@ const OTPVerification = () => {
 
 
     return (
-        <ScrollView >
+        <ScrollView style={{   backgroundColor:'#fff'}}>
             <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white, justifyContent: 'center', alignItems: 'center' }}>
-            <Container
+                <Container
                     position="top"
                     duration={3000}
                     animationIn="slideInDown"
                     height="auto"
                     width="100%"
-                    textStyle={{ 
-                        fontSize: 15,  
+                    textStyle={{
+                        fontSize: 15,
                         flexWrap: 'wrap', // Ensure text wraps
                         maxWidth: '90%', // Ensure text does not overflow
-                        overflow: 'hidden', }} // Ensure text wraps
+                        overflow: 'hidden',
+                    }} // Ensure text wraps
                 />
                 <View style={{ flex: 1, backgroundColor: COLORS.white, padding: 16, alignItems: 'center' }}>
                     {/* <StatusBar hidden /> */}
-                    <Image
-                        source={{ uri: "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png" }}
-                        resizeMode='contain'
-                        style={{
-                            width: SIZES.width * 0.4,
-                            height: SIZES.width * 0.8,
-
-                            marginBottom: 16,
-                        }}
-                    />
+                    <View style={styles.avatarContainer}>
+                            <Image
+                                style={styles.avatar}
+                                source={{ uri: "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png" }}
+                            />
+                        </View>
                     <Text style={{ fontSize: 20, marginBottom: 15, fontWeight: '900' }}>Enter Verification Code</Text>
-                    <Text style={{ ...FONTS.h6, marginBottom: 5, }}>We are automatically detecting SMS</Text>
-                    <Text style={{ ...FONTS.h6, marginBottom: 10, }}>send to your phone number</Text>
+                    {/* <Text style={{ ...FONTS.h6, marginBottom: 5, }}>We are automatically detecting SMS</Text>
+                    <Text style={{ ...FONTS.h6, marginBottom: 10, }}>send to your phone number</Text> */}
                     <View style={{ marginVertical: 15, width: SIZES.width - 72 }}>
                         <OtpInput
 
@@ -156,11 +152,30 @@ const OTPVerification = () => {
                         />
                     </View> */}
 
-                    <View style={{ paddingBottom: 120 }}>
+                    <View style={{ paddingBottom: 20 }}>
                         <TouchableOpacity style={styles.buttonContainer} onPress={verifyOTPFunction}>
                             <Text style={styles.buttonText}>Verify</Text>
                         </TouchableOpacity>
                     </View>
+
+                    <View style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                marginTop: 10,
+                                justifyContent: 'center',
+                                paddingBottom: 80 
+                            }}>
+                                <Text style={{ textAlign: 'center' }}>
+                                    Registered user?{" "}
+                                </Text>
+                                <TouchableOpacity>
+                                    <Text
+                                        style={{ color: '#4285F4', fontWeight: 'bold', textDecorationLine: 'underline' }}
+                                        onPress={() => navigation.navigate('Login')}
+                                    > Log in</Text>
+                                </TouchableOpacity>
+                            </View>
+
 
                 </View>
             </SafeAreaView>
@@ -174,6 +189,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+     
     },
     btn: {
         backgroundColor: 'brown',
@@ -198,6 +214,14 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: 'center',
         fontWeight: "bold"
+    },
+    avatarContainer: {
+        marginTop: 30,
+        alignItems: 'center',
+    },
+    avatar: {
+        width: 180,
+        height: 180,
     },
 })
 

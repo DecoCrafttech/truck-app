@@ -277,7 +277,7 @@ const ProfileTopContainer = () => {
             } else {
                 console.log(res.data.message)
             }
-        } catch (err) {
+        } catch (err) {r
             console.log(err)
         }
     };

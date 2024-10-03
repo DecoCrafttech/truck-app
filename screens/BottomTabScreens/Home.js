@@ -193,8 +193,6 @@ const Home = () => {
                         />
                       </View> */}
                       <TouchableOpacity
-
-                        onPress=""
                         style={[
                           styles.userContainer,
 
@@ -215,7 +213,7 @@ const Home = () => {
 
                         }}>
                           <View style={styles.userInfoContainer}>
-                            <Text style={styles.fullName}>FullNameFullName</Text>
+                            <Text style={styles.fullName}>FullName</Text>
                             {/* <Text style={styles.lastMessage}>{item.lastMessage}</Text> */}
                             <Text style={styles.lastMessage}>LastMessage</Text>
                           </View>
@@ -267,7 +265,7 @@ const Home = () => {
                   <View>
                     <ScrollView>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={{ fontSize: 18, fontWeight: "700", marginBottom: 18, color: COLORS.primary }}>Add States</Text>
+                        <Text style={{ fontSize: 18, fontWeight: "700", marginBottom: 18, color: COLORS.primary }}>Add your Operating States</Text>
                         <Text
                           style={{ fontSize: 18, fontWeight: "700", marginBottom: 18, color: COLORS.primary }}
                           onPress={() => {

@@ -403,7 +403,7 @@ const VaughanInfo = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "lightgrey",
+    backgroundColor: "#fff",
     marginTop: 10,
   },
   card: {

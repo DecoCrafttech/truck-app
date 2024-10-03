@@ -206,8 +206,8 @@ const SignUp = () => {
 
             const signupParams = {
                 first_name: inputs.name,
-                date_of_birth: `${inputs.dob.toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-')}`,
-                // date_of_birth: "1996-11-14" ,
+                // date_of_birth: `${inputs.dob.toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').map((part, index) => index === 0 ? part : part.padStart(2, '0')).join('-')}`,
+                date_of_birth: `${inputs.dob.toISOString().split('T')[0]}`,
                 phone_number: inputs.mobileNumber,
                 email: inputs.email,
                 category: category,
@@ -219,6 +219,8 @@ const SignUp = () => {
 
             try {
 
+
+                console.log("signupParams",signupParams)
 
 
                 const response = await axiosInstance.post("/registration", signupParams)

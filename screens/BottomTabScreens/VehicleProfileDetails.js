@@ -59,7 +59,7 @@ const VehicleProfileDetails = () => {
       }
     }
     (async () => getProfilePage())()
-  }, [isLoading, pageRefresh])
+  }, [isLoading, pageRefresh,pageLoading])
 
 
 
@@ -97,6 +97,7 @@ const VehicleProfileDetails = () => {
     //   setIsInputValid(false);
     //   return;
     // }
+    setPageLoading(true)
 
     const addTruckParams = {
       user_id: await AsyncStorage.getItem("user_id"),
@@ -112,6 +113,8 @@ const VehicleProfileDetails = () => {
         setModalVisible(false);
         setVehicleNumber("");
         setIsInputValid(true);
+        setPageLoading(false)
+
         setIsLoading(!isLoading)
 
       } else {
@@ -309,7 +312,10 @@ const VehicleProfileDetails = () => {
                     {!isInputValid && (
                       <Text style={styles.errorText}>Please enter a valid vehicle number</Text>
                     )}
+                    <View style={{display:'flex',flexDirection:'row',justifyContent:'space-around',gap:20}}>
+                    <Button title="Cancel" onPress={() => setModalVisible(false)} />
                     <Button title="Submit" onPress={handleSubmit} />
+                    </View>
                   </View>
                 </View>
               </Modal>
