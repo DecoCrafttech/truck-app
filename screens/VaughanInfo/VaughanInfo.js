@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  Image,
 } from "react-native";
 import axiosInstance from "../../services/axiosInstance";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
@@ -17,13 +18,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Entypo from '@expo/vector-icons/Entypo';
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Constants from 'expo-constants'
+import DeleteModal from "../DeleteModal";
 
 
 
 
 const VaughanInfo = ({ navigation }) => {
 
-  
+
+    // cdn link
+    const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK 
+
+
   // google api key
   const googleApiKey = Constants.expoConfig?.extra?.REACT_APP_GOOGLE_PLACES_KEY
 
@@ -34,6 +40,9 @@ const VaughanInfo = ({ navigation }) => {
 
   const [fromLocationModal, setFromLocationModal] = useState(false)
   const [toLocationModal, setToLocationModal] = useState(false)
+
+  const [deleteModal, setDeleteModal] = useState(false)
+  const [deleteItem, setDeleteItem] = useState({})
 
   useEffect(() => {
     const getLoadTripExpenseDetails = async () => {
@@ -63,7 +72,10 @@ const VaughanInfo = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.deleteButton}
-          onPress={() => handleDeleteTrip(item)}
+          onPress={() => {
+            setDeleteModal(true)
+            setDeleteItem(item)
+          }}
         >
           <Text style={styles.buttonText}>Delete</Text>
         </TouchableOpacity>
@@ -253,6 +265,17 @@ const VaughanInfo = ({ navigation }) => {
     setToLocationModal(false)
   };
 
+
+  const handleYes = () => {
+    setDeleteModal(false);
+    handleDeleteTrip(deleteItem)
+  };
+
+  const handleCancel = () => {
+    setDeleteModal(false);
+  };
+
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -262,11 +285,27 @@ const VaughanInfo = ({ navigation }) => {
           <TouchableOpacity style={styles.addButton} onPress={toggleModal}>
             <Text style={styles.addButtonText}>Add Trip Details</Text>
           </TouchableOpacity>
-          <FlatList
-            data={expense}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
+          {
+            expense.length === 0 ?
+            <View style={styles.noResultContainer}>
+            <View>
+              <Image
+                 source={{ uri: `${cdnLink}/Folder_empty.png` }}
+                width={50}
+                height={50}
+                resizeMode="center"
+              />
+            </View>
+            <Text style={styles.noResultsText}>No records</Text>
+
+          </View>
+              :
+              <FlatList
+                data={expense}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id.toString()}
+              />
+          }
         </View>
       </View>
 
@@ -390,6 +429,17 @@ const VaughanInfo = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+      </Modal>
+
+
+      {/* Delete Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={deleteModal}
+        onRequestClose={() => setDeleteModal(false)}
+      >
+        <DeleteModal handleYes={handleYes} handleCancel={handleCancel} />
       </Modal>
 
 
@@ -562,6 +612,20 @@ const styles = StyleSheet.create({
   locationTextInput: {
     borderWidth: 1,
     borderColor: COLORS.gray,
+  },
+  noResultContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex:1
+
+  },
+  noResultsText: {
+    textAlign: "center",
+    marginTop: -90,
+    marginBottom: 30,
+    color: "grey",
+    fontSize: 16,
   },
 });
 

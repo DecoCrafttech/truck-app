@@ -20,6 +20,8 @@ import MarketPlace from "./MarketPlace";
 import EditLoadModal from "./EditModal";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 
 const Refer = () => {
 
@@ -176,8 +178,8 @@ const Refer = () => {
         "tone": editedDetails.ton,
         "truck_body_type": editedDetails.truckBodyType,
         "truck_brand_name": editedDetails.truckBrandName,
-        "truck_id" : editedDetails.truckId,
-        "truck_name" : editedDetails.truckName,
+        "truck_id": editedDetails.truckId,
+        "truck_name": editedDetails.truckName,
         "updt": editedDetails.updatedTime,
         "user_id": editedDetails.userId,
         "user_post": editedDetails.userPost,
@@ -232,7 +234,7 @@ const Refer = () => {
   const handleSubmit = () => {
     const { item, type, selected } = feedbackModalData;
 
-    if (showFeedbackInput) {
+    if (!showFeedbackInput) {
       if (feedback.trim() === "") {
         Alert.alert("Error", "Please enter your feedback");
       } else {
@@ -334,7 +336,7 @@ const Refer = () => {
               companyName: item.company_name,
               contactNumber: item.contact_number,
               truckBodyType: item.truck_body_type,
-              updatedTime : item.updt,
+              updatedTime: item.updt,
               title: item.company_name,
               fromLocation: item.from_location,
               toLocation: item.to_location,
@@ -359,7 +361,7 @@ const Refer = () => {
               title: item.driver_name,
               fromLocation: item.from_location,
               toLocation: item.to_location,
-              updatedTime : item.updt,
+              updatedTime: item.updt,
               labels: [
                 { icon: "directions-bus", text: item.vehicle_number },
                 { icon: "attractions", text: item.no_of_tyres },
@@ -376,7 +378,7 @@ const Refer = () => {
           case "user_truck_details":
             setAllLoadData([]);
             const transformedAllTruckData = response.data.data.map((item) => ({
-              updatedTime : item.updt,
+              updatedTime: item.updt,
               companyName: item.company_name,
               title: item.company_name,
               fromLocation: item.from_location,
@@ -418,6 +420,14 @@ const Refer = () => {
   };
 
 
+  const [rating, setRating] = useState(0); // Default rating
+
+  // Function to handle star press
+  const handleStarPress = (star) => {
+    setRating(star);
+  };
+
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -442,7 +452,7 @@ const Refer = () => {
               <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
           ) : selectedValue === "user_buy_sell_details" ? (
-            <MarketPlace allData={allLoadData} editedDetails={editedDetails} fetchData={fetchData}   />
+            <MarketPlace allData={allLoadData} editedDetails={editedDetails} fetchData={fetchData} />
           ) : (
             <LoadDetails
               filteredTrucks={allLoadData}
@@ -477,7 +487,8 @@ const Refer = () => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.header}>
-                Did you post the {feedbackType} details using this platform?
+                {/* Did you post the {feedbackType} details using this platform? */}
+                Did you get leads using this platform?
               </Text>
 
               <View style={styles.buttonContainer}>
@@ -502,16 +513,37 @@ const Refer = () => {
               </View>
 
               {showFeedbackInput ? (
-                <View style={styles.inputContainer}>
-                  <Text style={styles.label}>Mobile Number:</Text>
-                  <TextInput
-                    style={styles.input}
-                    keyboardType="phone-pad"
-                    value={mobileNumber}
-                    onChangeText={(text) => setMobileNumber(text)}
-                    placeholder="Enter your mobile number"
-                  />
-                </View>
+                <>
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Mobile Number:</Text>
+                    <TextInput
+                      style={styles.input}
+                      keyboardType="phone-pad"
+                      value={mobileNumber}
+                      onChangeText={(text) => setMobileNumber(text)}
+                      placeholder="Enter your mobile number"
+                    />
+                  </View>
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Ratings</Text>
+                    <View style={styles.starContainer}>
+                      {/* Render 5 stars */}
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <TouchableOpacity
+                          key={star}
+                          onPress={() => handleStarPress(star)}
+                        >
+                          <Ionicons
+                            name={star <= rating ? "star" : "star-outline"} // Filled or outlined star
+                            size={32}
+                            color="#ffd700" // Gold color for stars
+                            style={styles.star}
+                          />
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                </>
               ) : (
                 <View style={styles.inputContainer}>
                   <Text style={styles.label}>Feedback:</Text>
@@ -639,6 +671,14 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: COLORS.white,
     fontSize: 16,
+  },
+  starContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 20,
+  },
+  star: {
+    marginHorizontal: 5,
   },
 });
 

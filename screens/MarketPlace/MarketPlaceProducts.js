@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingTop: 10,
-
+flex:1
   },
   noProductsText: {
     textAlign: "center",
@@ -237,11 +237,10 @@ const styles = StyleSheet.create({
     marginTop: 50,
     alignItems: 'center',
     justifyContent: 'center',
-
+flex:1
   },
   noResultsText: {
     textAlign: "center",
-    marginTop: -90,
     marginBottom: 30,
     color: "grey",
     fontSize: 16,

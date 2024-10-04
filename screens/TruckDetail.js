@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
+  Modal,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderWithOutBS from "../components/HeaderWithOutBS";
@@ -17,6 +18,7 @@ import { LoadNeedsContext } from "../hooks/LoadNeedsContext";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from "react-native-vector-icons/MaterialIcons";
 import AntDesign from '@expo/vector-icons/AntDesign';
+import SendMessageModal from "./SendMessageModal";
 
 
 
@@ -36,6 +38,9 @@ const TruckDetail = ({ route }) => {
   });
 
   const [formattedTime, setFormattedTime] = useState("")
+
+  const [sendMessageModal, setSendMessageModal] = useState(false)
+
 
 
   useEffect(() => {
@@ -127,6 +132,16 @@ const TruckDetail = ({ route }) => {
     setMessageReceiver(fullProductDetails)
     navigation.navigate("Chat")
   }
+
+
+  const handleYes = () => {
+    setSendMessageModal(false);
+    navigation.navigate("Chat")
+  };
+
+  const handleCancel = () => {
+    setSendMessageModal(false);
+  };
 
 
 
@@ -286,7 +301,7 @@ const TruckDetail = ({ route }) => {
             <View style={[styles.cardContent, { paddingBottom: 30 }]}>
               <TouchableOpacity
                 style={styles.shareButton}
-                onPress={() => handleChatNavigate()}
+                onPress={() => setSendMessageModal(true)}
               >
                 <Text style={styles.shareButtonText}>Message</Text>
               </TouchableOpacity>
@@ -296,6 +311,17 @@ const TruckDetail = ({ route }) => {
           </View>
         </ScrollView>
       </View>
+
+      {/* Send Message Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={sendMessageModal}
+        onRequestClose={() => setSendMessageModal(false)}
+      >
+        <SendMessageModal handleYes={handleYes} handleCancel={handleCancel} />
+      </Modal>
+
     </SafeAreaView>
   );
 };

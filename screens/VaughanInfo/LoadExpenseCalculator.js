@@ -27,12 +27,10 @@ const LoadExpenseCalculator = ({ route }) => {
     name: "",
     category: "",
     amount: "",
-    details: "",
   });
   const [errorFields, setErrorFields] = useState({
     name: false,
     amount: false,
-    details: false,
   });
 
   const toggleModal = (cash) => {
@@ -41,12 +39,10 @@ const LoadExpenseCalculator = ({ route }) => {
     setModalValues({
       name: "",
       amount: "",
-      details: "",
     });
     setErrorFields({
       name: false,
       amount: false,
-      details: false,
     });
 
 
@@ -130,12 +126,16 @@ const LoadExpenseCalculator = ({ route }) => {
     }
 
     try {
+
+   
         const loadTripCashFlowEntryParameters = {
             load_trip_id: item.load_trip_id,
-            cash_flow_name: modalValues.details,
-            category: modalValues.category,
-            cash_flow_type: cashStatus === "Cash In" ? "IN" : "OUT",
-            amount: modalValues.amount
+            cash_flow_name: modalValues.name,
+            category: "",
+            description : "",
+            cash_flow_type: cashStatus === "Credit entry" ? "IN" : "OUT",
+            amount: modalValues.amount,
+            
         };
 
         const response = await axiosInstance.post("/load_trip_cash_flow_entry", loadTripCashFlowEntryParameters);
@@ -186,13 +186,13 @@ const LoadExpenseCalculator = ({ route }) => {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.button, { backgroundColor: 'green' }]}
-              onPress={() => handleButtonPress("Cash In")}
+              onPress={() => handleButtonPress("Credit entry")}
             >
               <Text style={styles.buttonText}>Credit</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button1}
-              onPress={() => handleButtonPress("Cash Out")}
+              onPress={() => handleButtonPress("Debit entry")}
             >
               <Text style={styles.buttonText}>Debit</Text>
             </TouchableOpacity>
@@ -224,15 +224,15 @@ const LoadExpenseCalculator = ({ route }) => {
               onChangeText={(text) => handleInputChange("amount", text)} // Use lowercase
             />
 
-            <TextInput
+            {/* <TextInput
               style={[styles.input, errorFields.details && styles.inputError]}
               placeholder="Details"
               value={modalValues.details}
               onChangeText={(text) => handleInputChange("details", text)} // Use lowercase
-            />
+            /> */}
 
             <TouchableOpacity style={styles.applyButton} onPress={handleCashInOut}>
-              <Text style={styles.applyButtonText}>{cashStatus}</Text>
+              <Text style={styles.applyButtonText}>Add</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.applyButtonText}>Close</Text>

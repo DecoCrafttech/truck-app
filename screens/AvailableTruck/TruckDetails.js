@@ -61,16 +61,17 @@ const TruckDetails = ({ navigation, filteredTrucks }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+    flex:1
+
   },
   noResultContainer: {
     marginTop: 50,
     alignItems: 'center',
     justifyContent: 'center',
-
+    flex:1
   },
   noResultsText: {
     textAlign: "center",
-    marginTop: -90,
     marginBottom: 30,
     color: "grey",
     fontSize: 16,

@@ -144,7 +144,7 @@ const Home = () => {
                   openDuration={250}
                   closeOnDragDown={true}
                   closeOnPressBack={true}
-                  closeOnPressMask={false}
+                  closeOnPressMask={true}
                   customStyles={{
                     wrapper: {
                       backgroundColor: "rgba(0,0,0,0.5)",
@@ -173,11 +173,11 @@ const Home = () => {
                             refRBSheet.current.close()
                           }}
                         >
-                          <AntDesign name="close" size={24} color="black" />
+                          {/* <AntDesign name="close" size={24} color="black" /> */}
                         </Text>
                       </View>
                  
-                      <TouchableOpacity
+                      {/* <TouchableOpacity
                         style={[
                           styles.userContainer,
 
@@ -211,7 +211,7 @@ const Home = () => {
 
                           </View>
                         </View>
-                      </TouchableOpacity>
+                      </TouchableOpacity> */}
 
 
                     </ScrollView>

@@ -18,14 +18,16 @@ import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import { MaterialIcons as Icon } from '@expo/vector-icons';
 import { LoadNeedsContext } from '../../hooks/LoadNeedsContext';
 import RNPickerSelect from 'react-native-picker-select';
-
-
+import Constants from 'expo-constants';
 
 
 
 
 const ProfileTopContainer = () => {
 
+    const cdnLink = Constants.expoConfig?.extra?.REACT_NATIVE_APP_API_URL
+
+    console.log("cdnLink",cdnLink)
 
     const {
         setUserStatesFromProfile
@@ -188,7 +190,7 @@ const ProfileTopContainer = () => {
 
 
     const updateProfileImageAPI = async (uri) => {
-        const url = `${process.env.REACT_NATIVE_APP_API_URL}/update_profile_image`; // Replace with your server URL
+        const url = `${cdnLink}/update_profile_image`; // Replace with your server URL
 
         const formData = new FormData();
         formData.append('profile_image', {
@@ -197,6 +199,8 @@ const ProfileTopContainer = () => {
             name: 'profile_image',
         });
         formData.append("user_id", `${await AsyncStorage.getItem("user_id")}`)
+
+        console.log(formData)
 
         try {
             const response = await axios.post(url, formData, {
