@@ -1,18 +1,19 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, Button, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity,  ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, FONTS, images, SIZES } from '../constants/index.js';
-import { StatusBar } from 'expo-status-bar';
+import { COLORS, FONTS,  SIZES } from '../constants/index.js';
 import { OtpInput } from 'react-native-otp-entry';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-// import Button from '../components/Button.js';
 import Container, { Toast } from 'toastify-react-native';
 import axiosInstance from '../services/axiosInstance.js';
-
+import Constants from 'expo-constants';
 
 const ResetPasswordOTPVerification = () => {
+
+
+  // cdn link
+  const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK 
 
     const navigation = useNavigation()
 
@@ -45,7 +46,7 @@ const ResetPasswordOTPVerification = () => {
             otp: `${OTP}`,
         }
 
-    
+
         try {
 
 
@@ -67,22 +68,23 @@ const ResetPasswordOTPVerification = () => {
     return (
         <ScrollView >
             <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white, justifyContent: 'center', alignItems: 'center' }}>
-            <Container
+                <Container
                     position="top"
                     duration={3000}
                     animationIn="slideInDown"
                     height="auto"
                     width="100%"
-                    textStyle={{ 
-                        fontSize: 15,  
+                    textStyle={{
+                        fontSize: 15,
                         flexWrap: 'wrap', // Ensure text wraps
                         maxWidth: '90%', // Ensure text does not overflow
-                        overflow: 'hidden', }} // Ensure text wraps
+                        overflow: 'hidden',
+                    }} // Ensure text wraps
                 />
                 <View style={{ flex: 1, backgroundColor: COLORS.white, padding: 16, alignItems: 'center' }}>
                     {/* <StatusBar hidden /> */}
                     <Image
-                         source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
+                        source={{ uri: `${cdnLink}/truckmessage_round.png` }}
                         resizeMode='contain'
                         style={{
                             width: SIZES.width * 0.4,
@@ -130,13 +132,6 @@ const ResetPasswordOTPVerification = () => {
                         </TouchableOpacity>
                     </View>
 
-                    {/* <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', width: 300 }}>
-                        <Button
-                            color="brown"
-                            title="Verify"
-                            onPress={() => verifyOTPFunction()}
-                        />
-                    </View> */}
 
                     <View style={{ paddingBottom: 120 }}>
                         <TouchableOpacity style={styles.buttonContainer} onPress={verifyOTPFunction}>

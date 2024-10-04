@@ -355,14 +355,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.gray,
   },
-  // input: {
-  //   borderWidth: 1,
-  //   borderColor: "#ccc",
-  //   borderRadius: 5,
-  //   paddingHorizontal: 10,
-  //   marginBottom: 10,
-  //   height: 40,
-  // },
   closeButton: {
     backgroundColor: "#8a1c33",
     paddingVertical: 10,

@@ -18,30 +18,29 @@ import CustomButton from "../../components/CustomButton";
 import axiosInstance from "../../services/axiosInstance";
 import TruckDetails from "./TruckDetails";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import RNPickerSelect from 'react-native-picker-select';
-import MultiSelectComponent from "../../components/MultiSelectComponent";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import { MaterialIcons as Icon } from '@expo/vector-icons';
 import SendMessageModal from "../SendMessageModal";
+import Constants from 'expo-constants'
 
 
 
 const AvailableTruck = ({ navigation }) => {
 
-  const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+
+  // google api key
+  const googleApiKey = Constants.expoConfig?.extra?.REACT_APP_GOOGLE_PLACES_KEY
 
 
   const {
     isLoading,
     setIsLoading,
     aadhaarOTP,
-    setAadhaarOTP,
     setMessageReceiver,
     userStatesFromProfile,
-    setUserStatesFromProfile
 
   } = useContext(LoadNeedsContext)
 
@@ -145,9 +144,7 @@ const AvailableTruck = ({ navigation }) => {
     setSearchQuery(query);
   };
 
-  const handleChatNavigate = () => {
-    navigation.navigate("Chat")
-  }
+
 
   useEffect(() => {
     const getAllTruckDetails = async () => {
@@ -253,7 +250,6 @@ const AvailableTruck = ({ navigation }) => {
 
   const handleInputChange = (field, value) => {
     setModalValues({ ...modalValues, [field]: value });
-    // setErrorFields({ ...errorFields, [field]: false });
   };
 
   const handleAadhaarSubmit = async () => {
@@ -352,7 +348,6 @@ const AvailableTruck = ({ navigation }) => {
       ...prevState, fromLocation: (`${city}, ${state}`)
     }))
     setFromLocationModal(false)
-    // You can use the extracted details as needed
   };
 
   const handleToLocation = (data, details) => {
@@ -379,7 +374,6 @@ const AvailableTruck = ({ navigation }) => {
       ...prevState, toLocation: (`${city}, ${state}`)
     }))
     setToLocationModal(false)
-    // You can use the extracted details as needed
   };
 
   const applyFilter = async () => {
@@ -576,7 +570,6 @@ const AvailableTruck = ({ navigation }) => {
               ]}
               placeholder="From Location"
               value={modalValues.fromLocation}
-              // onChangeText={(text) => handleInputChange('fromLocation', text)}
               onPress={() => {
                 setFromLocationModal(true);
                 setModalValues(prevValues => ({
@@ -585,34 +578,7 @@ const AvailableTruck = ({ navigation }) => {
                 }));
               }}
             />
-            {/* <TextInput
-              style={[
-                styles.input,
-                errorFields.toLocation && styles.inputError,
-              ]}
-              placeholder="To Location"
-              value={modalValues.toLocation}
-              onPress={() => {
-                setToLocationModal(true);
-                setModalValues(prevValues => ({
-                  ...prevValues,
-                  toLocation: ""
-                }));
-              }}
-            /> */}
-
-            {/* <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
-              <RNPickerSelect
-                onValueChange={(value) => setModalValues({ ...modalValues, toLocation: value })}
-                items={userToLocationStatesData}
-                value={modalValues.truckName}
-                placeholder={{
-                  label: 'To Location',
-                  value: null,
-                  color: 'grey',
-                }}
-              />
-            </View> */}
+           
 
             <View style={{ width: "auto", marginBottom: 5 }}>
               <SectionedMultiSelect
@@ -686,42 +652,7 @@ const AvailableTruck = ({ navigation }) => {
               onChangeText={(text) => handleInputChange("tons", text)}
             />
 
-
-
-
-
-            {/* <TextInput
-              style={[styles.input, errorFields.material && styles.inputError]}
-              placeholder="Material"
-              value={modalValues.material}
-              onChangeText={(text) => handleInputChange("material", text)}
-            /> */}
-            {/* <TextInput
-              style={[styles.input, errorFields.noOfTyres && styles.inputError]}
-              placeholder="Number of Tyres"
-              keyboardType="number-pad"
-              value={modalValues.noOfTyres}
-              onChangeText={(text) => handleInputChange("noOfTyres", text)}
-            />
-           
-            <TextInput
-              style={[
-                styles.input,
-                errorFields.truckBodyType && styles.inputError,
-              ]}
-              placeholder="Truck Body Type"
-              value={modalValues.truckBodyType}
-              onChangeText={(text) => handleInputChange("truckBodyType", text)}
-            /> */}
-
-
-
-
-
-
-
-
-
+    
             <TouchableOpacity style={styles.applyButton} onPress={applyFilter}>
               <Text style={styles.applyButtonText}>Apply Filter</Text>
             </TouchableOpacity>
@@ -810,7 +741,6 @@ const AvailableTruck = ({ navigation }) => {
         animationType="slide"
         transparent={true}
         visible={fromLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.locationModalContainer}>
           <View style={styles.locationModalContent}>
@@ -825,7 +755,7 @@ const AvailableTruck = ({ navigation }) => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location
@@ -849,7 +779,6 @@ const AvailableTruck = ({ navigation }) => {
         animationType="slide"
         transparent={true}
         visible={toLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.locationModalContainer}>
           <View style={styles.locationModalContent}>
@@ -864,7 +793,7 @@ const AvailableTruck = ({ navigation }) => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location
@@ -939,7 +868,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    // height: 40,
     padding: 12
   },
   inputError: {

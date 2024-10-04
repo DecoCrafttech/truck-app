@@ -1,27 +1,20 @@
-import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Button, Image, Alert } from 'react-native'
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity,  Image, Alert } from 'react-native'
+import React, { useContext, useState } from 'react'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
-import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
 import { Pressable } from 'react-native';
-import axios from 'axios';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Dropdown } from 'react-native-element-dropdown';
-import AntDesign from '@expo/vector-icons/AntDesign';
 import CustomButton from '../components/CustomButton';
 import Container, { Toast } from 'toastify-react-native';
 import axiosInstance from '../services/axiosInstance';
-import { citiesData, statesData } from '../constants/cityAndState';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { FlatList } from 'react-native-web';
-import MultiSelectComponent from '../components/MultiSelectComponent';
 import { BackHandler } from 'react-native';
 import { COLORS } from '../constants';
 import { LoadNeedsContext } from '../hooks/LoadNeedsContext';
-
+import Constants from 'expo-constants'
 
 
 
@@ -32,10 +25,10 @@ import { LoadNeedsContext } from '../hooks/LoadNeedsContext';
 
 const SignUp = () => {
 
-    const inputRef = useRef("")
+    // cdn link
+    const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK
 
     const {
-        isSignedUp,
         setIsSignedUp
     } = useContext(LoadNeedsContext)
 
@@ -52,10 +45,7 @@ const SignUp = () => {
         password: "",
         confirmPassword: "",
     })
-    const [selectedCities, setSelectedCities] = useState([]);
-    const [selectedStates, setSelectedStates] = useState([]);
 
-    const [operatingCities, setOperatingCities] = useState([])
     const [operatingStates, setOperatingStates] = useState([])
 
     const [showPassword, setShowPassword] = useState(false)
@@ -67,9 +57,7 @@ const SignUp = () => {
     const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
 
-    const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(null);
-    const [items, setItems] = useState(citiesData);
+
 
 
 
@@ -83,13 +71,6 @@ const SignUp = () => {
         })
     )
 
-    // useEffect(() => {
-    //     BackHandler.addEventListener('hardwareBackPress',handleBackPress)
-
-    //     return () => {
-    //         BackHandler.removeEventListener('hardwareBackPress',handleBackPress)
-    //     }
-    // })
 
     const handleBackPress = () => {
         Alert.alert('Exit App', 'Are you sure want to exit?',
@@ -180,17 +161,6 @@ const SignUp = () => {
 
         else {
 
-            // const regex = "^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$"
-
-            // if ((inputs.password).match(regex)) {
-            //     Toast.error('enter correct password')
-            // }
-
-            // if (inputs.password !== inputs.confirmPassword) {
-            //     Toast.error('Confirm password should be matched with password')
-            //     return
-            // }
-
             const regex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/;
 
             if (!inputs.password.match(regex)) {
@@ -206,7 +176,6 @@ const SignUp = () => {
 
             const signupParams = {
                 first_name: inputs.name,
-                // date_of_birth: `${inputs.dob.toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').map((part, index) => index === 0 ? part : part.padStart(2, '0')).join('-')}`,
                 date_of_birth: `${inputs.dob.toISOString().split('T')[0]}`,
                 phone_number: inputs.mobileNumber,
                 email: inputs.email,
@@ -233,7 +202,6 @@ const SignUp = () => {
                     await AsyncStorage.setItem("user_id", `${response.data.data[0].id}`)
                     await AsyncStorage.setItem("mobileNumber", `${inputs.mobileNumber}`)
                     setIsSignedUp(true)
-                    // alert(response.data.message)
                     setCategory("")
                     setInputs({
                         name: "",
@@ -307,8 +275,8 @@ const SignUp = () => {
                         <View style={styles.avatarContainer}>
                             <Image
                                 style={styles.avatar}
-                                source={{ uri: "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png" }}
-                            />
+                                source={{uri : `${cdnLink}/truckmessage_round.png`}}
+                                />
                         </View>
 
                         <View style={styles.pageHeadingContainer}>
@@ -427,22 +395,6 @@ const SignUp = () => {
                                 </View>
                             </View>
 
-                            {/* <View style={styles.inputField}>
-                                <View>
-                                    <Text style={styles.label}>Operating City</Text>
-                                </View>
-                                <View>
-                                    <MultiSelectComponent
-                                        listOfData={citiesData}
-                                        selectedCities={selectedCities}
-                                        setSelectedCities={setSelectedCities}
-                                        setOperatingCities={setOperatingCities}
-                                       
-                                    />
-                                </View>
-                            </View> */}
-
-
 
                             <View style={styles.inputField}>
                                 <View>
@@ -531,11 +483,7 @@ const SignUp = () => {
                                     style={{ paddingLeft: 12 }}
                                 >I agree to the terms and conditions</Text>
                             </View>
-                            {/* <View>
-                                <TouchableOpacity style={styles.buttonContainer} onPress={handleRegisterClick}>
-                                    <Text style={styles.buttonText}>Register</Text>
-                                </TouchableOpacity>
-                            </View> */}
+
                             <CustomButton title="Register" onPress={handleRegisterClick} />
                             <View style={{
                                 flexDirection: 'row',

@@ -1,13 +1,9 @@
-import { View, Text, StyleSheet, Modal } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import React from 'react'
 import { TouchableOpacity } from 'react-native';
 import { COLORS } from '../constants';
 
 const SendMessageModal = ({ handleYes, handleCancel }) => {
-
-    const [sendMessageModal, setSendMessageModal] = useState(false)
-
-
 
     return (
         <>
@@ -77,7 +73,6 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         paddingHorizontal: 10,
         marginBottom: 10,
-        // height: 40,
         padding: 12,
 
     },
@@ -163,8 +158,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginTop: 20,
         alignItems: 'center',
-        // width:"100%",
-        // flexWrap :"wrap",
         marginHorizontal: 20
 
     },

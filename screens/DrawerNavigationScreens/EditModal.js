@@ -11,17 +11,15 @@ import {
 import { COLORS } from "../../constants";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import RNPickerSelect from 'react-native-picker-select';
+import Constants from 'expo-constants'
 
 
 
 const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,editedDetails,setEditedDetails }) => {
 
-  const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
 
-  // const [editedDetails, setEditedDetails] = useState(null);
-
-
-  const [truckBodyType, setTruckBodyType] = useState("");
+  // google api key
+  const googleApiKey = Constants.expoConfig?.extra?.REACT_APP_GOOGLE_PLACES_KEY
 
   const [locationModal, setLocationModal] = useState(false)
 
@@ -64,14 +62,6 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
 
 
-
-        // labels: [
-        //   { icon: "table-view", text: loadDetails.labels[0]?.text || "" },
-        //   { icon: "attractions", text: loadDetails.labels[1]?.text || "" },
-        //   { icon: "monitor-weight", text: loadDetails.labels[2]?.text || "" },
-        //   { icon: "local-shipping", text: loadDetails.labels[3]?.text || "" },
-        //   { icon: "verified", text: loadDetails.labels[4]?.text || "" },
-        // ],
         labels: [
           { icon: "table-view", text: loadDetails.text || "" },
           { icon: "attractions", text: loadDetails.text || "" },
@@ -133,7 +123,6 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
       setLocation(`${city}, ${state}`)
       setLocationModal(false)
-      // You can use the extracted details as needed
     };
 
     const handleFromLocation = (data, details) => {
@@ -159,7 +148,6 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
       setEditedDetails({ ...editedDetails, fromLocation: (`${city}, ${state}`) })
       setFromLocationModal(false)
-      // You can use the extracted details as needed
     };
 
     const handleToLocation = (data, details) => {
@@ -180,15 +168,9 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
           }
         });
       }
-
-
-      // setModalValues((prevState) => ({
-      //   ...prevState, toLocation: (`${city}, ${state}`)
-      // }))
       setEditedDetails({ ...editedDetails, toLocation: (`${city}, ${state}`) })
 
       setToLocationModal(false)
-      // You can use the extracted details as needed
     };
 
 
@@ -231,23 +213,6 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
       { label: 'Scania', value: 'Scania' },
       { label: 'Others', value: 'Others' },
     ]
-
-    const kmsData = [
-      { label: '0 - 10,000 kms', value: '(0 - 10,000) kms' },
-      { label: '10,001 - 30,000 kms', value: '(10,001 - 30,000) kms' },
-      { label: '30,001 - 50,000 kms', value: '(30,001 - 50,000) kms' },
-      { label: '50,001 - 70,000 kms', value: '(50,001 - 70,000) kms' },
-      { label: '70,001 - 100,000 kms', value: '(70,001 - 100,000) kms' },
-      { label: '100,001 - 150,000 kms', value: '(100,001 - 150,000) kms' },
-      { label: '150,001 - 200,000 kms', value: '(150,001 - 200,000) kms' },
-      { label: '200,001 - 300,000 kms', value: '(200,001 - 300,000) kms' },
-      { label: '300,001 - 500,000 kms', value: '(300,001 - 500,000) kms' },
-      { label: '500,001 - 700,000 kms', value: '(500,001 - 700,000) kms' },
-      { label: '700,001 - 1,000,000 kms', value: '(700,001 - 1,000,000) kms' },
-      { label: '1,000,001 - 1,500,000 kms', value: '(1,000,001 - 1,500,000) kms' },
-      { label: '1,500,001 - 2,000,000 kms', value: '(1,500,001 - 2,000,000) kms' },
-      { label: '2,000,001+ kms', value: '(2,000,001+) kms' }
-    ];
 
 
     const priceData = [
@@ -304,9 +269,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
               <TextInput
                 style={styles.input}
-                // onChangeText={(text) =>
-                //   setEditedDetails({ ...editedDetails, fromLocation: text })
-                // }
+
                 placeholder="From Location"
                 value={editedDetails.fromLocation}
                 onPress={() => setFromLocationModal(true)}
@@ -314,9 +277,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
               <TextInput
                 style={styles.input}
-                // onChangeText={(text) =>
-                //   setEditedDetails({ ...editedDetails, toLocation: text })
-                // }
+
                 placeholder="To Location"
                 value={editedDetails.toLocation}
                 onPress={() => setToLocationModal(true)}
@@ -392,14 +353,6 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
                 placeholder="Vehicle number"
               />
 
-              {/* <TextInput
-                style={styles.input}
-                value={editedDetails.companyName}
-                onChangeText={(text) =>
-                  setEditedDetails({ ...editedDetails, companyName: text })
-                }
-                placeholder="Company name"
-              /> */}
 
               <TextInput
                 style={styles.input}
@@ -423,9 +376,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
               <TextInput
                 style={styles.input}
-                // onChangeText={(text) =>
-                //   setEditedDetails({ ...editedDetails, fromLocation: text })
-                // }
+               
                 placeholder="From Location"
                 value={editedDetails.fromLocation}
                 onPress={() => setFromLocationModal(true)}
@@ -433,9 +384,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
               <TextInput
                 style={styles.input}
-                // onChangeText={(text) =>
-                //   setEditedDetails({ ...editedDetails, toLocation: text })
-                // }
+
                 placeholder="To Location"
                 value={editedDetails.toLocation}
                 onPress={() => setToLocationModal(true)}
@@ -545,9 +494,6 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
               <TextInput
                 style={styles.input}
-                // onChangeText={(text) =>
-                //   setEditedDetails({ ...editedDetails, fromLocation: text })
-                // }
                 placeholder="From Location"
                 value={editedDetails.fromLocation}
                 onPress={() => setFromLocationModal(true)}
@@ -555,9 +501,6 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
               <TextInput
                 style={styles.input}
-                // onChangeText={(text) =>
-                //   setEditedDetails({ ...editedDetails, toLocation: text })
-                // }
                 placeholder="To Location"
                 value={editedDetails.toLocation}
                 onPress={() => setToLocationModal(true)}
@@ -683,9 +626,6 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
 
               <TextInput
                 style={styles.input}
-                // onChangeText={(text) =>
-                //   setEditedDetails({ ...editedDetails, fromLocation: text })
-                // }
                 placeholder="Location"
                 value={editedDetails.location}
                 onPress={() => setLocationModal(true)}
@@ -735,7 +675,6 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
         animationType="slide"
         transparent={true}
         visible={locationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -750,7 +689,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location
@@ -776,11 +715,9 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
           animationType="slide"
           transparent={true}
           visible={fromLocationModal}
-        // onRequestClose={() => setIsAadhaarModal(false)}
         >
           <View style={styles.locationModalContainer}>
             <View style={styles.locationModalContent}>
-              {/* <Text style={styles.modalTitle}>From Location</Text> */}
 
 
               <View style={styles.locationContainer}>
@@ -791,7 +728,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
                     autoFocus: true,
                   }}
                   query={{
-                    key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                    key: googleApiKey, // Use your hardcoded key if Config is not working
                     language: 'en',
                   }}
                   fetchDetails={true} // This ensures that you get more detailed information about the selected location
@@ -815,11 +752,9 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
           animationType="slide"
           transparent={true}
           visible={toLocationModal}
-        // onRequestClose={() => setIsAadhaarModal(false)}
         >
           <View style={styles.locationModalContainer}>
             <View style={styles.locationModalContent}>
-              {/* <Text style={styles.modalTitle}>To Location</Text> */}
 
 
               <View style={styles.locationContainer}>
@@ -830,7 +765,7 @@ const EditLoadModal = ({ visible, onClose, onSave, loadDetails, selectedValue,ed
                     autoFocus: true,
                   }}
                   query={{
-                    key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                    key: googleApiKey, // Use your hardcoded key if Config is not working
                     language: 'en',
                   }}
                   fetchDetails={true} // This ensures that you get more detailed information about the selected location

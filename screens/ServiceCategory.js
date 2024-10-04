@@ -2,16 +2,21 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, FlatList } from 'react-native';
 import { icons } from "../constants";
 import { useNavigation } from '@react-navigation/native';
+import Constants from 'expo-constants';
+
 
 export default ServiceCategory = () => {
   const navigation = useNavigation();
 
-  
+  // cdn link
+  const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK 
+
+
 const images = [
-  { id: '1', uri: 'https://ddyz8ollngqwo.cloudfront.net/load.png', screen: "AvailableLoads" },
-  { id: '2', uri: 'https://ddyz8ollngqwo.cloudfront.net/truck.png',screen: "AvailableTrucks"  },
-  { id: '3', uri: 'https://ddyz8ollngqwo.cloudfront.net/driver.png', screen: "AvailableDrivers" },
-  { id: '4', uri: 'https://ddyz8ollngqwo.cloudfront.net/buy&sell.png', screen: "MarketPlace" },
+  { id: '1', uri: `${cdnLink}/load.png`, screen: "AvailableLoads" },
+  { id: '2', uri: `${cdnLink}/truck.png`,screen: "AvailableTrucks"  },
+  { id: '3', uri: `${cdnLink}/driver.png`, screen: "AvailableDrivers" },
+  { id: '4', uri: `${cdnLink}/buy&sell.png`, screen: "MarketPlace" },
 
 ];
 
@@ -85,12 +90,6 @@ const styles = StyleSheet.create({
     height: 150,
     marginRight: 10,
     borderRadius: 8,
-  },
-  listContainer: {
-    // flex: 1,
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // marginTop:"-30%"
   },
   card: {
     backgroundColor: '#F6F8FF',

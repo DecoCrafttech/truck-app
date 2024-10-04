@@ -18,7 +18,6 @@ import FuelPrice from "../screens/FuelPrice/FuelPrice";
 import Toast from "react-native-toast-message";
 import LoadExpenseCalculator from "../screens/VaughanInfo/LoadExpenseCalculator";
 import TruckDetail from "../screens/TruckDetail";
-import ViewFullDetails from "../screens/BottomTabScreens/ViewFullDetails";
 import SignUp from "../screens/SignUp";
 import Login from "../screens/Login";
 import OTPVerification from "../screens/OTPVerification";
@@ -35,7 +34,7 @@ const AppNavigation = () => {
       <Toast />
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName="Login"
+        initialRouteName="Main"
       >
 
         <Stack.Screen name="SignUp" component={SignUp} />
@@ -133,11 +132,6 @@ const AppNavigation = () => {
           name="LoadExpenseCalculator"
           component={LoadExpenseCalculator}
           options={{ title: "Load Expense Calculator" }}
-        />
-        <Stack.Screen
-          name="ViewFullDetails"
-          component={ViewFullDetails}
-          options={{ title: "View Full Truck Details" }}
         />
         <Stack.Screen
           name='Chat'

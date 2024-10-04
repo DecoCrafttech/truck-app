@@ -5,11 +5,10 @@ import { COLORS, SIZES } from "../../constants";
 import HeaderWithoutNotifications from "../../components/HeaderWithoutNotifications";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import images from '../../constants/images.js';
 import icons from '../../constants/icons.js';
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axiosInstance from "../../services/axiosInstance.js";
 
 
 const Message = () => {
@@ -17,12 +16,8 @@ const Message = () => {
   const navigation = useNavigation()
 
   const {
-    currentUser,
-    setCurrentUser,
-    messageReceiver,
     setMessageReceiver,
     pageRefresh,
-    setPageRefresh
   } = useContext(LoadNeedsContext)
 
 
@@ -37,7 +32,7 @@ const Message = () => {
       const userIdParams = {
         user_id : await AsyncStorage.getItem("user_id")
       }
-      const response = await axios.post('https://truck.truckmessage.com/get_user_chat_list', userIdParams);
+      const response = await axiosInstance.post('/get_user_chat_list', userIdParams);
    
       setAllPersons(response.data.data)
       setFilteredUsers(response.data.data)

@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  ActivityIndicator,
   Alert,
 } from "react-native";
 
@@ -32,7 +31,6 @@ const LoadExpenseCalculator = ({ route }) => {
   });
   const [errorFields, setErrorFields] = useState({
     name: false,
-    // category: false,
     amount: false,
     details: false,
   });
@@ -42,13 +40,11 @@ const LoadExpenseCalculator = ({ route }) => {
     setIsModalVisible(!isModalVisible);
     setModalValues({
       name: "",
-      // category: "",
       amount: "",
       details: "",
     });
     setErrorFields({
       name: false,
-      // category: false,
       amount: false,
       details: false,
     });

@@ -1,15 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, FlatList, Alert, BackHandler } from "react-native";
+import { View, Text, Image, StyleSheet,  Alert, BackHandler } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants";
-import DropDownPicker from "react-native-dropdown-picker";
 import HeaderWithoutNotifications from "../../components/HeaderWithoutNotifications";
 import { useFocusEffect } from "@react-navigation/native";
 
 const Blogs = () => {
-  const [selectedValue, setSelectedValue] = useState(null);
-  const [open, setOpen] = useState(false);
-  
+
   useFocusEffect(
     React.useCallback(() => {
        BackHandler.addEventListener('hardwareBackPress',handleBackPress)
@@ -37,83 +34,12 @@ const Blogs = () => {
     return true
   }
 
-  const posts = [
-    {
-      id: 1,
-      userId: 1,
-      username: "User 1",
-      avatarUrl: "https://bootdey.com/img/Content/avatar/avatar2.png",
-      date: "May 18, 2023",
-      description: "This is a post description",
-      imageUrl: "https://www.bootdey.com/image/580x520/FF00FF/000000",
-    },
-    {
-      id: 2,
-      userId: 2,
-      username: "User 2",
-      avatarUrl: "https://bootdey.com/img/Content/avatar/avatar6.png",
-      date: "May 17, 2023",
-      description: "Another post",
-      imageUrl: null,
-    },
-    {
-      id: 3,
-      userId: 1,
-      username: "User 1",
-      avatarUrl: "https://bootdey.com/img/Content/avatar/avatar3.png",
-      date: "May 18, 2023",
-      description: "This is a post description",
-      imageUrl: "https://www.bootdey.com/image/580x520/32CD32/000000",
-    },
-  ];
 
-  const PostCard = ({ post }) => (
-    <View style={styles.postCard}>
-      <View style={styles.postHeader}>
-        <Image source={{ uri: post.avatarUrl }} style={styles.postAvatar} />
-        <Text style={styles.postUsername}>{post.username}</Text>
-        <Text style={styles.postDate}>{post.date}</Text>
-      </View>
-      <Text style={styles.postDescription}>{post.description}</Text>
-      {post.imageUrl && (
-        <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
-      )}
-    </View>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
       <HeaderWithoutNotifications title="Blogs" />
-      {/* <View style={styles.content}>
-        <DropDownPicker
-          open={open}
-          value={selectedValue}
-          items={[
-            { label: "Tamil", value: "Tamil" },
-            { label: "English", value: "English" },
-            { label: "Malayalam", value: "Malayalam" },
-            { label: "Hindi", value: "Hindi" },
-            { label: "Telugu", value: "Telugu" },
-            { label: "Kannada", value: "Kannada" },
-          ]}
-          setOpen={setOpen}
-          setValue={(value) => {
-            setSelectedValue(value);
-          }}
-          placeholder="Select your language"
-          containerStyle={styles.dropdownContainer}
-          style={styles.dropdown}
-          dropDownStyle={styles.dropdownStyle}
-          onChangeItem={(item) => setSelectedValue(item.value)}
-        />
-        <FlatList
-          data={posts}
-          contentContainerStyle={styles.postListContainer}
-          keyExtractor={(post) => post.id.toString()}
-          renderItem={({ item }) => <PostCard post={item} />}
-        />
-      </View> */}
-      <View style={styles.container2}>
+           <View style={styles.container2}>
           <Text>Coming soon</Text>
       </View>
     </SafeAreaView>

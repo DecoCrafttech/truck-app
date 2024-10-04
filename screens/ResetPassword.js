@@ -1,16 +1,14 @@
-import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Button, Image, BackHandler, Alert } from 'react-native'
-import React, { useRef, useState } from 'react'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
-import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, BackHandler, Alert } from 'react-native'
+import React, { useState } from 'react'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons';
-import Checkbox from 'expo-checkbox';
 import { Pressable } from 'react-native';
-import axios from 'axios';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { COLORS } from '../constants';
 import Container, { Toast } from 'toastify-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axiosInstance from '../services/axiosInstance';
+import Constants from 'expo-constants';
 
 
 
@@ -19,7 +17,9 @@ import axiosInstance from '../services/axiosInstance';
 
 const ResetPassword = () => {
 
-    const inputRef = useRef("")
+    
+  // cdn link
+  const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK 
 
     const navigation = useNavigation()
 
@@ -159,10 +159,7 @@ const ResetPassword = () => {
                         overflow: 'hidden', }} // Ensure text wraps
                 />
             <View >
-                {/* <StatusBar hidden /> */}
-                {/* <View style={styles.pageHeadingContainer}>
-                    <Text style={styles.pageHeading}>Login</Text>
-                </View> */}
+
 
 
 
@@ -171,7 +168,7 @@ const ResetPassword = () => {
                     <View style={styles.avatarContainer}>
                         <Image
                             style={styles.avatar}
-                            source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
+                            source={{uri : `${cdnLink}/truckmessage_round.png`}}
                         />
                     </View>
 
@@ -372,7 +369,6 @@ const styles = StyleSheet.create({
         borderColor: 'grey',
         borderWidth: 1,
         justifyContent: 'center',
-        // alignItems:'center'
     },
     errMessage : {
         color : 'red',

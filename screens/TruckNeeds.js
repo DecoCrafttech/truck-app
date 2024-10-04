@@ -19,13 +19,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import RNPickerSelect from 'react-native-picker-select';
 import { useNavigation } from "@react-navigation/native";
-import { Dropdown } from 'react-native-element-dropdown';
+import Constants from 'expo-constants'
 
 
 
 const TruckNeeds = () => {
 
-  const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+  // google api key
+  const googleApiKey = Constants.expoConfig?.extra?.REACT_APP_GOOGLE_PLACES_KEY
+
+
   const navigation = useNavigation("")
 
   const { isLoading, setIsLoading } = useContext(LoadNeedsContext);
@@ -65,28 +68,8 @@ const TruckNeeds = () => {
 
   const [vehicleListData, setVehicleListData] = useState([])
   const [vehicleFromDropdown, setVehicleFromDropdown] = useState("")
-  const [searchText, setSearchText] = useState('');  // To track the search text
 
 
-
-  const categoryData = [
-    { label: 'Lorry owners', category: 'Lorry owners' },
-    { label: 'Logistics', category: 'Logistics' },
-    { label: 'Lorry contractors', category: 'Lorry contractors' },
-    { label: 'Load booking agent', category: 'Load booking agent' },
-    { label: 'Driver', category: 'Driver' },
-    { label: 'Lorry Buy & Sell dealers / Owners', category: 'Lorry Buy &Sell dealers / Owners' },
-  ];
-
-
-  // useEffect(() => {
-  //   setUserToLocationStatesData(
-  //     userStatesFromProfile.map((state, index) => ({
-  //       id: index + 1,
-  //       name: state
-  //     }))
-  //   )
-  // }, [])
 
 
 
@@ -309,28 +292,7 @@ const TruckNeeds = () => {
               <Text style={styles.label}>Vehicle Number</Text>
               <Text style={{ textAlign: 'right', textDecorationLine: 'underline', color: 'blue' }} onPress={() => navigation.navigate("Profile")}>Add Truck</Text>
             </View>
-            {/* <View style={styles.mobileNumberInputBox}>
-              <Dropdown
-                style={styles.dropdown}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                iconStyle={styles.iconStyle}
-                itemTextStyle={styles.itemTextStyle}
-                itemContainerStyle={styles.itemContainerStyle}
-                data={vehicleList}
-                maxHeight={300}
-                labelField="label"
-                valueField="category"
-                placeholder="Select or type new item"
-                search
-                searchPlaceholder="Search or type to add..."
-                value={vehicle}
-                onChange={handleSelect}
-                onChangeText={setSearchText}
-                onBlur={handleNewItem}
-              />
-            </View> */}
+          
 
 
 
@@ -411,15 +373,7 @@ const TruckNeeds = () => {
             />
 
             <Text style={styles.label}>Truck Name</Text>
-            {/* <TextInput
-              style={[
-                styles.textInput,
-                !truckNameValid && { borderColor: "red" },
-              ]}
-              placeholder="Truck Name"
-              onChangeText={setTruckName}
-              value={truckName}
-            /> */}
+
             <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
                 onValueChange={(value) => setTruckName(value)}
@@ -440,7 +394,6 @@ const TruckNeeds = () => {
                 !fromLocationValid && { borderColor: "red" },
               ]}
               placeholder="Starting Location"
-              // onChangeText={setFromLocation}
               value={fromLocation}
               onPress={() => setFromLocationModal(true)}
             />
@@ -452,7 +405,6 @@ const TruckNeeds = () => {
                 !toLocationValid && { borderColor: "red" },
               ]}
               placeholder="Destination Location"
-              // onChangeText={setToLocation}
               value={toLocation}
               onPress={() => setToLocationModal(true)}
             />
@@ -515,7 +467,6 @@ const TruckNeeds = () => {
         animationType="slide"
         transparent={true}
         visible={fromLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -530,7 +481,7 @@ const TruckNeeds = () => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location
@@ -555,7 +506,6 @@ const TruckNeeds = () => {
         animationType="slide"
         transparent={true}
         visible={toLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -570,7 +520,7 @@ const TruckNeeds = () => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location

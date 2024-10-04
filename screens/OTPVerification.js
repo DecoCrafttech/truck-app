@@ -1,15 +1,14 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, Button, ScrollView, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity,  ScrollView, Alert } from 'react-native';
 import React, { useContext, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, FONTS, images, SIZES } from '../constants/index.js';
-import { StatusBar } from 'expo-status-bar';
+import { COLORS,  SIZES } from '../constants/index.js';
 import { OtpInput } from 'react-native-otp-entry';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-// import Button from '../components/Button.js';
 import Container, { Toast } from 'toastify-react-native';
 import { LoadNeedsContext } from '../hooks/LoadNeedsContext.js';
+import axiosInstance from '../services/axiosInstance.js';
+import Constants from 'expo-constants';
 
 
 const OTPVerification = () => {
@@ -19,9 +18,10 @@ const OTPVerification = () => {
     const [OTP, setOTP] = useState("")
 
 
+  // cdn link
+  const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK 
 
     const {
-        isFirstSignup,
         setIsFirstSignup
     } = useContext(LoadNeedsContext)
 
@@ -32,7 +32,7 @@ const OTPVerification = () => {
             phone_number: await AsyncStorage.getItem("mobileNumber")
         }
         try {
-            await axios.post("https://truck.truckmessage.com/send_signup_otp", resendParams)
+            await axiosInstance.post("/send_signup_otp", resendParams)
                 .then((response) => {
                     if (response.data.error_code === 0) {
                        console.log(response.data.message)
@@ -55,11 +55,10 @@ const OTPVerification = () => {
         }
         try {
 
-            await axios.post("https://truck.truckmessage.com/validate_otp", verifyParams)
+            await axiosInstance.post("/validate_otp", verifyParams)
                 .then((response) => {
 
                     if (response.data.error_code === 1) {
-                        // AsyncStorage.setItem("user_id",`${response.data.data[0].user_id}`)
                         Toast.success(response.data.message)
                         setIsFirstSignup(true)
                         navigation.navigate("Main")
@@ -102,12 +101,11 @@ const OTPVerification = () => {
                     <View style={styles.avatarContainer}>
                             <Image
                                 style={styles.avatar}
-                                source={{ uri: "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png" }}
+                                source={{uri : `${cdnLink}/truckmessage_round.png`}}
+
                             />
                         </View>
                     <Text style={{ fontSize: 20, marginBottom: 15, fontWeight: '900' }}>Enter Verification Code</Text>
-                    {/* <Text style={{ ...FONTS.h6, marginBottom: 5, }}>We are automatically detecting SMS</Text>
-                    <Text style={{ ...FONTS.h6, marginBottom: 10, }}>send to your phone number</Text> */}
                     <View style={{ marginVertical: 15, width: SIZES.width - 72 }}>
                         <OtpInput
 
@@ -144,13 +142,6 @@ const OTPVerification = () => {
                         </TouchableOpacity>
                     </View>
 
-                    {/* <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', width: 300 }}>
-                        <Button
-                            color="brown"
-                            title="Verify"
-                            onPress={() => verifyOTPFunction()}
-                        />
-                    </View> */}
 
                     <View style={{ paddingBottom: 20 }}>
                         <TouchableOpacity style={styles.buttonContainer} onPress={verifyOTPFunction}>

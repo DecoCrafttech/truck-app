@@ -2,11 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants";
 import HeaderWithOutBS from "../../components/HeaderWithOutBS";
-import { images } from "../../constants";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   FlatList,
   TouchableOpacity,
@@ -18,10 +16,16 @@ import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Entypo from '@expo/vector-icons/Entypo';
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import Constants from 'expo-constants'
+
+
+
 
 const VaughanInfo = ({ navigation }) => {
 
-    const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+  
+  // google api key
+  const googleApiKey = Constants.expoConfig?.extra?.REACT_APP_GOOGLE_PLACES_KEY
 
 
   const { isLoading } = useContext(LoadNeedsContext);
@@ -120,7 +124,6 @@ const VaughanInfo = ({ navigation }) => {
   };
 
   const applyFilter = async () => {
-    // Validate inputs
     let hasError = false;
     const errors = {};
 
@@ -222,7 +225,6 @@ const VaughanInfo = ({ navigation }) => {
       ...prevState, fromLocation: (`${city}, ${state}`)
     }))
     setFromLocationModal(false)
-    // You can use the extracted details as needed
   };
 
   const handleToLocation = (data, details) => {
@@ -249,7 +251,6 @@ const VaughanInfo = ({ navigation }) => {
       ...prevState, toLocation: (`${city}, ${state}`)
     }))
     setToLocationModal(false)
-    // You can use the extracted details as needed
   };
 
   return (
@@ -290,7 +291,6 @@ const VaughanInfo = ({ navigation }) => {
                 errorFields.fromLocation && styles.inputError,
               ]}
               placeholder="From Location"
-              // onChangeText={(text) => handleInputChange("fromLocation", text)}
               value={modalValues.fromLocation}
               onPress={() => setFromLocationModal(true)}
             />
@@ -300,7 +300,6 @@ const VaughanInfo = ({ navigation }) => {
                 errorFields.toLocation && styles.inputError,
               ]}
               placeholder="To Location"
-              // onChangeText={(text) => handleInputChange("toLocation", text)}
               value={modalValues.toLocation}
               onPress={() => setToLocationModal(true)}
             />
@@ -322,7 +321,6 @@ const VaughanInfo = ({ navigation }) => {
         animationType="slide"
         transparent={true}
         visible={fromLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.locationModalContainer}>
           <View style={styles.locationModalContent}>
@@ -337,7 +335,7 @@ const VaughanInfo = ({ navigation }) => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location
@@ -361,7 +359,6 @@ const VaughanInfo = ({ navigation }) => {
         animationType="slide"
         transparent={true}
         visible={toLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.locationModalContainer}>
           <View style={styles.locationModalContent}>
@@ -376,7 +373,7 @@ const VaughanInfo = ({ navigation }) => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location

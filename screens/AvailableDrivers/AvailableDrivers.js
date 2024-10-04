@@ -17,8 +17,6 @@ import CustomButton from "../../components/CustomButton";
 import DriverDetails from "./DriverDetails";
 import axiosInstance from "../../services/axiosInstance";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
-import axios from "axios";
-import { OtpInput } from "react-native-otp-entry";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import RNPickerSelect from 'react-native-picker-select';
@@ -26,21 +24,23 @@ import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import { MaterialIcons as Icon } from '@expo/vector-icons';
 import { Alert } from "react-native";
 import SendMessageModal from "../SendMessageModal";
+import Constants from 'expo-constants'
+
 
 
 
 const AvailableDrivers = ({ navigation }) => {
 
-  const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+
+  // google api key
+  const googleApiKey = Constants.expoConfig?.extra?.REACT_APP_GOOGLE_PLACES_KEY
 
   const {
     isLoading,
     setIsLoading,
     aadhaarOTP,
-    setAadhaarOTP,
     setMessageReceiver,
     userStatesFromProfile,
-    setUserStatesFromProfile
 
   } = useContext(LoadNeedsContext)
 
@@ -140,9 +140,6 @@ const AvailableDrivers = ({ navigation }) => {
     setSearchQuery(query);
   };
 
-  const handleChatNavigate = () => {
-    navigation.navigate("Chat")
-  }
 
   useEffect(() => {
     const getAllDrivers = async () => {
@@ -244,10 +241,7 @@ const AvailableDrivers = ({ navigation }) => {
 
   }
 
-  const handleInputChange = (field, value) => {
-    setModalValues({ ...modalValues, [field]: value });
-    // setErrorFields({ ...errorFields, [field]: false });
-  };
+
 
   const handleAadhaarSubmit = async () => {
     if (aadhaar === "") {
@@ -346,7 +340,6 @@ const AvailableDrivers = ({ navigation }) => {
       ...prevState, fromLocation: (`${city}, ${state}`)
     }))
     setFromLocationModal(false)
-    // You can use the extracted details as needed
   };
 
   const handleToLocation = (data, details) => {
@@ -373,26 +366,10 @@ const AvailableDrivers = ({ navigation }) => {
       ...prevState, toLocation: (`${city}, ${state}`)
     }))
     setToLocationModal(false)
-    // You can use the extracted details as needed
   };
 
 
   const applyFilter = async () => {
-    // Validate inputs
-    let hasError = false;
-    const errors = {};
-
-    // Object.keys(modalValues).forEach((key) => {
-    //   if (!modalValues[key]) {
-    //     errors[key] = true;
-    //     hasError = true;
-    //   }
-    // });
-
-    // if (hasError) {
-    //   setErrorFields(errors);
-    //   return;
-    // }
 
     const filterParams = {
       "driver_name": modalValues.driverName,
@@ -590,7 +567,6 @@ const AvailableDrivers = ({ navigation }) => {
               ]}
               placeholder="From Location"
               value={modalValues.fromLocation}
-              // onChangeText={(text) => handleInputChange('fromLocation', text)}
               onPress={() => {
                 setFromLocationModal(true);
                 setModalValues(prevValues => ({
@@ -742,7 +718,6 @@ const AvailableDrivers = ({ navigation }) => {
         animationType="slide"
         transparent={true}
         visible={fromLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.locationModalContainer}>
           <View style={styles.locationModalContent}>
@@ -757,7 +732,7 @@ const AvailableDrivers = ({ navigation }) => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location
@@ -781,7 +756,6 @@ const AvailableDrivers = ({ navigation }) => {
         animationType="slide"
         transparent={true}
         visible={toLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.locationModalContainer}>
           <View style={styles.locationModalContent}>
@@ -796,7 +770,7 @@ const AvailableDrivers = ({ navigation }) => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location

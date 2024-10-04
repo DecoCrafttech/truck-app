@@ -22,19 +22,21 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import AadhaarOTPVerification from "../AadhaarOTPVerification";
 import Toast from "react-native-toast-message";
 import RNPickerSelect from 'react-native-picker-select';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import Constants from 'expo-constants'
 
 
 const MarketPlace = ({ navigation }) => {
 
-  const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+  
+  // google api key
+  const googleApiKey = Constants.expoConfig?.extra?.REACT_APP_GOOGLE_PLACES_KEY
+
   const [loading, setLoading] = useState(true);
 
   const {
     isLoading,
     setIsLoading,
     aadhaarOTP,
-    setAadhaarOTP
   } = useContext(LoadNeedsContext)
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -151,30 +153,8 @@ const MarketPlace = ({ navigation }) => {
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
 
-    // if(clearFilter){
-    //   setModalValues({
-    //     brand: "",
-    //     price: "",
-    //     kmsDriven: "",
-    //     model: "",
-    //     location: "",
-    //     ton : ""
-    //   });
-    //   setTruckBodyType("")
-    //   setNumberOfTyres("")
-    //   console.log("hi1")
-    // }else{
-    //   setIsModalVisible(!isModalVisible);
-    //   console.log("hello1")
-    // }
-
-
   };
 
-  const handleInputChange = (field, value) => {
-    setModalValues({ ...modalValues, [field]: value });
-    setErrorFields({ ...errorFields, [field]: false });
-  };
 
   const handleAadhaarSubmit = async () => {
     if (aadhaar === "") {
@@ -261,7 +241,6 @@ const MarketPlace = ({ navigation }) => {
       "location": modalValues.location,
       "price": modalValues.price !== "" ? modalValues.price : "",
       "tonnage": modalValues.ton
-      // "price": `${modalValues.price}`
     }
 
 
@@ -487,9 +466,6 @@ const MarketPlace = ({ navigation }) => {
           <View style={styles.modalContent}>
             <View style={styles.filterHeadingContainer}>
               <Text style={styles.modalTitle}>Filter Options</Text>
-              {/* <Text style={styles.closeIcon}>
-                <AntDesign name="close" size={18} color="black" />
-              </Text> */}
             </View>
 
 
@@ -524,7 +500,6 @@ const MarketPlace = ({ navigation }) => {
               placeholder="Search location"
               placeholderTextColor="#c2c2c2"
               value={modalValues.location}
-              // onChangeText={(text) => handleInputChange("location", text)}
               onPress={() => {
                 setLocationModal(true);
               }}
@@ -694,7 +669,6 @@ const MarketPlace = ({ navigation }) => {
         animationType="slide"
         transparent={true}
         visible={locationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.locationModalContainer}>
           <View style={styles.locationModalContent}>
@@ -709,7 +683,7 @@ const MarketPlace = ({ navigation }) => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location

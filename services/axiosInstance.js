@@ -19,7 +19,6 @@ axiosInstance.interceptors.response.use(
         text1: 'Success',
         text2: response.data.message
       });
-      // toast.success(response.data.message);
     } else {
       Toast.show({
         type: 'error',
@@ -32,21 +31,10 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       refreshToken()
-      // Handle 401 error, e.g., redirect to login or refresh token
     }
     return Promise.reject(error);
   }
 );
 
-// axiosInstance.interceptors.request.use((config) => {
-
-//   let token = localStorage.getItem("Token");
-
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   } 
-
-//   return config;
-// });
 
 export default axiosInstance;

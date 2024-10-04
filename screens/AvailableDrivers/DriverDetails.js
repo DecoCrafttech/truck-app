@@ -3,8 +3,18 @@ import { StyleSheet, ScrollView, Text, View, Image } from "react-native";
 import TruckCard from "../TruckCard"; 
 import { TouchableOpacity } from "react-native";
 import { COLORS } from "../../constants";
+import Constants from 'expo-constants';
+
+
+
 
 const DriverDetails = ({  filteredTrucks,navigation }) => {
+
+  
+  // cdn link
+  const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK 
+
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {filteredTrucks.length > 0 ? (
@@ -28,7 +38,7 @@ const DriverDetails = ({  filteredTrucks,navigation }) => {
         <View style={styles.noResultContainer}>
           <View>
             <Image
-              source={require("../../assets/images/Folder_empty.png")}
+               source={{ uri: `${cdnLink}/Folder_empty.png` }}
               width={50}
               height={50}
               resizeMode="center"
@@ -55,7 +65,6 @@ const styles = StyleSheet.create({
     marginTop: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    // flex:1,
 
   },
   noResultsText: {

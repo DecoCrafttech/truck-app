@@ -2,10 +2,16 @@ import React from "react";
 import { StyleSheet, View, ScrollView, Text, Image } from "react-native";
 import TruckCard from "../TruckCard";
 import { TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { COLORS } from "../../constants";
+import Constants from 'expo-constants';
+
+
 
 const TruckDetails = ({ navigation, filteredTrucks }) => {
+
+  // cdn link
+
+  const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK 
 
 
 
@@ -33,7 +39,7 @@ const TruckDetails = ({ navigation, filteredTrucks }) => {
         <View style={styles.noResultContainer}>
           <View>
             <Image
-              source={require("../../assets/images/Folder_empty.png")}
+               source={{ uri: `${cdnLink}/Folder_empty.png` }}
               width={50}
               height={50}
               resizeMode="center"
@@ -60,7 +66,6 @@ const styles = StyleSheet.create({
     marginTop: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    // flex:1,
 
   },
   noResultsText: {

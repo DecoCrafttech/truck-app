@@ -1,27 +1,29 @@
-import { View, Text, Image, BackHandler, Alert } from "react-native";
+import { View, Text, Image, Alert } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import {
   DrawerItem,
   DrawerItemList,
   createDrawerNavigator,
 } from "@react-navigation/drawer";
-import { COLORS, images } from "../constants";
+import { COLORS } from "../constants";
 import { Ionicons } from "@expo/vector-icons";
 import BottomTabNavigation from "./BottomTabNavigation";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Refer from "../screens/DrawerNavigationScreens/Refer";
-import Language from "../screens/DrawerNavigationScreens/Language";
 import AboutUs from "../screens/DrawerNavigationScreens/AboutUs";
 import Blogs from "../screens/DrawerNavigationScreens/Blogs";
 import TermsAndCondition from "../screens/DrawerNavigationScreens/TermsAndCondition";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoadNeedsContext } from "../hooks/LoadNeedsContext";
+import Constants from 'expo-constants';
+
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigation = () => {
 
   const navigation = useNavigation()
+  
 
   const {
     isLoggedIn,
@@ -33,6 +35,10 @@ const DrawerNavigation = () => {
 
   const [userName,setUserName] = useState("")
   const [mobileNumber,setMobileNumber] = useState("")
+
+  // cdn link
+  const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK 
+
 
 
   
@@ -90,7 +96,7 @@ const DrawerNavigation = () => {
               }}
             >
               <Image
-                source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
+                source={{uri : `${cdnLink}/truckmessage_round.png`}}
                 style={{
                   width: 100,
                   height: 100,

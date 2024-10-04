@@ -46,7 +46,6 @@ const styles = StyleSheet.create({
         height:150,
         borderRadius:20,
         marginStart:10
-        // objectFit:'contain'
     }
 })
 

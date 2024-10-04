@@ -10,7 +10,15 @@
     "preview": {
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+      "android": {
+        "buildType": "apk",
+        "resourceClass": "large"  
+      },
+      "ios": {
+        "resourceClass": "large"  
+      }
+    }
   },
   "submit": {
     "production": {}

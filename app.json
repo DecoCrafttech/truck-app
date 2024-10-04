@@ -1,10 +1,10 @@
 {
   "expo": {
     "name": "TruckMessage",
-    "slug": "truckmessage",
+    "slug": "deco",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "https://ddyz8ollngqwo.cloudfront.net/splash_screen.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "https://ddyz8ollngqwo.cloudfront.net/splash_screen.png",
@@ -13,23 +13,26 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mrdesigner.truckmessage"
+      "bundleIdentifier": "com.mash1221.truckmessage"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "https://ddyz8ollngqwo.cloudfront.net/splash_screen.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.mrdesigner.truckmessage"
+      "package": "com.mash1221.truckmessage"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "eas": {
-        "projectId": "f9253304-9484-4e21-879f-12d9ab73ed23"
-      }
+      "REACT_APP_CDN_LINK": "https://ddyz8ollngqwo.cloudfront.net",
+      "REACT_NATIVE_APP_API_URL": "https://truck.truckmessage.com",
+      "REACT_APP_GOOGLE_PLACES_KEY": "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
     },
-    "owner": "mrdesigner"
-  }
+    "eas": {
+      "projectId": "4721c354-4ddd-4df2-b0d8-07fa84f86cc1"
+    }
+  },
+  "owner": "mash1221"
 }

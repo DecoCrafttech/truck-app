@@ -1,21 +1,13 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, Button, ScrollView } from 'react-native';
-import React, { useContext, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, FONTS, images, SIZES } from '../constants/index.js';
-import { StatusBar } from 'expo-status-bar';
+import { View, StyleSheet } from 'react-native';
+import React, { useContext } from 'react';
+import { COLORS } from '../constants/index.js';
 import { OtpInput } from 'react-native-otp-entry';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-// import Button from '../components/Button.js';
-import Container, { Toast } from 'toastify-react-native';
 import { LoadNeedsContext } from '../hooks/LoadNeedsContext.js';
 
 
 const AadhaarOTPVerification = () => {
 
     const {
-        aadhaarOTP,
         setAadhaarOTP
           } = useContext(LoadNeedsContext)
 

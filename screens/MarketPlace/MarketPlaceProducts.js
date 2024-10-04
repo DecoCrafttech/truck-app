@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import {
   View,
   Text,
@@ -9,24 +9,25 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import axiosInstance from "../../services/axiosInstance";
 import { COLORS, images } from "../../constants";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Constants from 'expo-constants'
 
 
 
-const ProductCategoryList = ({ navigation, searchQuery, filteredProducts, onPressCategory, loading }) => {
+
+const ProductCategoryList = ({ navigation, filteredProducts, onPressCategory, loading }) => {
 
   const {
-    currentUser,
-    setCurrentUser,
-    messageReceiver,
     setMessageReceiver
   } = useContext(LoadNeedsContext)
+
+  // cdn link
+  const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK
 
 
 
@@ -112,7 +113,7 @@ const ProductCategoryList = ({ navigation, searchQuery, filteredProducts, onPres
     <View style={styles.noResultContainer}>
           <View>
             <Image
-              source={require("../../assets/images/Folder_empty.png")}
+               source={{ uri: `${cdnLink}/Folder_empty.png` }}
               width={50}
               height={50}
               resizeMode="center"
@@ -231,13 +232,11 @@ const styles = StyleSheet.create({
   textRight: {
     textAlign: 'right',
     fontWeight:'600'
-    // Additional styling for the "Hi" text if needed
   },
   noResultContainer: {
     marginTop: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    // flex:1,
 
   },
   noResultsText: {

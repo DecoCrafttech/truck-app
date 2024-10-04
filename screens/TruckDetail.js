@@ -15,7 +15,6 @@ import axiosInstance from "../services/axiosInstance";
 import { useNavigation } from "@react-navigation/native";
 import { LoadNeedsContext } from "../hooks/LoadNeedsContext";
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Ionicons } from "@expo/vector-icons";
 import Icon1 from "react-native-vector-icons/MaterialIcons";
 import AntDesign from '@expo/vector-icons/AntDesign';
 
@@ -27,7 +26,6 @@ const TruckDetail = ({ route }) => {
   const { item } = route.params;
 
   const {
-    messageReceiver,
     setMessageReceiver,
     
   } = useContext(LoadNeedsContext)
@@ -130,32 +128,6 @@ const TruckDetail = ({ route }) => {
     navigation.navigate("Chat")
   }
 
-
-  // useEffect(() => {
-
-  //   if(fullProductDetails.updt){
-  //     const dateObject = new Date(fullProductDetails.updt);
-
-  //     // Format the date as "23 Sep 2024"
-  //     const formattedDate = dateObject.toLocaleDateString('en-GB', {
-  //       day: '2-digit',
-  //       month: 'short',
-  //       year: 'numeric'
-  //     });
-
-  //     // Format the time as "04:13 PM"
-  //     const formattedTime = dateObject.toLocaleTimeString('en-US', {
-  //       hour: '2-digit',
-  //       minute: '2-digit',
-  //       hour12: true
-  //     });
-
-  //     const finalResult = `${formattedDate} ${formattedTime}`;
-
-  //     setFormattedTime(finalResult)
-  //   }
-
-  // }, [])
 
 
   return (

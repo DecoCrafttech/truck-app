@@ -1,27 +1,19 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, Image, Text, Button, Modal, TextInput, TouchableOpacity, Platform, Alert, ActivityIndicator } from 'react-native';
+import { View, Image, Text,  Modal, TextInput, TouchableOpacity, Platform, Alert, ActivityIndicator } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import Feather from '@expo/vector-icons/Feather';
-import AntDesign from '@expo/vector-icons/AntDesign';
-
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Dropdown } from 'react-native-element-dropdown';
-import { useNavigation } from '@react-navigation/native';
-import DropDownPicker from 'react-native-dropdown-picker';
 import MultiSelectComponent from '../../components/MultiSelectComponent';
-import { citiesData, statesData } from '../../constants/cityAndState';
+import {  statesData } from '../../constants/cityAndState';
 import { ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { COLORS } from '../../constants';
-import MultiSelectComponentUpdation from '../../components/MultiSelectComponentUpdation';
 import { Toast } from 'toastify-react-native';
 import axiosInstance from '../../services/axiosInstance';
-import { launchImageLibrary } from 'react-native-image-picker';
-import CustomButton from '../../components/CustomButton';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import { MaterialIcons as Icon } from '@expo/vector-icons';
 import { LoadNeedsContext } from '../../hooks/LoadNeedsContext';
@@ -36,7 +28,6 @@ const ProfileTopContainer = () => {
 
 
     const {
-        userStatesFromProfile,
         setUserStatesFromProfile
     } = useContext(LoadNeedsContext)
 
@@ -59,13 +50,11 @@ const ProfileTopContainer = () => {
 
     const [selectedStates, setSelectedStates] = useState([]);
     const [operatingStates, setOperatingStates] = useState([])
-    const [statesUpdated, setStatesUpdated] = useState(false)
 
     const [editSelectedStates, setEditSelectedStates] = useState([])
     const [editStates, setEditStates] = useState([])
     const [editStatesClick, setEditStatesClick] = useState(false)
     const [updateSelectedStates, setUpdateSelectedStates] = useState([])
-    const [updateStates, setUpdateStates] = useState([])
 
 
 
@@ -105,7 +94,7 @@ const ProfileTopContainer = () => {
             const getUserProfileParams = {
                 user_id: await AsyncStorage.getItem("user_id")
             }
-            const response = await axios.post("https://truck.truckmessage.com/get_user_profile", getUserProfileParams)
+            const response = await axiosInstance.post("/get_user_profile", getUserProfileParams)
             if (response.data.error_code === 0) {
                 setTimeout(() => {
                     setPageLoading(true)
@@ -160,9 +149,6 @@ const ProfileTopContainer = () => {
         setUpdatedMobile(mobile)
         setUpdatedDob(dob)
         setUpdatedCategory(category)
-        // setUpdatedProfileImage(profileImage)
-        // setUpdatedOperatingCities(userCities)
-        // setUpdatedOperatingStates(userStates)
     };
 
 
@@ -202,7 +188,7 @@ const ProfileTopContainer = () => {
 
 
     const updateProfileImageAPI = async (uri) => {
-        const url = 'https://truck.truckmessage.com/update_profile_image'; // Replace with your server URL
+        const url = `${process.env.REACT_NATIVE_APP_API_URL}/update_profile_image`; // Replace with your server URL
 
         const formData = new FormData();
         formData.append('profile_image', {
@@ -264,7 +250,7 @@ const ProfileTopContainer = () => {
                 "state": []
             }
 
-            const res = await axios.post("https://truck.truckmessage.com/update_profile", updateProfileParams, {
+            const res = await axiosInstance.post("/update_profile", updateProfileParams, {
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -405,7 +391,6 @@ const ProfileTopContainer = () => {
 
     return (
         <View style={styles.container}>
-            {/* <Text  onPress={() => alert('hey')}>Edit</Text> */}
 
             <View style={styles.header}>
                 {
@@ -502,43 +487,7 @@ const ProfileTopContainer = () => {
                             }
                         </View>
 
-                        {/* <Dropdown
-                            style={styles.input}
-                            placeholderStyle={styles.placeholderStyle}
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-                            iconStyle={styles.iconStyle}
-                            itemTextStyle={styles.itemTextStyle}
-                            itemContainerStyle={styles.itemContainerStyle}
-                            data={categoryData}
-                            maxHeight={300}
-                            labelField="label"
-                            valueField="category"
-                            placeholder="Select item"
-                            searchPlaceholder="Search..."
-                            value={updatedCategory}
-                            onChange={item => setUpdatedCategory(item.category)}
-                        /> */}
-
-                        {/* <View style={{ marginBottom: 6 }}>
-                            <MultiSelectComponentUpdation
-                                listOfData={citiesData}
-                                userCities={userCities}
-                                setUserCities={setUserCities}
-                                updatedOperatingCities={updatedOperatingCities}
-                                setUpdatedOperatingCities={setUpdatedOperatingCities}
-                            />
-                        </View> */}
-
-                        {/* <View style={{ marginBottom: 6 }}>
-                            <MultiSelectComponentUpdation
-                                listOfData={statesData}
-                                userStates={userStates}
-                                setUserStates={setUserStates}
-                                updatedOperatingStates={updatedOperatingStates}
-                                setUpdatedOperatingStates={setUpdatedOperatingStates}
-                            />
-                        </View> */}
+                    
                         <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10, height: 50, alignItems: 'center', justifyContent: 'center' }}>
                             <RNPickerSelect
                                 onValueChange={(value) => setUpdatedCategory(value)}
@@ -638,11 +587,6 @@ const ProfileTopContainer = () => {
                                     />
                                 </View>
                             </View>
-
-
-
-
-
 
                             <View>
                                 <Text
@@ -825,23 +769,7 @@ const ProfileTopContainer = () => {
                                     </Text>
 
                                 </View>
-                                {/* <View>
-                                    <Text
-                                        style={{
-                                            fontWeight: "bold",
-                                            color: COLORS.brand,
-                                            fontSize: 16,
-                                            marginTop: 20,
-                                        }}
-                                    >Your Operating States {'\n'}
-                                    </Text>
-                                    <Text
-                                        style={{ position: 'absolute', right: "0%", bottom: "35%" }}
-                                        onPress={() => handleEditStates()}
-                                    >Edit
-                                    </Text>
 
-                                </View> */}
                             </View>
                             <Text style={{ fontWeight: "500", color: COLORS.secondary, fontSize: 14 }}>
 
@@ -959,7 +887,6 @@ const styles = {
         alignItems: 'center',
     },
     dob: {
-        // marginBottom : 10,
         marginHorizontal: 0,
         flexDirection: 'row',
         justifyContent: 'center',
@@ -1087,8 +1014,6 @@ const styles = {
         justifyContent: "center",
         marginTop: 20,
         alignItems: 'center',
-        // width:"100%",
-        // flexWrap :"wrap",
         marginHorizontal: 20
 
     },

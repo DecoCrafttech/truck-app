@@ -1,16 +1,12 @@
-import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Button, Image, BackHandler, Alert } from 'react-native'
-import React, { useRef, useState } from 'react'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
-import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
-import Checkbox from 'expo-checkbox';
-import { Pressable } from 'react-native';
-import axios from 'axios';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image,  } from 'react-native'
+import React, {  useState } from 'react'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import {  useNavigation } from '@react-navigation/native';
 import { COLORS } from '../constants';
 import Container, { Toast } from 'toastify-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axiosInstance from '../services/axiosInstance';
+import Constants from 'expo-constants';
 
 
 
@@ -20,14 +16,18 @@ import axiosInstance from '../services/axiosInstance';
 const ForgotPassword = () => {
 
 
+  // cdn link
+  const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK 
+
+
     const navigation = useNavigation()
 
     const [mobileNumber, setMobileNumber] = useState("")
 
-    
+
     const handleSendOTP = async () => {
         const OTPParams = {
-            "phone_number" : `${mobileNumber}`
+            "phone_number": `${mobileNumber}`
         }
 
 
@@ -35,9 +35,8 @@ const ForgotPassword = () => {
 
             await AsyncStorage.setItem("mobileNumber", `${mobileNumber}`)
 
-            // const response = await axiosInstance.post("/send_signup_otp", LogInParams)
 
-            const response = await axios.post("https://truck.truckmessage.com/send_forgot_pwd_otp", OTPParams)
+            const response = await axiosInstance.post("/send_forgot_pwd_otp", OTPParams)
 
 
             if (response.data.error_code === 0) {
@@ -55,18 +54,19 @@ const ForgotPassword = () => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: '#fff' }]}>
-             <Container
-                    position="top"
-                    duration={3000}
-                    animationIn="slideInDown"
-                    height="auto"
-                    width="100%"
-                    textStyle={{ 
-                        fontSize: 15,  
-                        flexWrap: 'wrap', // Ensure text wraps
-                        maxWidth: '90%', // Ensure text does not overflow
-                        overflow: 'hidden', }} // Ensure text wraps
-                />
+            <Container
+                position="top"
+                duration={3000}
+                animationIn="slideInDown"
+                height="auto"
+                width="100%"
+                textStyle={{
+                    fontSize: 15,
+                    flexWrap: 'wrap',
+                    maxWidth: '90%',
+                    overflow: 'hidden',
+                }}
+            />
             <View >
 
 
@@ -74,7 +74,7 @@ const ForgotPassword = () => {
                     <View style={styles.avatarContainer}>
                         <Image
                             style={styles.avatar}
-                            source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
+                            source={{ uri: `${cdnLink}/truckmessage_round.png` }}
                         />
                     </View>
 
@@ -95,14 +95,13 @@ const ForgotPassword = () => {
                                 placeholder='Enter your mobile number'
                                 placeholderTextColor='grey'
                                 inputMode='numeric'
-                                // maxLength={10}
                                 style={styles.mobileNumberInput}
                                 value={mobileNumber}
                                 onChangeText={(text) => setMobileNumber(text)}
                             >
                             </TextInput>
                         </View>
-                    </View>           
+                    </View>
                     <View>
                         <TouchableOpacity style={styles.buttonContainer} onPress={handleSendOTP}>
                             <Text style={styles.buttonText}>Send OTP</Text>
@@ -222,12 +221,11 @@ const styles = StyleSheet.create({
         borderColor: 'grey',
         borderWidth: 1,
         justifyContent: 'center',
-        // alignItems:'center'
     },
-    errMessage : {
-        color : 'red',
-        marginTop : 10
-    },  
+    errMessage: {
+        color: 'red',
+        marginTop: 10
+    },
     buttonContainer: {
         backgroundColor: COLORS.primary,
         borderRadius: 5,

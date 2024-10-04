@@ -9,21 +9,18 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Button,
   ScrollView,
   Alert,
-  Platform
 } from "react-native";
 import axiosInstance from "../../services/axiosInstance";
 import RNPickerSelect from 'react-native-picker-select';
-import Feather from '@expo/vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
 
-const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setBuyAndSellRefresh,fetchData }) => {
+const MarketPlace = ({  allData,fetchData }) => {
   const [editItem, setEditItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [pageRefresh, setPageRefresh] = useState(false)
@@ -75,37 +72,7 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
     { label: 'Others', value: 'Others' },
   ]
 
-  const kmsData = [
-    { label: '0 - 10,000 kms', value: '(0 - 10,000) kms' },
-    { label: '10,001 - 30,000 kms', value: '(10,001 - 30,000) kms' },
-    { label: '30,001 - 50,000 kms', value: '(30,001 - 50,000) kms' },
-    { label: '50,001 - 70,000 kms', value: '(50,001 - 70,000) kms' },
-    { label: '70,001 - 100,000 kms', value: '(70,001 - 100,000) kms' },
-    { label: '100,001 - 150,000 kms', value: '(100,001 - 150,000) kms' },
-    { label: '150,001 - 200,000 kms', value: '(150,001 - 200,000) kms' },
-    { label: '200,001 - 300,000 kms', value: '(200,001 - 300,000) kms' },
-    { label: '300,001 - 500,000 kms', value: '(300,001 - 500,000) kms' },
-    { label: '500,001 - 700,000 kms', value: '(500,001 - 700,000) kms' },
-    { label: '700,001 - 1,000,000 kms', value: '(700,001 - 1,000,000) kms' },
-    { label: '1,000,001 - 1,500,000 kms', value: '(1,000,001 - 1,500,000) kms' },
-    { label: '1,500,001 - 2,000,000 kms', value: '(1,500,001 - 2,000,000) kms' },
-    { label: '2,000,001+ kms', value: '(2,000,001+) kms' }
-  ];
 
-
-  const priceData = [
-    { label: '0 - 5,00,000 lakhs', value: '(0 - 5,00,000) lakhs' },
-    { label: '5,00,001 - 10,00,000 lakhs', value: '(5,00,001 - 10,00,000) lakhs' },
-    { label: '10,00,001 - 20,00,000 lakhs', value: '(10,00,001 - 20,00,000) lakhs' },
-    { label: '20,00,001 - 30,00,000 lakhs', value: '(20,00,001 - 30,00,000) lakhs' },
-    { label: '30,00,001 - 40,00,000 lakhs', value: '(30,00,001 - 40,00,000) lakhs' },
-    { label: '40,00,001 - 50,00,000 lakhs', value: '(40,00,001 - 50,00,000) lakhs' },
-    { label: '50,00,001 - 60,00,000 lakhs', value: '(50,00,001 - 60,00,000) lakhs' },
-    { label: '60,00,001 - 70,00,000 lakhs', value: '(60,00,001 - 70,00,000) lakhs' },
-    { label: '70,00,001 - 80,00,000 lakhs', value: '(70,00,001 - 80,00,000) lakhs' },
-    { label: '80,00,001 - 90,00,000 lakhs', value: '(80,00,001 - 90,00,000) lakhs' },
-    { label: '90,00,001 and above lakhs', value: '(90,00,001 and above) lakhs' }
-  ];
 
   const bodyTypeData = [
     { label: 'Open body', value: 'open_body' },
@@ -158,66 +125,10 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
     setModalVisible(true);
   };
 
-  // const pickProfileImage = async () => {
-  //   // Request permission to access the media library
-  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //   if (status !== 'granted') {
-  //     Alert.alert('Permission required', 'Sorry, we need media library permissions to make this work!');
-  //     return;
-  //   }
-
-  //   // Launch the image picker
-  //   const result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     allowsEditing: true,
-  //     aspect: [4, 4],
-  //     quality: 1,
-  //   });
-
-  //   if (!result.canceled) {
-  //     const { uri } = result.assets[0];
-  //     setUpdatedImage(uri);
-  //   }
-  // };
-
-  const pickProfileImage = async () => {
-    if (images.length >= 3) {
-      Alert.alert("Maximum of 3 images can be uploaded.");
-      return;
-    }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      // Filter out already selected images and limit to 3
-      const newImages = result.assets.slice(0, 3 - images.length);
-      setImages((prevImages) => [...prevImages, ...newImages]);
-    }
-  };
 
 
-  const pickImage = async () => {
-    if (images.length >= 3) {
-      Alert.alert("Maximum of 3 images can be uploaded.");
-      return;
-    }
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
-      quality: 1,
-    });
 
-    if (!result.canceled) {
-      // Filter out already selected images and limit to 3
-      const newImages = result.assets.slice(0, 3 - images.length);
-      setImages((prevImages) => [...prevImages, ...newImages]);
-    }
-  };
 
 
   const handleDeletePress = async (item) => {
@@ -253,22 +164,6 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
 
   const saveChanges = async () => {
 
-    // const requiredParams = {
-    //   "user_id": editedData.userId,
-    //   "brand": editedData.brand,
-    //   "buy_sell_id": editedData.buySellId,
-    //   "contact_no": editedData.contact_no,
-    //   "description": editedData.description,
-    //   "id": editedData.id,
-    //   "kms_driven": editedData.kms_driven,
-    //   "location": editedData.location,
-    //   "model": editedData.model,
-    //   "owner_name": editedData.owner_name,
-    //   "price": editedData.price,
-    //   "vehicle_number": editedData.vehicleNumber,
-    // }
-
-
     const formData = new FormData();
 
     // Append images to FormData
@@ -280,11 +175,6 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
       });
     });
 
-    // formData.append('truck_image1', {
-    //   uri: Platform.OS === 'ios' ? updateImage.replace('file://', '') : updateImage,
-    //   type: 'image/jpeg', // Adjust if you are dealing with different image types
-    //   name: 'truck_image1',
-    // });
 
     formData.append("user_id", editedData.userId)
     formData.append("brand", editedData.brand)
@@ -412,10 +302,6 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
             <Text style={styles.modalTitle}>Edit Item</Text>
             <ScrollView style={{ width: '100%', height: "70%" }} >
 
-              {/* <Image source={{ uri: editedData.imageUrl }} style={styles.itemImage} /> */}
-
-
-
 
               <TextInput
                 style={styles.input}
@@ -441,12 +327,6 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
                 value={editedData.kms_driven}
                 onChangeText={(text) => setEditedData({ ...editedData, kms_driven: text })}
               />
-              {/* <TextInput
-              style={styles.input}
-              placeholder="Brand"
-              value={editedData.brand}
-              onChangeText={(text) => setEditedData({ ...editedData, brand: text })}
-            /> */}
               <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
                 <RNPickerSelect
                   onValueChange={(value) => setEditedData({ ...editedData, brand: value })}
@@ -459,14 +339,6 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
                 />
               </View>
 
-
-
-              {/* <TextInput
-              style={styles.input}
-              placeholder="Model"
-              value={editedData.model}
-              onChangeText={(text) => setEditedData({ ...editedData, model: text })}
-            /> */}
               <View style={{ borderColor: "#ccc", borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
                 <RNPickerSelect
                   onValueChange={(value) => setEditedData({ ...editedData, model: value })}
@@ -491,19 +363,6 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
                   }}
                 />
               </View>
-              {/* 
-              <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
-              <RNPickerSelect
-                onValueChange={(value) => setEditedData({ ...editedData, tons: value })}
-                items={tonsData}
-                value={editedData.ton}
-                placeholder={{
-                  label: 'Select ton',
-                  value: null,
-                  color: 'grey',
-                }}
-              />
-            </View> */}
 
               <TextInput
                 style={styles.input}
@@ -536,40 +395,7 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
               />
 
 
-              {/* <View>
-                <View style={{ backgroundColor: 'red', marginBottom: 20 }}>
-                  <Image
-                    style={[styles.avatar, { alignItems: 'center', marginHorizontal: 'auto' }]}
-                    source={{ uri: updateImage === null ? editedData.imageUrl : updateImage }} />
-                  <Feather style={[styles.modalImageEditIcon, { position: 'absolute', top: 0, left: 0 }]}
-                    name="edit"
-                    size={20}
-                    color="#000"
-                    onPress={() => pickProfileImage()}
-                  />
-                </View>
-              </View> */}
-
-
-              {/* <View style={styles.multipleImageContainer}>
-                {
-                    <Image
-                      source={{ uri: editedData.images[0] }}
-                      style={styles.image}
-                      width={80}
-                      height={80}
-                    />
-                }
-                {
-                    <Image
-                      source={{ uri: editedData.images[1] }}
-                      style={styles.image}
-                      width={80}
-                      height={80}
-                    />
-                }
-              </View> */}
-
+             
 
 
               <View style={styles.multipleImageContainer}>
@@ -587,14 +413,6 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
                     )
                   })
                 }
-
-                {/* <Image
-                  source={{ uri: "https://www.themarketingnutz.com/wp-content/uploads/2018/01/opulent-profile-square-07.jpg" }}
-                  style={styles.image}
-                  width={80}
-                  height={80}
-                /> */}
-
 
               </View>
 
@@ -615,7 +433,6 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
 
             <View style={styles.modalButtons}>
 
-              {/* <Button  title="Save Changes" onPress={saveChanges} /> */}
               <TouchableOpacity
                 style={styles.saveButton}
                 onPress={saveChanges}
@@ -623,7 +440,6 @@ const MarketPlace = ({ navigation, allData, editedDetails,buyAndSellRefresh,setB
                 <Text style={styles.saveButtonText}>Save Changes</Text>
               </TouchableOpacity>
 
-              {/* <Button title="Cancel" onPress={() => setModalVisible(false)} /> */}
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => {
@@ -742,11 +558,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
-  // modalButtons: {
-  //   flexDirection: "row",
-  //   justifyContent: "space-around",
-  //   marginTop: 20,
-  // },
   saveButton: {
     backgroundColor: COLORS.primary,
     padding: 10,

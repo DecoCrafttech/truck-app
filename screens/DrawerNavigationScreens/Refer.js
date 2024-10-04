@@ -32,7 +32,6 @@ const Refer = () => {
   const [feedbackModalVisible, setFeedbackModalVisible] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [editedDetails, setEditedDetails] = useState(null);
-  const [buyAndSellRefresh, setBuyAndSellRefresh] = useState(false)
 
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
@@ -310,10 +309,7 @@ const Refer = () => {
     fetchData("user_load_details"); // Trigger fetchData when selectedValue changes
   }, []);
 
-  // useEffect(() => {
-  //   setSelectedValue("user_buy_sell_details")
-  //   fetchData("user_buy_sell_details"); // Trigger fetchData when selectedValue changes
-  // }, [buyAndSellRefresh]);
+
 
 
   const fetchData = async (selectedValue) => {
@@ -368,7 +364,6 @@ const Refer = () => {
                 { icon: "directions-bus", text: item.vehicle_number },
                 { icon: "attractions", text: item.no_of_tyres },
                 { icon: "local-shipping", text: item.truck_body_type },
-                // { icon: "verified", text: item.truck_name },
               ],
               description: item.description,
               onButton1Press: () => handleEdit(item),

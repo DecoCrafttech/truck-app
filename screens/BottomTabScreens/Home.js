@@ -23,8 +23,6 @@ const Home = () => {
   const {
     isFirstSignup,
     setIsFirstSignup,
-    isLoggedIn,
-    setIsLoggedIn,
     userStatesFromProfile,
     setUserStatesFromProfile
   } = useContext(LoadNeedsContext)
@@ -68,12 +66,6 @@ const Home = () => {
   const setStateFun = () => {
     setUserStatesFromProfile(userStatesFromProfile)
   }
-
-
-
-  useEffect(() => {
-    console.log("userStatesFromProfileHome", userStatesFromProfile)
-  }, [userStatesFromProfile])
 
 
 
@@ -184,14 +176,7 @@ const Home = () => {
                           <AntDesign name="close" size={24} color="black" />
                         </Text>
                       </View>
-                      {/* <View style={{ width: 320 }}>
-                        <MultiSelectComponent
-                          listOfData={statesData}
-                          selectedStates={selectedStates}
-                          setSelectedStates={setSelectedStates}
-                          setOperatingStates={setOperatingStates}
-                        />
-                      </View> */}
+                 
                       <TouchableOpacity
                         style={[
                           styles.userContainer,
@@ -214,7 +199,6 @@ const Home = () => {
                         }}>
                           <View style={styles.userInfoContainer}>
                             <Text style={styles.fullName}>FullName</Text>
-                            {/* <Text style={styles.lastMessage}>{item.lastMessage}</Text> */}
                             <Text style={styles.lastMessage}>LastMessage</Text>
                           </View>
 
@@ -375,7 +359,6 @@ const styles = StyleSheet.create({
   lastMessage: {
     fontSize: 14,
     color: 'grey',
-    // maxWidth:"78%"
   },
   lastMessageTime: {
     fontSize: 12,

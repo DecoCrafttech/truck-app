@@ -7,7 +7,7 @@ const HeaderWithBackButton = ({ title, onBackPress }) => {
     <View style={styles.header}>
       <TouchableOpacity onPress={onBackPress} style={styles.backButton}>
         <Image
-          source={icons.home} // Replace with your back icon image
+          source={icons.home} 
           style={styles.backIcon}
         />
       </TouchableOpacity>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { COLORS } from "../constants";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Icon1 from 'react-native-vector-icons/FontAwesome';
@@ -7,7 +7,6 @@ import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 const TruckCard = ({
-  title,
   fromLocation,
   toLocation,
   labels,
@@ -87,7 +86,6 @@ const TruckCard = ({
             :
             <>
               <Text style={styles.title}>{profileName}</Text>
-              {/* <Text style={styles.title}>{companyName}</Text> */}
             </>
         }
 
@@ -249,7 +247,6 @@ const styles = StyleSheet.create({
   textRight: {
     textAlign: 'right',
     fontWeight: '600'
-    // Additional styling for the "Hi" text if needed
   },
 });
 

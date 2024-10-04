@@ -13,10 +13,10 @@ import { GiftedChat, Bubble } from "react-native-gifted-chat";
 import { useNavigation } from "@react-navigation/native";
 import { COLORS, icons, SIZES } from "../constants";
 import { LoadNeedsContext } from "../hooks/LoadNeedsContext";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import axiosInstance from "../services/axiosInstance";
 
 const Chat = () => {
   const navigation = useNavigation();
@@ -42,7 +42,6 @@ const Chat = () => {
 
     const fetchChatMessages = async () => {
       try {
-        // setChatMessageLoading(true)
 
 
         let requiredParams;
@@ -87,9 +86,7 @@ const Chat = () => {
 
 
         const userId = await AsyncStorage.getItem("user_id");
-        const response = await axios.post(
-          "https://truck.truckmessage.com/get_user_chat_message_list", requiredParams
-        );
+        const response = await axiosInstance.post("/get_user_chat_message_list", requiredParams);
 
    
 
@@ -158,7 +155,7 @@ const Chat = () => {
       const userId = await AsyncStorage.getItem("user_id");
       const currentTime = new Date().getTime();
 
-      await axios.post("https://truck.truckmessage.com/user_chat_message", {
+      await axiosInstance.post("/user_chat_message", {
         user_id: userId,
         person_id: messageReceiver.person_id ? messageReceiver?.person_id : messageReceiver?.user_id,
         message: inputMessage,

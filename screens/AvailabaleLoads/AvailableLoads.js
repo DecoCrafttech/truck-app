@@ -8,23 +8,22 @@ import CustomButton from "../../components/CustomButton";
 import LoadDetails from "./LoadDetails";
 import axiosInstance from "../../services/axiosInstance";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
-import axios from "axios";
-import { OtpInput } from "react-native-otp-entry";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Container, { Toast } from 'toastify-react-native';
 import AadhaarOTPVerification from "../AadhaarOTPVerification";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import { useNavigation } from "@react-navigation/native";
 import RNPickerSelect from 'react-native-picker-select';
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import { MaterialIcons as Icon } from '@expo/vector-icons';
 import SendMessageModal from "../SendMessageModal";
+import Constants from 'expo-constants'
 
 
 
 const AvailableLoads = ({ navigation }) => {
-
-  const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+  
+  // google api key
+  const googleApiKey = Constants.expoConfig?.extra?.REACT_APP_GOOGLE_PLACES_KEY
 
 
 
@@ -32,7 +31,6 @@ const AvailableLoads = ({ navigation }) => {
     isLoading,
     setIsLoading,
     aadhaarOTP,
-    setAadhaarOTP,
     setMessageReceiver,
     userStatesFromProfile,
   } = useContext(LoadNeedsContext);
@@ -231,7 +229,6 @@ const AvailableLoads = ({ navigation }) => {
 
   const handleInputChange = (field, value) => {
     setModalValues({ ...modalValues, [field]: value });
-    // setErrorFields({ ...errorFields, [field]: false });
   };
 
   const handleAadhaarSubmit = async () => {
@@ -333,7 +330,6 @@ const AvailableLoads = ({ navigation }) => {
       ...modalValues, fromLocation: (`${city}, ${state}`)
     })
     setFromLocationModal(false)
-    // You can use the extracted details as needed
   };
 
   const handleToLocation = (data, details) => {
@@ -360,7 +356,6 @@ const AvailableLoads = ({ navigation }) => {
       ...modalValues, toLocation: (`${city}, ${state}`)
     })
     setToLocationModal(false)
-    // You can use the extracted details as needed
   };
 
 
@@ -552,7 +547,6 @@ const AvailableLoads = ({ navigation }) => {
               style={[styles.input, errorFields.fromLocation && styles.inputError]}
               placeholder="From Location"
               value={modalValues.fromLocation}
-              // onChangeText={(text) => handleInputChange('fromLocation', text)}
               onPress={() => {
                 setFromLocationModal(true);
                 setModalValues(prevValues => ({
@@ -717,7 +711,6 @@ const AvailableLoads = ({ navigation }) => {
         animationType="slide"
         transparent={true}
         visible={fromLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.locationModalContainer}>
           <View style={styles.locationModalContent}>
@@ -732,7 +725,7 @@ const AvailableLoads = ({ navigation }) => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location
@@ -756,7 +749,6 @@ const AvailableLoads = ({ navigation }) => {
         animationType="slide"
         transparent={true}
         visible={toLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.locationModalContainer}>
           <View style={styles.locationModalContent}>
@@ -771,7 +763,7 @@ const AvailableLoads = ({ navigation }) => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location
@@ -852,7 +844,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    // height: 40,
     padding: 12,
 
   },
@@ -938,8 +929,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 20,
     alignItems: 'center',
-    // width:"100%",
-    // flexWrap :"wrap",
     marginHorizontal: 20
 
   },

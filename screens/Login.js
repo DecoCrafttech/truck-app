@@ -1,11 +1,8 @@
-import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Button, Image, BackHandler, Alert } from 'react-native'
-import React, { useContext, useRef, useState } from 'react'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
-import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet, TextInput,  TouchableOpacity,  Image, BackHandler, Alert } from 'react-native'
+import React, { useContext,  useState } from 'react'
+import {  SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons';
-import Checkbox from 'expo-checkbox';
 import { Pressable } from 'react-native';
-import axios from 'axios';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { COLORS } from '../constants';
 import Container, { Toast } from 'toastify-react-native';
@@ -20,12 +17,9 @@ import { LoadNeedsContext } from '../hooks/LoadNeedsContext';
 
 const Login = () => {
 
-    const inputRef = useRef("")
 
     const {
-        isLoggedIn,
         setIsLoggedIn,
-        userStatesFromProfile,
         setUserStatesFromProfile
     } = useContext(LoadNeedsContext)
 
@@ -36,11 +30,8 @@ const Login = () => {
         password: "",
     })
 
-    const [currentPage, setCurrentPage] = useState('login')
 
     const [showPassword, setShowPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const [isChecked, setIsChecked] = useState(false)
 
 
     useFocusEffect(
@@ -122,7 +113,6 @@ const Login = () => {
 
                 await AsyncStorage.setItem("mobileNumber", `${inputs.mobileNumber}`)
 
-                // const response = await axiosInstance.post("/send_signup_otp", LogInParams)
 
                 const response = await axiosInstance.post("/login", LogInParams)
                 if (response.data.error_code === 0) {
@@ -148,39 +138,11 @@ const Login = () => {
         }
     }
 
-    const handleResetPassword = async () => {
-        const resetPasswordPasswordParams = {
-            "user_id": `${await AsyncStorage.getItem("user_id")}`,
-        }
-
-        try {
-
-            const response = await axios.post("https://truck.truckmessage.com/send_forgot_pwd_otp", resetPasswordPasswordParams)
-
-            if (response.data.error_code === 0) {
-                Toast.success(response.data.message)
-                navigation.navigate('ForgotPassword')
-            } else {
-                Toast.error(response.data.message)
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }
 
 
-    const [date, setDate] = useState(new Date());
-    const [show, setShow] = useState(false);
 
-    const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date;
-        setShow(Platform.OS === 'android');
-        setDate(currentDate);
-    };
 
-    const showMode = (currentMode) => {
-        setShow(!show);
-    };
+
 
 
 
@@ -202,10 +164,7 @@ const Login = () => {
             />
 
             <View >
-                {/* <StatusBar hidden /> */}
-                {/* <View style={styles.pageHeadingContainer}>
-                    <Text style={styles.pageHeading}>Login</Text>
-                </View> */}
+
 
 
 
@@ -214,7 +173,7 @@ const Login = () => {
                     <View style={styles.avatarContainer}>
                         <Image
                             style={styles.avatar}
-                            source={{ uri: "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png" }}
+                            source={{uri : "https://ddyz8ollngqwo.cloudfront.net/truckmessage_round.png"}}
                         />
                     </View>
 
@@ -238,7 +197,6 @@ const Login = () => {
                                 placeholderTextColor='grey'
                                 inputMode='numeric'
                                 maxLength={10}
-                                // maxLength={10}
                                 style={styles.mobileNumberInput}
                                 value={inputs.mobileNumber}
                                 onChangeText={(value) => handleChange('mobileNumber', value)}
@@ -275,11 +233,6 @@ const Login = () => {
                             </View>
                         </View>
                     </View>
-
-                    {/* <View style={{ marginTop: 30, marginHorizontal: 'auto', width: 300, justifyContent: 'center' }}>
-                        <Button title='Login' onPress={handleLogInClick} />
-                        <CustomButton title="Register" onPress={handleLogInClick} />
-                    </View> */}
 
                     <View>
                         <TouchableOpacity style={styles.buttonContainer} onPress={handleLogInClick}>
@@ -414,7 +367,6 @@ const styles = StyleSheet.create({
         borderColor: 'grey',
         borderWidth: 1,
         justifyContent: 'center',
-        // alignItems:'center'
     },
     buttonContainer: {
         backgroundColor: COLORS.primary,

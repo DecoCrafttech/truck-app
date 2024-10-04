@@ -1,23 +1,25 @@
 import React, { useContext, useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Button, ActivityIndicator } from "react-native";
 import { COLORS, images } from "../../constants";
-import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import Container, { Toast } from 'toastify-react-native';
 import axiosInstance from "../../services/axiosInstance";
 import { Alert } from "react-native";
+import Constants from 'expo-constants'
 
 
 const VehicleProfileDetails = () => {
+
+
+  // cdn link
+  const cdnLink = Constants.expoConfig?.extra?.REACT_APP_CDN_LINK
 
   const {
     isLoading,
     setIsLoading,
   } = useContext(LoadNeedsContext)
 
-  const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [isInputValid, setIsInputValid] = useState(true);
@@ -26,18 +28,6 @@ const VehicleProfileDetails = () => {
 
 
 
-  // Example array of users
-  // const users = [
-  //   { id: 1, vehicleNumber: "TN22 AV4455", avatar: images.truck },
-  //   { id: 2, vehicleNumber: "TN22 AV4455", avatar: images.truck },
-  //   { id: 3, vehicleNumber: "TN22 AV4455", avatar: images.truck },
-  //   { id: 4, vehicleNumber: "TN22 AV4455", avatar: images.truck },
-  //   { id: 5, vehicleNumber: "TN22 AV4455", avatar: images.truck },
-  //   { id: 6, vehicleNumber: "TN22 AV4455", avatar: images.truck },
-  //   { id: 7, vehicleNumber: "TN22 AV4455", avatar: images.truck },
-  //   { id: 8, vehicleNumber: "TN22 AV4455", avatar: images.truck },
-  //   { id: 9, vehicleNumber: "TN22 AV4455", avatar: images.truck },
-  // ];
   const [users, setUsers] = useState([])
 
 
@@ -47,7 +37,7 @@ const VehicleProfileDetails = () => {
       const getVehicleDetailsParams = {
         user_id: await AsyncStorage.getItem("user_id")
       }
-      const response = await axios.post("https://truck.truckmessage.com/get_user_profile", getVehicleDetailsParams)
+      const response = await axiosInstance.post("/get_user_profile", getVehicleDetailsParams)
 
       if (response.data.error_code === 0) {
         setUsers(response.data.data[0].vehicle_data)
@@ -64,27 +54,6 @@ const VehicleProfileDetails = () => {
 
 
 
-  // useEffect(() => {
-  //   const viewFullVehicleDetails = async () => {
-  //     const viewVehicleParams = {
-  //       "vehicle_no": `${vehicleNo}`
-  //     }
-  //     try {
-  //       const response = await axios.post("https://truck.truckmessage.com/get_vehicle_details", viewVehicleParams)
-  //       if (response.data.error_code === 0) {
-  //         setVehicleData(response.data.data)
-  //       } else {
-  //         console.log(response.data.message)
-  //       }
-  //     } catch (err) {
-  //       console.log(err)
-  //     }
-  //   }
-
-  //   (async => viewFullVehicleDetails())()
-
-
-  // }, [])
 
 
   const handleAddTruck = () => {
@@ -93,10 +62,6 @@ const VehicleProfileDetails = () => {
 
   const handleSubmit = async () => {
 
-    // if (!vehicleNumber.trim()) {
-    //   setIsInputValid(false);
-    //   return;
-    // }
     setPageLoading(true)
 
     const addTruckParams = {
@@ -104,12 +69,12 @@ const VehicleProfileDetails = () => {
       vehicle_no: `${vehicleNumber}`
     }
     try {
-      const response = await axios.post("https://truck.truckmessage.com/add_user_vehicle_details", addTruckParams)
+      const response = await axiosInstance.post("/add_user_vehicle_details", addTruckParams)
       if (response.data.error_code === 0) {
         Toast.success("Posted successfully")
 
 
-        // Reset state and close modal
+        // Reset state and close modal99
         setModalVisible(false);
         setVehicleNumber("");
         setIsInputValid(true);
@@ -125,25 +90,6 @@ const VehicleProfileDetails = () => {
       console.log(err)
     }
 
-
-
-  };
-
-  const handleViewVehicleDetails = async (vehicleNo) => {
-    // const viewVehicleParams = {
-    //   "vehicle_no": `${vehicleNo}`
-    // }
-
-    // try {
-    //   const response = await axios.post("https://truck.truckmessage.com/get_vehicle_details", viewVehicleParams)
-    //   if (response.data.error_code === 0) {
-    //     navigation.navigate("ViewFullDetails", { vehicleNo })
-    //   } else {
-    //     console.log(response.data.message)
-    //   }
-    // } catch (err) {
-    //   console.log(err)
-    // }
 
 
   };
@@ -222,7 +168,7 @@ const VehicleProfileDetails = () => {
                   <View style={styles.noResultContainer}>
                     <View>
                       <Image
-                        source={require("../../assets/images/Folder_empty.png")}
+                         source={{ uri: `${cdnLink}/Folder_empty.png` }}
                         width={50}
                         height={50}
                         resizeMode="center"
@@ -234,10 +180,6 @@ const VehicleProfileDetails = () => {
                   <>
                     {users.map((user, index) => (
                       <View key={index} style={styles.userCard}>
-                        {/* <Image
-                source={images.truck}
-                style={styles.userPhoto}
-              /> */}
                         <View style={styles.userInfo}>
                           <Text style={styles.vehicleNumber}>{user.vehicle_no}</Text>
                           <View style={{ marginBottom: 10 }}>
@@ -262,16 +204,6 @@ const VehicleProfileDetails = () => {
                           </View>
 
                         </View>
-                        {/* <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => handleViewVehicleDetails(user.vehicle_no)}
-              >
-                <Image
-                  source={images.editIcon}
-                  style={styles.icon}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity> */}
                         <TouchableOpacity
                           style={styles.editButton}
                           onPress={() => handleDeleteProfile(user.vehicle_no)}
@@ -448,7 +380,6 @@ const styles = StyleSheet.create({
     marginTop: -40,
     alignItems: 'center',
     justifyContent: 'center',
-    // flex:1,
   },
   noResultsText: {
     textAlign: "center",

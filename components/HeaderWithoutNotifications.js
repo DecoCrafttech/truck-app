@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    // backgroundColor: COLORS.gray,
   },
   icon: {
     height: 24,

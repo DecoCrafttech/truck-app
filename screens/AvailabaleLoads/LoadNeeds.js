@@ -16,15 +16,16 @@ import HeaderWithOutBS from "../../components/HeaderWithOutBS";
 import axiosInstance from "../../services/axiosInstance";
 import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ReactGoogleAutocomplete from "react-google-autocomplete";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import RNPickerSelect from 'react-native-picker-select';
 import { useNavigation } from "@react-navigation/native";
+import Constants from 'expo-constants'
 
 
 const LoadNeeds = () => {
 
-  const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+  // google api key
+  const googleApiKey = Constants.expoConfig?.extra?.REACT_APP_GOOGLE_PLACES_KEY
 
   const navigate = useNavigation("")
 
@@ -107,7 +108,6 @@ const LoadNeeds = () => {
         setIsLoading(!isLoading);
         Alert.alert("Post added successfully!");
         navigate.goBack()
-        // Optionally, reset the form fields after successful submission
         setCompanyName("");
         setContactNumber("");
         setFromLocation("");
@@ -152,7 +152,6 @@ const LoadNeeds = () => {
     setFromLocation(`${city}, ${state}`)
     setFromLocationModal(false)
 
-    // You can use the extracted details as needed
   };
 
 
@@ -241,7 +240,6 @@ const LoadNeeds = () => {
                 !fromLocationValid && { borderColor: "red" },
               ]}
               placeholder="Enter your location"
-              // onChangeText={setFromLocation}
               value={fromLocation}
               onPress={() => setFromLocationModal(true)}
             />
@@ -253,7 +251,6 @@ const LoadNeeds = () => {
                 !toLocationValid && { borderColor: "red" },
               ]}
               placeholder="Enter your location"
-              // onChangeText={setToLocation}
               value={toLocation}
               onPress={() => setToLocationModal(true)}
             />
@@ -276,15 +273,6 @@ const LoadNeeds = () => {
               keyboardType="number-pad"
             />
             <Text style={styles.label}>Truck Body Type</Text>
-            {/* <TextInput
-              style={[
-                styles.textInput,
-                !truckBodyTypeValid && { borderColor: "red" },
-              ]}
-              placeholder="Type of Truck Body"
-              onChangeText={setTruckBodyType}
-              value={truckBodyType}
-            /> */}
 
             <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
@@ -300,15 +288,7 @@ const LoadNeeds = () => {
             </View>
 
             <Text style={styles.label}>No. of Tyres</Text>
-            {/* <TextInput
-              style={[
-                styles.textInput,
-                !numberOfTyresValid && { borderColor: "red" },
-              ]}
-              placeholder="Number of Tyres"
-              onChangeText={setNumberOfTyres}
-              value={numberOfTyres}
-            /> */}
+
             <View style={{ borderColor: COLORS.gray, borderWidth: 1, padding: 0, borderRadius: 5, marginBottom: 10 }}>
               <RNPickerSelect
                 onValueChange={(value) => setNumberOfTyres(value)}
@@ -354,7 +334,6 @@ const LoadNeeds = () => {
         animationType="slide"
         transparent={true}
         visible={fromLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -369,7 +348,7 @@ const LoadNeeds = () => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location
@@ -394,7 +373,6 @@ const LoadNeeds = () => {
         animationType="slide"
         transparent={true}
         visible={toLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -409,7 +387,7 @@ const LoadNeeds = () => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location

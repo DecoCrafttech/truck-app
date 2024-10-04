@@ -32,13 +32,11 @@ const MileageForm = () => {
     const parsedPrice = parseFloat(price);
 
     if (isNaN(parsedDistance) || isNaN(parsedFuel) || isNaN(parsedPrice)) {
-      // Handle invalid input
       console.error("Please enter valid numbers");
       return;
     }
 
     if (parsedFuel === 0) {
-      // Handle zero fuel
       console.error(
         "Fuel amount cannot be zero. Please enter a valid fuel amount."
       );

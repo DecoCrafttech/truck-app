@@ -18,11 +18,14 @@ import { LoadNeedsContext } from "../../hooks/LoadNeedsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import RNPickerSelect from 'react-native-picker-select';
+import Constants from 'expo-constants'
 
 
 const DriverNeeds = () => {
 
-  const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+
+  // google api key
+  const googleApiKey = Constants.expoConfig?.extra?.REACT_APP_GOOGLE_PLACES_KEY
 
 
   const { isLoading, setIsLoading } = useContext(LoadNeedsContext);
@@ -49,7 +52,6 @@ const DriverNeeds = () => {
 
   const [vehicleListData, setVehicleListData] = useState([])
   const [vehicleFromDropdown, setVehicleFromDropdown] = useState("")
-  const [searchText, setSearchText] = useState('');  // To track the search text
 
   // State variables to track input field validity
   const [driverNameValid, setDriverNameValid] = useState(true);
@@ -204,7 +206,6 @@ const DriverNeeds = () => {
     setFromLocation(`${city}, ${state}`)
     setFromLocationModal(false)
 
-    // You can use the extracted details as needed
   };
 
 
@@ -342,7 +343,6 @@ const DriverNeeds = () => {
                 !fromLocationValid && { borderColor: "red" },
               ]}
               placeholder="Starting Location"
-              // onChangeText={setFromLocation}
               value={fromLocation}
               onPress={() => setFromLocationModal(true)}
             />
@@ -354,7 +354,6 @@ const DriverNeeds = () => {
                 !toLocationValid && { borderColor: "red" },
               ]}
               placeholder="Destination Location"
-              // onChangeText={setToLocation}
               value={toLocation}
               onPress={() => setToLocationModal(true)}
             />
@@ -423,7 +422,6 @@ const DriverNeeds = () => {
         animationType="slide"
         transparent={true}
         visible={fromLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -436,7 +434,7 @@ const DriverNeeds = () => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location
@@ -461,7 +459,6 @@ const DriverNeeds = () => {
         animationType="slide"
         transparent={true}
         visible={toLocationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -476,7 +473,7 @@ const DriverNeeds = () => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location

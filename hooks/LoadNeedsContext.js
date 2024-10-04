@@ -8,12 +8,7 @@ export const LoadNeedsProvider = ({ children }) => {
 
   const [aadhaarOTP, setAadhaarOTP] = useState("")
 
-  // const [messageReceiver, setMessageReceiver] = useState({
-  //   personId : "1",
-  //   personName : "Marshal",
-  //   personImage : require("../assets/images/apple.png"),
-  //   lastMessage : "heloo"
-  // })
+
   const [messageReceiver, setMessageReceiver] = useState(null)
   const [pageRefresh, setPageRefresh] = useState(false)
   const [userStatesFromProfile, setUserStatesFromProfile] = useState([])

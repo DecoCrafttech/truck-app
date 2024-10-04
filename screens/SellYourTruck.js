@@ -19,16 +19,16 @@ import axiosInstance from "../services/axiosInstance";
 import { LoadNeedsContext } from "../hooks/LoadNeedsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import { Picker } from "react-native-web";
-import { Dropdown } from "react-native-element-dropdown";
 import { useNavigation } from "@react-navigation/native";
 import RNPickerSelect from 'react-native-picker-select';
+import Constants from 'expo-constants'
 
 
 
 const SellYourTruck = () => {
 
-  const GOOLE_API_KEY = "AIzaSyCLT-nqnS-13nBpe-mqzJVsRK7RZIl3I5s"
+  // google api key
+  const googleApiKey = Constants.expoConfig?.extra?.REACT_APP_GOOGLE_PLACES_KEY
 
   const navigation = useNavigation("")
 
@@ -125,7 +125,6 @@ const SellYourTruck = () => {
     try {
 
 
-      console.log("formdata",formData)
 
       const response = await axiosInstance.post("/truck_buy_sell", formData, {
         headers: {
@@ -200,7 +199,6 @@ const SellYourTruck = () => {
 
     setLocation(`${city}, ${state}`)
     setLocationModal(false)
-    // You can use the extracted details as needed
   };
 
   const brandData = [
@@ -220,38 +218,7 @@ const SellYourTruck = () => {
     { label: 'Others', value: 'Others' },
   ]
 
-  const kmsData = [
-    { label: '0 - 10,000 kms', value: '(0 - 10,000) kms' },
-    { label: '10,001 - 30,000 kms', value: '(10,001 - 30,000) kms' },
-    { label: '30,001 - 50,000 kms', value: '(30,001 - 50,000) kms' },
-    { label: '50,001 - 70,000 kms', value: '(50,001 - 70,000) kms' },
-    { label: '70,001 - 100,000 kms', value: '(70,001 - 100,000) kms' },
-    { label: '100,001 - 150,000 kms', value: '(100,001 - 150,000) kms' },
-    { label: '150,001 - 200,000 kms', value: '(150,001 - 200,000) kms' },
-    { label: '200,001 - 300,000 kms', value: '(200,001 - 300,000) kms' },
-    { label: '300,001 - 500,000 kms', value: '(300,001 - 500,000) kms' },
-    { label: '500,001 - 700,000 kms', value: '(500,001 - 700,000) kms' },
-    { label: '700,001 - 1,000,000 kms', value: '(700,001 - 1,000,000) kms' },
-    { label: '1,000,001 - 1,500,000 kms', value: '(1,000,001 - 1,500,000) kms' },
-    { label: '1,500,001 - 2,000,000 kms', value: '(1,500,001 - 2,000,000) kms' },
-    { label: '2,000,001+ kms', value: '(2,000,001+) kms' }
-  ];
-
-
-  const priceData = [
-    { label: '0 - 5,00,000 lakhs', value: '(0 - 5,00,000) lakhs' },
-    { label: '5,00,001 - 10,00,000 lakhs', value: '(5,00,001 - 10,00,000) lakhs' },
-    { label: '10,00,001 - 20,00,000 lakhs', value: '(10,00,001 - 20,00,000) lakhs' },
-    { label: '20,00,001 - 30,00,000 lakhs', value: '(20,00,001 - 30,00,000) lakhs' },
-    { label: '30,00,001 - 40,00,000 lakhs', value: '(30,00,001 - 40,00,000) lakhs' },
-    { label: '40,00,001 - 50,00,000 lakhs', value: '(40,00,001 - 50,00,000) lakhs' },
-    { label: '50,00,001 - 60,00,000 lakhs', value: '(50,00,001 - 60,00,000) lakhs' },
-    { label: '60,00,001 - 70,00,000 lakhs', value: '(60,00,001 - 70,00,000) lakhs' },
-    { label: '70,00,001 - 80,00,000 lakhs', value: '(70,00,001 - 80,00,000) lakhs' },
-    { label: '80,00,001 - 90,00,000 lakhs', value: '(80,00,001 - 90,00,000) lakhs' },
-    { label: '90,00,001 and above lakhs', value: '(90,00,001 and above) lakhs' }
-  ];
-
+  
   const bodyTypeData = [
     { label: 'Open body', value: 'open_body' },
     { label: 'Container', value: 'container' },
@@ -379,15 +346,6 @@ const SellYourTruck = () => {
             />
 
 
-
-
-
-
-
-
-
-
-
             <Text style={styles.label}>Location</Text>
             <TextInput
               style={[
@@ -474,7 +432,6 @@ const SellYourTruck = () => {
         animationType="slide"
         transparent={true}
         visible={locationModal}
-      // onRequestClose={() => setIsAadhaarModal(false)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -489,7 +446,7 @@ const SellYourTruck = () => {
                   autoFocus: true,
                 }}
                 query={{
-                  key: GOOLE_API_KEY, // Use your hardcoded key if Config is not working
+                  key: googleApiKey, // Use your hardcoded key if Config is not working
                   language: 'en',
                 }}
                 fetchDetails={true} // This ensures that you get more detailed information about the selected location

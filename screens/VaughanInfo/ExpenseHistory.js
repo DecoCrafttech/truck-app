@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, FlatList, TextInput } from "react-native";
+import { StyleSheet, Text, View, FlatList } from "react-native";
 import { COLORS } from "../../constants";
 
 const ExpenseHistory = ({ cashFlowExpenseHistory }) => {
@@ -10,16 +10,6 @@ const ExpenseHistory = ({ cashFlowExpenseHistory }) => {
   useEffect(() => {
     setFilteredData(cashFlowExpenseHistory);
   }, [cashFlowExpenseHistory]);
-
-  // Update filteredData based on searchQuery
-  const handleSearch = (text) => {
-    setSearchQuery(text);
-    const filtered = cashFlowExpenseHistory.filter(item =>
-      item.category.toLowerCase().includes(text.toLowerCase())
-    );
-    setFilteredData(filtered);
-  };
-
 
 
   const renderContent = () => {
@@ -34,12 +24,6 @@ const ExpenseHistory = ({ cashFlowExpenseHistory }) => {
     } else {
       return (
         <View style={styles.container}>
-          {/* <TextInput
-            style={styles.searchInput}
-            placeholder="Search by category..."
-            value={searchQuery}
-            onChangeText={handleSearch}
-          /> */}
           <FlatList
             style={styles.root}
             data={filteredData}
@@ -137,7 +121,6 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
     borderWidth: 1,
     paddingHorizontal: 20,
-    // marginBottom: 10,
   },
 });
 
