@@ -27,7 +27,7 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.mash1221.truckmessage</string>
+          <string>com.mrdesigner.truckmessage</string>
         </array>
       </dict>
     </array>

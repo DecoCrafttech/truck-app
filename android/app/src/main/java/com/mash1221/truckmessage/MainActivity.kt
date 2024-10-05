@@ -1,4 +1,4 @@
-package com.mash1221.truckmessage
+package com.mrdesigner.truckmessage
 
 import android.os.Build
 import android.os.Bundle

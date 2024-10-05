@@ -12,11 +12,7 @@
     },
     "production": {
       "android": {
-        "buildType": "apk",
-        "resourceClass": "large"  
-      },
-      "ios": {
-        "resourceClass": "large"  
+        "buildType": "apk"
       }
     }
   },

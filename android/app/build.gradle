@@ -111,7 +111,7 @@ android {
 
     namespace "com.truckmessage"
     defaultConfig {
-        applicationId 'com.mash1221.truckmessage'
+        applicationId 'com.mrdesigner.truckmessage'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
