@@ -109,7 +109,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.truckmessage"
+    namespace 'com.mrdesigner.truckmessage'
     defaultConfig {
         applicationId 'com.mrdesigner.truckmessage'
         minSdkVersion rootProject.ext.minSdkVersion
